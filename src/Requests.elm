@@ -5,17 +5,7 @@ import Json.Encode as Encode
 import Json.Decode as Decode exposing (Decoder, field)
 import Types exposing (Query, Event, decodeQuery)
 import Date
-import Http exposing (Error)
-
-type alias Group =
-    { name : String
-    , slug : String
-    }
-
-type Msg
-    = GraphQlMsg (Result Error Query)
-    | SetDate Date.Date
-    | SetGroup String
+import Update exposing (Msg(..))
 
 
 planningRequest : GraphQl.Value GraphQl.Root
