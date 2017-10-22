@@ -23,7 +23,7 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         SetDate date ->
-            ( { model | date = Just date }, createPLanningRequest date model.selectedGroup.slug)
+            ( { model | date = Just date }, createPlanningRequest date model.selectedGroup.slug)
 
         GraphQlMsg response ->
             ( { model | data = Just response, loading = False }, Cmd.none )
@@ -39,7 +39,7 @@ update msg model =
                     else
                         case model.date of
                             Just date ->
-                                createPLanningRequest date slug
+                                createPlanningRequest date slug
 
                             Nothing ->
                                 Cmd.none
@@ -48,8 +48,8 @@ update msg model =
                 ( { model | selectedGroup = group, loading = True }, cmd )
 
 
-createPLanningRequest: Date.Date -> String -> Cmd Msg
-createPLanningRequest date slug =
+createPlanningRequest: Date.Date -> String -> Cmd Msg
+createPlanningRequest date slug =
     -- sendRequest (toDatetime (Dateextra.add Dateextra.Month -7 date)) (toDatetime (Dateextra.add Dateextra.Month 7 date)) [ slug ]
     -- sendRequest (toDatetime date) (toDatetime (Dateextra.add Dateextra.Week 1 date)) [ slug ]
     Task.succeed (GraphQlMsg ( Ok createFakeQuery ) ) |> Task.perform identity
