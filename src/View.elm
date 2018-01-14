@@ -8,7 +8,7 @@ import Html.Events exposing (on, targetValue)
 import Json.Decode as Json
 
 import Model exposing ( Model, Group, allGroups, toDatetime )
-import Update exposing ( Msg(..) )
+import Requests exposing ( Msg(..) )
 import Types exposing (..)
 
 ---- VIEW ----

@@ -6,7 +6,8 @@ import Task
 
 import View exposing (view)
 import Model exposing (Model, initialModel)
-import Update exposing ( update, Msg(..) )
+import Update exposing ( update )
+import Requests exposing ( Msg(..) )
 
 
 ---- PROGRAM ----

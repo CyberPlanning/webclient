@@ -1,22 +1,14 @@
 module Update exposing (..)
 
 import Date
-import Task
-import Http exposing (Error)
+import Date.Extra as Dateextra
 
-import Model exposing (Model, allGroups)
-import Types exposing (Query)
+import Model exposing (Model, allGroups, toDatetime)
 
-import FakeQuery exposing (createFakeQuery)
+import Requests exposing (sendRequest, Msg(..))
 
 
 ---- UPDATE ----
-
-
-type Msg
-    = GraphQlMsg (Result Error Query)
-    | SetDate Date.Date
-    | SetGroup String
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -51,8 +43,8 @@ update msg model =
 createPlanningRequest: Date.Date -> String -> Cmd Msg
 createPlanningRequest date slug =
     -- sendRequest (toDatetime (Dateextra.add Dateextra.Month -7 date)) (toDatetime (Dateextra.add Dateextra.Month 7 date)) [ slug ]
-    -- sendRequest (toDatetime date) (toDatetime (Dateextra.add Dateextra.Week 1 date)) [ slug ]
-    Task.succeed (GraphQlMsg ( Ok createFakeQuery ) ) |> Task.perform identity
+    sendRequest (toDatetime date) (toDatetime (Dateextra.add Dateextra.Week 1 date)) [ slug ]
+    -- Task.succeed (GraphQlMsg ( Ok createFakeQuery ) ) |> Task.perform identity
 
 
 find : (a -> Bool) -> List a -> Maybe a

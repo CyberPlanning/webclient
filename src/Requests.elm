@@ -5,7 +5,13 @@ import Json.Encode as Encode
 import Json.Decode as Decode exposing (Decoder, field)
 import Types exposing (Query, Event, decodeQuery)
 import Date
-import Update exposing (Msg(..))
+import Http exposing (Error)
+
+
+type Msg
+    = GraphQlMsg (Result Error Query)
+    | SetDate Date.Date
+    | SetGroup String
 
 
 planningRequest : GraphQl.Value GraphQl.Root
@@ -34,7 +40,8 @@ planningRequest =
 
 baseRequest : GraphQl.Value GraphQl.Root -> Decoder a -> GraphQl.Request a
 baseRequest =
-  GraphQl.query "http://ensibs.planningiut.fr/graphql/"
+  GraphQl.query "http://localhost:3001/graphql/"
+  -- GraphQl.query "http://ensibs.planningiut.fr/graphql/"
 
 
 sendRequest : String -> String -> List String -> Cmd Msg
