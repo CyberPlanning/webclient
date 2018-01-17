@@ -92,7 +92,7 @@ secondDateParser =
 viewHeader: Group -> List Group -> Html Msg
 viewHeader selected groups=
     div []
-        [ h2 [] [ text <| "Salut " ++ selected.name ++ " voila tes cours :" ]
+        [ h2 [] [ text <| "Salut " ++ selected.name ++ " voila tes cours connard:" ]
         , select [ on "change" <| Json.map SetGroup targetValue ] 
                  (List.map optionGroup groups)
         ]
