@@ -1,5 +1,6 @@
 module Model exposing (..)
 
+import String exposing(dropRight)
 import Date
 import Date.Extra as Dateextra
 
@@ -35,8 +36,12 @@ allGroups =
     ]
 
 toDatetime : Date.Date -> String
-toDatetime =
-    Dateextra.toFormattedString "y-MM-dd"
+toDatetime date =
+    date
+    |> Dateextra.add Dateextra.Hour -1
+    |> Dateextra.toUtcIsoString
+    |> dropRight 1
+    -- Dateextra.toFormattedString "y-MM-ddTHH:mm:ss.000"
 
 
 initialModel : Model
