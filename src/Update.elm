@@ -7,6 +7,8 @@ import Model exposing (Model, allGroups, toDatetime)
 
 import Requests exposing (sendRequest, Msg(..))
 
+import Calendar.Calendar as Calendar
+
 
 ---- UPDATE ----
 
@@ -15,7 +17,7 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         SetDate date ->
-            ( { model | date = Just date }, createPlanningRequest date model.selectedGroup.slug)
+            ( { model | date = Just date, calendarState = Calendar.init Calendar.Week date }, createPlanningRequest date model.selectedGroup.slug)
 
         GraphQlMsg response ->
             ( { model | data = Just response, loading = False }, Cmd.none )
@@ -39,6 +41,24 @@ update msg model =
             in
                 ( { model | selectedGroup = group, loading = True }, cmd )
 
+        SetCalendarState calendarMsg ->
+            let
+                ( updatedCalendar, maybeMsg ) =
+                    Calendar.update eventConfig timeSlotConfig calendarMsg model.calendarState
+
+                newModel =
+                    { model | calendarState = updatedCalendar }
+            in
+                case maybeMsg of
+                    Nothing ->
+                        ( newModel, Cmd.none )
+
+                    Just updateMsg ->
+                        update updateMsg newModel
+
+        SelectDate date ->
+            ( model, Cmd.none )
+
 
 createPlanningRequest: Date.Date -> String -> Cmd Msg
 createPlanningRequest date slug =
@@ -58,3 +78,27 @@ find predicate list =
                 Just first
             else
                 find predicate rest
+
+
+eventConfig : Calendar.EventConfig Msg
+eventConfig =
+    Calendar.eventConfig
+        { onClick = \_ -> Nothing
+        , onMouseEnter = \_ -> Nothing
+        , onMouseLeave = \_ -> Nothing
+        , onDragStart = \_ -> Nothing
+        , onDragging = \_ _ -> Nothing
+        , onDragEnd = \_ _ -> Nothing
+        }
+
+
+timeSlotConfig : Calendar.TimeSlotConfig Msg
+timeSlotConfig =
+    Calendar.timeSlotConfig
+        { onClick = \date pos -> Just <| SelectDate date
+        , onMouseEnter = \_ _ -> Nothing
+        , onMouseLeave = \_ _ -> Nothing
+        , onDragStart = \_ _ -> Nothing
+        , onDragging = \_ _ -> Nothing
+        , onDragEnd = \_ _ -> Nothing
+        }

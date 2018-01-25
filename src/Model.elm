@@ -4,6 +4,9 @@ import String exposing(dropRight)
 import Date
 import Date.Extra as Dateextra
 
+import Calendar.Calendar as Calendar
+import Fixtures
+
 import Http exposing (Error)
 import Types exposing (Query)
 
@@ -18,6 +21,7 @@ type alias Model =
     , date : Maybe Date.Date
     , selectedGroup : Group
     , loading : Bool
+    , calendarState : Calendar.State
     }
 
 type alias Group =
@@ -50,4 +54,5 @@ initialModel =
     , date = Nothing
     , selectedGroup = { name = "Cyber1 TD2", slug = "12" }
     , loading = False
+    , calendarState = Calendar.init Calendar.Week ( Dateextra.fromParts 2018 Date.Jan 1 1 0 0 0 )
     }

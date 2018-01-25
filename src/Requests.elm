@@ -7,11 +7,14 @@ import Types exposing (Query, Event, decodeQuery)
 import Date
 import Http exposing (Error)
 
+import Calendar.Calendar as Calendar
 
 type Msg
     = GraphQlMsg (Result Error Query)
     | SetDate Date.Date
     | SetGroup String
+    | SetCalendarState Calendar.Msg
+    | SelectDate Date.Date
 
 
 planningRequest : GraphQl.Value GraphQl.Root

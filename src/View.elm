@@ -3,13 +3,15 @@ module View exposing (..)
 import Date
 import Date.Extra as Dateextra
 import Html exposing (..)
-import Html.Attributes exposing (value)
+import Html.Attributes exposing (..)
 import Html.Events exposing (on, targetValue)
 import Json.Decode as Json
 
 import Model exposing ( Model, Group, allGroups, toDatetime )
 import Requests exposing ( Msg(..) )
 import Types exposing (..)
+
+import Calendar.Calendar as Calendar
 
 ---- VIEW ----
 
@@ -25,13 +27,23 @@ view model =
                 Nothing ->
                     "Nothing"
 
+        events = case model.data of
+                Just (Ok query) ->
+                    if List.isEmpty query.planning.events then
+                        []
+                    else
+                        query.planning.events
+
+                _ ->
+                    []
+
         planning =
             case model.data of
                 Just (Ok query) ->
                     if List.isEmpty query.planning.events then
                         text "Vide :("
                     else
-                        viewPlanning query
+                        viewPlanning query.planning.events
 
                 Just (Err error) ->
                     text <| toString error
@@ -47,12 +59,14 @@ view model =
                 [ model.loading |> toString |> text ]
             , div []
                 [ planning ]
+            , div []
+                [ Html.map SetCalendarState (Calendar.view viewConfig events model.calendarState) ]
             ]
 
 
-viewPlanning : Query -> Html Msg
-viewPlanning query =
-    div [] <| List.map viewEvent query.planning.events
+viewPlanning : List Event -> Html Msg
+viewPlanning events =
+    div [] <| List.map viewEvent events
 
 
 viewEvent: Event -> Html Msg
@@ -93,7 +107,7 @@ viewHeader: Group -> List Group -> Html Msg
 viewHeader selected groups=
     div []
         [ h2 [] [ text <| "Salut " ++ selected.name ++ " voila tes cours connard:" ]
-        , select [ on "change" <| Json.map SetGroup targetValue ] 
+        , select [ on "change" <| Json.map SetGroup targetValue, value selected.slug ] 
                  (List.map optionGroup groups)
         ]
 
@@ -102,3 +116,33 @@ optionGroup: Group -> Html Msg
 optionGroup group =
     option [ value group.slug ]
            [ text group.name ]
+
+
+parseDateEvent: (Event -> String) -> Event -> Date.Date
+parseDateEvent date ev =
+    (date ev) ++ "Z"
+    |> Dateextra.fromIsoString
+    |> Maybe.withDefault (Date.fromTime 0)
+
+
+viewConfig : Calendar.ViewConfig Event
+viewConfig =
+    Calendar.viewConfig
+        { toId = .title
+        , title = .title
+        , start = parseDateEvent .startDate
+        , end = parseDateEvent .endDate
+        , event =
+            \event isSelected ->
+                Calendar.eventView
+                    { nodeName = "div"
+                    , classes =
+                        [ ( "elm-calendar--event-content", True )
+                        , ( "elm-calendar--event-content--is-selected", isSelected )
+                        ]
+                    , children =
+                        [ div []
+                            [ text <| event.title ]
+                        ]
+                    }
+        }
