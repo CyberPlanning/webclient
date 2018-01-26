@@ -5,10 +5,8 @@ import Mouse
 
 
 type TimeSpan
-    = Month
-    | Week
+    = Week
     | Day
-    | Agenda
 
 
 type Msg

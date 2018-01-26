@@ -57,12 +57,12 @@ view config events selectedId viewing =
 viewWeekHeader : List Date -> Html Msg
 viewWeekHeader days =
     div [ class "elm-calendar--week-header" ]
-        [ viewDates days
-        , viewAllDayCell days
-        ]
+        [ viewDates days ]
 
 
 viewDates : List Date -> Html Msg
 viewDates days =
-    div [ class "elm-calendar--dates" ]
-        (viewTimeGutterHeader :: List.map viewDate days)
+    div [ class "elm-calendar--dates-header" ]
+        [ viewTimeGutterHeader
+        , div [ class "elm-calendar--dates" ] <| List.map viewDate days
+        ]

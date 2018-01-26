@@ -51,22 +51,16 @@ view model =
                 Nothing ->
                     text "Loading"
     in
-        div []
+        div [ class "main--container"]
             [ viewHeader model.selectedGroup allGroups
-            , div []
-                [ datetime |> toString |> text ]
-            , div []
-                [ model.loading |> toString |> text ]
-            , div []
-                [ planning ]
-            , div []
+            , div [ class "main--calendar" ]
                 [ Html.map SetCalendarState (Calendar.view viewConfig events model.calendarState) ]
             ]
 
 
 viewPlanning : List Event -> Html Msg
 viewPlanning events =
-    div [] <| List.map viewEvent events
+    div [] <| List.map (Debug.log "" >> viewEvent) events
 
 
 viewEvent: Event -> Html Msg
@@ -106,10 +100,7 @@ secondDateParser =
 viewHeader: Group -> List Group -> Html Msg
 viewHeader selected groups=
     div []
-        [ h2 [] [ text <| "Salut " ++ selected.name ++ " voila tes cours connard:" ]
-        , select [ on "change" <| Json.map SetGroup targetValue, value selected.slug ] 
-                 (List.map optionGroup groups)
-        ]
+        [ select [ on "change" <| Json.map SetGroup targetValue, value selected.slug ] (List.map optionGroup groups) ]
 
 
 optionGroup: Group -> Html Msg

@@ -6,9 +6,7 @@ import Html.Events exposing (..)
 import Date exposing (Date)
 import Date.Extra
 import Calendar.Config exposing (ViewConfig, EventConfig, TimeSlotConfig)
-import Calendar.Agenda as Agenda
 import Calendar.Day as Day
-import Calendar.Month as Month
 import Calendar.Week as Week
 import Calendar.Msg exposing (Msg(..), TimeSpan(..))
 import Mouse
@@ -147,17 +145,12 @@ getTimeDiffForPosition xy state =
                 |> (*) Time.minute
                 |> (*) 30
     in
-        case state.timeSpan of
-            Month ->
+        case state.dragState of
+            Just drag ->
+                timeDiff drag
+
+            Nothing ->
                 0
-
-            _ ->
-                case state.dragState of
-                    Just drag ->
-                        timeDiff drag
-
-                    Nothing ->
-                        0
 
 
 page : Int -> State -> State
@@ -173,9 +166,6 @@ page step state =
             Day ->
                 { state | viewing = Date.Extra.add Date.Extra.Day step viewing }
 
-            _ ->
-                { state | viewing = Date.Extra.add Date.Extra.Month step viewing }
-
 
 changeTimeSpan : TimeSpan -> State -> State
 changeTimeSpan timeSpan state =
@@ -187,17 +177,11 @@ view config events { viewing, timeSpan, selected } =
     let
         calendarView =
             case timeSpan of
-                Month ->
-                    Month.view config events selected viewing
-
                 Week ->
                     Week.view config events selected viewing
 
                 Day ->
                     Day.view config events selected viewing
-
-                Agenda ->
-                    Agenda.view config events viewing
     in
         div
             [ class "elm-calendar--container"
@@ -236,10 +220,8 @@ viewPagination =
 viewTimeSpanSelection : TimeSpan -> Html Msg
 viewTimeSpanSelection timeSpan =
     div [ class "elm-calendar--time-spans" ]
-        [ button [ class "elm-calendar--button", onClick (ChangeTimeSpan Month) ] [ text "Month" ]
-        , button [ class "elm-calendar--button", onClick (ChangeTimeSpan Week) ] [ text "Week" ]
+        [ button [ class "elm-calendar--button", onClick (ChangeTimeSpan Week) ] [ text "Week" ]
         , button [ class "elm-calendar--button", onClick (ChangeTimeSpan Day) ] [ text "Day" ]
-        , button [ class "elm-calendar--button", onClick (ChangeTimeSpan Agenda) ] [ text "Agenda" ]
         ]
 
 

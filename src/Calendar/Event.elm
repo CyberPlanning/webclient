@@ -93,73 +93,13 @@ eventStyling config event eventRange timeSpan customClasses =
 
         styles =
             case timeSpan of
-                Month ->
-                    style []
-
                 Week ->
                     style []
 
                 Day ->
                     styleDayEvent eventStart eventEnd
-
-                Agenda ->
-                    style []
     in
         [ classList (( classes, True ) :: customClasses), styles ]
-
-
-maybeViewMonthEvent : ViewConfig event -> event -> Maybe String -> EventRange -> Maybe (Html Msg)
-maybeViewMonthEvent config event selectedId eventRange =
-    case eventRange of
-        ExistsOutside ->
-            Nothing
-
-        _ ->
-            Just <| viewMonthEvent config event selectedId eventRange
-
-
-viewMonthEvent : ViewConfig event -> event -> Maybe String -> EventRange -> Html Msg
-viewMonthEvent config event selectedId eventRange =
-    let
-        eventStart =
-            config.start event
-
-        eventEnd =
-            config.end event
-
-        numDaysThisWeek =
-            case eventRange of
-                StartsAndEnds ->
-                    Date.Extra.diff Date.Extra.Day eventStart eventEnd + 1
-
-                ContinuesAfter ->
-                    7 - (Date.Extra.weekdayNumber eventStart) + 1
-
-                ContinuesPrior ->
-                    7 - (Date.Extra.weekdayNumber eventEnd) + 1
-
-                ContinuesAfterAndPrior ->
-                    7
-
-                ExistsOutside ->
-                    0
-
-        eventWidthPercentage eventRange =
-            (numDaysThisWeek
-                |> toFloat
-                |> (*) cellWidth
-                |> toString
-            )
-                ++ "%"
-    in
-        if offsetLength eventStart > 0 then
-            div [ class "elm-calendar--row" ]
-                [ rowSegment (offsetPercentage eventStart) []
-                , rowSegment (eventWidthPercentage eventRange) [ eventSegment config event selectedId eventRange Month ]
-                ]
-        else
-            div [ class "elm-calendar--row" ]
-                [ rowSegment (eventWidthPercentage eventRange) [ eventSegment config event selectedId eventRange Month ] ]
 
 
 (=>) : a -> b -> ( a, b )
@@ -167,14 +107,19 @@ viewMonthEvent config event selectedId eventRange =
     (,)
 
 
+percentDay: Date -> Float -> Float -> Float
+percentDay date min max = 
+    ((Date.Extra.fractionalDay date) - min ) / (max-min)
+
+
 styleDayEvent : Date -> Date -> Html.Attribute msg
 styleDayEvent start end =
     let
         startPercent =
-            100 * (Date.Extra.fractionalDay start)
+            100 * percentDay start (7/24) (20/24)
 
         endPercent =
-            100 * (Date.Extra.fractionalDay end)
+            100 * percentDay end (7/24) (20/24)
 
         height =
             (toString <| endPercent - startPercent) ++ "%"
@@ -185,8 +130,8 @@ styleDayEvent start end =
         style
             [ "top" => startPercentage
             , "height" => height
-            , "left" => "0%"
-            , "width" => "90%"
+            , "left" => "2%"
+            , "width" => "96%"
             , "position" => "absolute"
             ]
 

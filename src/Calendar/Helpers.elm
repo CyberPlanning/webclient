@@ -25,10 +25,10 @@ hours date =
             bumpMidnightBoundary date
 
         midnight =
-            Date.Extra.floor Date.Extra.Day day
+            Date.Extra.floor Date.Extra.Day day |> Date.Extra.add Date.Extra.Hour 7
 
         lastHour =
-            Date.Extra.ceiling Date.Extra.Day day
+            Date.Extra.ceiling Date.Extra.Day day |> Date.Extra.add Date.Extra.Hour -4
     in
         Date.Extra.range Date.Extra.Hour 1 midnight lastHour
 
@@ -53,5 +53,5 @@ dayRangeOfWeek : Date -> List Date
 dayRangeOfWeek date =
     Date.Extra.range Date.Extra.Day
         1
-        (Date.Extra.floor Date.Extra.Sunday date)
-        (Date.Extra.ceiling Date.Extra.Sunday date)
+        (Date.Extra.floor Date.Extra.Monday date)
+        (Date.Extra.ceiling Date.Extra.Saturday date)

@@ -58,10 +58,8 @@ type State
 {-| All the time spans
 -}
 type TimeSpan
-    = Month
-    | Week
+    = Week
     | Day
-    | Agenda
 
 
 {-| Somehow update plz
@@ -225,14 +223,8 @@ subscriptions (State state) =
 toInternalTimespan : TimeSpan -> InternalMsg.TimeSpan
 toInternalTimespan timeSpan =
     case timeSpan of
-        Month ->
-            InternalMsg.Month
-
         Week ->
             InternalMsg.Week
 
         Day ->
             InternalMsg.Day
-
-        Agenda ->
-            InternalMsg.Agenda
