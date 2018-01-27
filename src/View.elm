@@ -121,6 +121,9 @@ viewConfig =
     Calendar.viewConfig
         { toId = .title
         , title = .title
+        , classrooms = .classrooms
+        , teachers = .teachers
+        , groups = .groups
         , start = parseDateEvent .startDate
         , end = parseDateEvent .endDate
         , event =
@@ -132,8 +135,10 @@ viewConfig =
                         , ( "elm-calendar--event-content--is-selected", isSelected )
                         ]
                     , children =
-                        [ div []
-                            [ text <| event.title ]
+                        [ div [] [ text <| event.title ]
+                        , div [ class "elm-calendar--event-sub" ] [ text <| String.join "," event.classrooms ]
+                        , div [ class "elm-calendar--event-sub" ] [ text <| String.join "," event.teachers ]
+                        , div [ class "elm-calendar--event-sub" ] [ text <| String.join "," event.groups ]
                         ]
                     }
         }

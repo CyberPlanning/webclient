@@ -51,7 +51,12 @@ weekRangesFromMonth year month =
 
 dayRangeOfWeek : Date -> List Date
 dayRangeOfWeek date =
-    Date.Extra.range Date.Extra.Day
-        1
-        (Date.Extra.floor Date.Extra.Monday date)
-        (Date.Extra.ceiling Date.Extra.Saturday date)
+    let
+        weekDate = date
+                 |> Date.Extra.add Date.Extra.Day 2
+                 |> Date.Extra.floor Date.Extra.Monday
+    in
+        Date.Extra.range Date.Extra.Day
+            1
+            (Date.Extra.floor Date.Extra.Monday weekDate)
+            (Date.Extra.ceiling Date.Extra.Saturday weekDate)

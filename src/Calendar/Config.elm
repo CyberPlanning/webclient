@@ -19,6 +19,9 @@ type alias ViewConfig event =
     , title : event -> String
     , start : event -> Date
     , end : event -> Date
+    , classrooms : event -> (List String)
+    , teachers : event -> (List String)
+    , groups : event -> (List String)
     , event : event -> Bool -> EventView
     }
 

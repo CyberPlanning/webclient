@@ -1,7 +1,7 @@
 module Main exposing (..)
 
 import Html
-import Date
+import Window
 import Task
 
 import View exposing (view)
@@ -15,7 +15,7 @@ import Requests exposing ( Msg(..) )
 
 init : ( Model, Cmd Msg )
 init =
-    ( initialModel, Date.now |> Task.perform SetDate )
+    ( initialModel, Task.perform WindowSize Window.size )
 
 
 main : Program Never Model Msg

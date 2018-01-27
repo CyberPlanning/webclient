@@ -10,6 +10,7 @@ import Calendar.Config exposing (ViewConfig)
 import Json.Decode as Json
 import Mouse
 import Calendar.Helpers as Helpers
+import MD5
 
 
 type EventRange
@@ -74,6 +75,9 @@ eventStyling config event eventRange timeSpan customClasses =
         eventEnd =
             config.end event
 
+        eventId =
+            config.toId event
+
         classes =
             case eventRange of
                 StartsAndEnds ->
@@ -97,7 +101,7 @@ eventStyling config event eventRange timeSpan customClasses =
                     style []
 
                 Day ->
-                    styleDayEvent eventStart eventEnd
+                    styleDayEvent eventStart eventEnd eventId
     in
         [ classList (( classes, True ) :: customClasses), styles ]
 
@@ -112,8 +116,8 @@ percentDay date min max =
     ((Date.Extra.fractionalDay date) - min ) / (max-min)
 
 
-styleDayEvent : Date -> Date -> Html.Attribute msg
-styleDayEvent start end =
+styleDayEvent : Date -> Date -> String -> Html.Attribute msg
+styleDayEvent start end id =
     let
         startPercent =
             100 * percentDay start (7/24) (20/24)
@@ -126,6 +130,11 @@ styleDayEvent start end =
 
         startPercentage =
             (toString startPercent) ++ "%"
+
+        bgColor =
+            MD5.hex id
+            |> String.right 6
+            |> (++) "#"
     in
         style
             [ "top" => startPercentage
@@ -133,6 +142,7 @@ styleDayEvent start end =
             , "left" => "2%"
             , "width" => "96%"
             , "position" => "absolute"
+            , "background-color" => bgColor
             ]
 
 

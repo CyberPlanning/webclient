@@ -199,7 +199,6 @@ viewToolbar viewing timeSpan =
     div [ class "elm-calendar--toolbar" ]
         [ viewPagination
         , viewTitle viewing
-        , viewTimeSpanSelection timeSpan
         ]
 
 

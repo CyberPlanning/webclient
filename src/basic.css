@@ -14,14 +14,14 @@
 
 .elm-calendar--toolbar {
   display: flex;
-  flex-direction: column;
+  /* flex-direction: column; */
   position: relative;
   width: 100%;
   margin-bottom: 1rem;
 }
 
 .elm-calendar--paginators {
-  position: absolute;
+  /* position: absolute; */
 }
 
 .elm-calendar--time-spans {
@@ -29,8 +29,12 @@
   right: 0;
 }
 
+.elm-calendar--month-title {
+  flex: 1;
+}
+
 .elm-calendar--month-title h2 {
-  margin: 5px 0;
+  margin: 0;
 }
 
 .elm-calendar--date-cell {
@@ -160,6 +164,10 @@
   overflow: hidden; */
 }
 
+.elm-calendar--event-sub {
+  font-size: 11px;
+}
+
 .elm-calendar--event {
   font-size: 14px;  
   padding: 2px 5px;
@@ -193,5 +201,5 @@
 .elm-calendar--agenda-times {}
 
 .elm-calendar--event-content--is-selected {
-  background-color: rgb(52, 112, 182);
+  /* background-color: rgb(52, 112, 182); */
 }

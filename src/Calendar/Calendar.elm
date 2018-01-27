@@ -147,10 +147,13 @@ viewConfig :
     , title : event -> String
     , start : event -> Date
     , end : event -> Date
+    , classrooms : event -> (List String)
+    , teachers : event -> (List String)
+    , groups : event -> (List String)
     , event : event -> Bool -> EventView
     }
     -> ViewConfig event
-viewConfig { toId, title, start, end, event } =
+viewConfig { toId, title, start, end, classrooms, teachers, groups, event } =
     let
         extractEventView eventView =
             case eventView of
@@ -165,6 +168,9 @@ viewConfig { toId, title, start, end, event } =
             , title = title
             , start = start
             , end = end
+            , classrooms = classrooms
+            , teachers = teachers
+            , groups = groups
             , event = eventView
             }
 

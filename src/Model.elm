@@ -3,9 +3,9 @@ module Model exposing (..)
 import String exposing(dropRight)
 import Date
 import Date.Extra as Dateextra
+import Window
 
 import Calendar.Calendar as Calendar
-import Fixtures
 
 import Http exposing (Error)
 import Types exposing (Query)
@@ -22,6 +22,7 @@ type alias Model =
     , selectedGroup : Group
     , loading : Bool
     , calendarState : Calendar.State
+    , size : Window.Size
     }
 
 type alias Group =
@@ -55,4 +56,5 @@ initialModel =
     , selectedGroup = { name = "Cyber1 TD2", slug = "12" }
     , loading = False
     , calendarState = Calendar.init Calendar.Week ( Dateextra.fromParts 2018 Date.Jan 1 1 0 0 0 )
+    , size = { width = 1200, height = 800 }
     }

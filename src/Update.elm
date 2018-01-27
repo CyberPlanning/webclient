@@ -1,12 +1,11 @@
 module Update exposing (..)
 
+import Task
 import Date
 import Date.Extra as Dateextra
 
 import Model exposing (Model, allGroups, toDatetime)
-
 import Requests exposing (sendRequest, Msg(..))
-
 import Calendar.Calendar as Calendar
 
 
@@ -17,7 +16,15 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         SetDate date ->
-            ( { model | date = Just date, calendarState = Calendar.init Calendar.Week date }, createPlanningRequest date model.selectedGroup.slug)
+            let
+                timespan = if model.size.width < 720 then
+                                Calendar.Day
+                           else
+                                Calendar.Week
+            in
+                ( { model | date = Just date, calendarState = Calendar.init timespan date }
+                , createPlanningRequest date model.selectedGroup.slug
+                )
 
         GraphQlMsg response ->
             ( { model | data = Just response, loading = False }, Cmd.none )
@@ -59,11 +66,14 @@ update msg model =
         SelectDate date ->
             ( model, Cmd.none )
 
+        WindowSize size ->
+            ( { model | size = size }, Task.perform SetDate Date.now)
+
 
 createPlanningRequest: Date.Date -> String -> Cmd Msg
 createPlanningRequest date slug =
     -- sendRequest (toDatetime (Dateextra.add Dateextra.Month -7 date)) (toDatetime (Dateextra.add Dateextra.Month 7 date)) [ slug ]
-    sendRequest (toDatetime date) (toDatetime (Dateextra.add Dateextra.Week 1 date)) [ slug ]
+    sendRequest (toDatetime date) (toDatetime (Dateextra.add Dateextra.Month 2 date)) [ slug ]
     -- Task.succeed (GraphQlMsg ( Ok createFakeQuery ) ) |> Task.perform identity
 
 
