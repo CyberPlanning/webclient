@@ -2,14 +2,11 @@ module Calendar.Day exposing (..)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.Events exposing (..)
 import Date exposing (Date)
 import Date.Extra
 import Calendar.Config exposing (ViewConfig)
-import Json.Decode as Json
 import Calendar.Helpers as Helpers
 import Calendar.Msg exposing (Msg(..))
-import Mouse
 import Calendar.Event as Event exposing (rangeDescription)
 
 
@@ -87,12 +84,7 @@ viewDaySlotGroup date =
 viewTimeSlot : Date -> Html Msg
 viewTimeSlot date =
     div
-        [ class "elm-calendar--time-slot"
-        , on "click" (Json.map (TimeSlotClick date) Mouse.position)
-        , on "mouseenter" (Json.map (TimeSlotMouseEnter date) Mouse.position)
-        , on "mouseleave" (Json.map (TimeSlotMouseLeave date) Mouse.position)
-        , on "mousedown" (Json.map (TimeSlotDragStart date) Mouse.position)
-        ]
+        [ class "elm-calendar--time-slot" ]
         []
 
 

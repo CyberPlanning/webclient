@@ -5,6 +5,8 @@ import Date
 import Date.Extra as Dateextra
 import Window
 
+import Calendar.Internal
+import Calendar.Msg
 import Calendar.Calendar as Calendar
 
 import Http exposing (Error)
@@ -21,7 +23,7 @@ type alias Model =
     , date : Maybe Date.Date
     , selectedGroup : Group
     , loading : Bool
-    , calendarState : Calendar.State
+    , calendarState : Calendar.Internal.State
     , size : Window.Size
     }
 
@@ -55,6 +57,6 @@ initialModel =
     , date = Nothing
     , selectedGroup = { name = "Cyber1 TD2", slug = "12" }
     , loading = False
-    , calendarState = Calendar.init Calendar.Week ( Dateextra.fromParts 2018 Date.Jan 1 1 0 0 0 )
+    , calendarState = Calendar.init Calendar.Msg.Week ( Dateextra.fromParts 2018 Date.Jan 1 1 0 0 0 )
     , size = { width = 1200, height = 800 }
     }

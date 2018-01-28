@@ -4,11 +4,11 @@ import Date
 import Date.Extra as Dateextra
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.Events exposing (on, targetValue)
+import Html.Events exposing (on, targetValue, onClick)
 import Json.Decode as Json
 
 import Model exposing ( Model, Group, allGroups, toDatetime )
-import Requests exposing ( Msg(..) )
+import Msg exposing ( Msg(..) )
 import Types exposing (..)
 
 import Calendar.Calendar as Calendar
@@ -37,70 +37,45 @@ view model =
                 _ ->
                     []
 
-        planning =
-            case model.data of
-                Just (Ok query) ->
-                    if List.isEmpty query.planning.events then
-                        text "Vide :("
-                    else
-                        viewPlanning query.planning.events
-
-                Just (Err error) ->
-                    text <| toString error
-
-                Nothing ->
-                    text "Loading"
     in
         div [ class "main--container"]
-            [ viewHeader model.selectedGroup allGroups
+            [ viewToolbar model.selectedGroup (Maybe.withDefault (Date.fromTime 0 )model.date)
             , div [ class "main--calendar" ]
                 [ Html.map SetCalendarState (Calendar.view viewConfig events model.calendarState) ]
             ]
 
 
-viewPlanning : List Event -> Html Msg
-viewPlanning events =
-    div [] <| List.map (Debug.log "" >> viewEvent) events
 
-
-viewEvent: Event -> Html Msg
-viewEvent event =
-    div []
-        [ h2 [] [ text event.title ]
-        , p [] [ text ( "De " ++ ( viewDateFormat event.startDate firstDateParser ) ++ " à " ++ ( viewDateFormat event.endDate secondDateParser ) ) ]
-        , p [] [ text <| String.join ", " event.classrooms ]
-        , p [] [ text <| String.join ", " event.groups ]
-        , p [] [ text <| String.join ", " event.teachers ]
+viewToolbar : Group -> Date.Date -> Html Msg
+viewToolbar selected viewing =
+    div [ class "elm-calendar--toolbar" ]
+        [ viewPagination
+        , viewTitle viewing
+        , select [ on "change" <| Json.map SetGroup targetValue, value selected.slug ] (List.map optionGroup allGroups)
+        -- , viewTimeSpanSelection timeSpan
         ]
 
 
-viewDateFormat: String -> ( Date.Date -> String ) -> String
-viewDateFormat dateString parser =
-    let
-        parsedDate = Dateextra.fromIsoString (dateString ++ "Z")
-    in
-        case parsedDate of
-            Just date ->
-                parser date
-
-            Nothing ->
-                "Invalid : " ++ dateString
+viewTitle : Date.Date -> Html Msg
+viewTitle viewing =
+    div [ class "elm-calendar--month-title" ]
+        [ h2 [] [ text <| Dateextra.toFormattedString "MMMM yyyy" viewing ] ]
 
 
-firstDateParser : Date.Date -> String
-firstDateParser =
-    Dateextra.toFormattedString "eeee dd/MM HH:mm"
+viewPagination : Html Msg
+viewPagination =
+    div [ class "elm-calendar--paginators" ]
+        [ button [ class "elm-calendar--button", onClick PageBack ] [ text "back" ]
+        , button [ class "elm-calendar--button", onClick PageForward ] [ text "next" ]
+        ]
 
 
-secondDateParser : Date.Date -> String
-secondDateParser =
-    Dateextra.toFormattedString "HH:mm"
-
-
-viewHeader: Group -> List Group -> Html Msg
-viewHeader selected groups=
-    div []
-        [ select [ on "change" <| Json.map SetGroup targetValue, value selected.slug ] (List.map optionGroup groups) ]
+-- viewTimeSpanSelection : TimeSpan -> Html Msg
+-- viewTimeSpanSelection timeSpan =
+--     div [ class "elm-calendar--time-spans" ]
+--         [ button [ class "elm-calendar--button", onClick (ChangeTimeSpan Week) ] [ text "Week" ]
+--         , button [ class "elm-calendar--button", onClick (ChangeTimeSpan Day) ] [ text "Day" ]
+--         ]
 
 
 optionGroup: Group -> Html Msg

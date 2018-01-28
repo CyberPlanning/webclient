@@ -5,8 +5,12 @@ import Date
 import Date.Extra as Dateextra
 
 import Model exposing (Model, allGroups, toDatetime)
-import Requests exposing (sendRequest, Msg(..))
+import Requests exposing (sendRequest)
+import Msg exposing (Msg(..))
+import Calendar.Msg
+
 import Calendar.Calendar as Calendar
+import Calendar.Msg as CalMsg exposing (TimeSpan(..))
 
 
 ---- UPDATE ----
@@ -18,9 +22,9 @@ update msg model =
         SetDate date ->
             let
                 timespan = if model.size.width < 720 then
-                                Calendar.Day
+                                Day
                            else
-                                Calendar.Week
+                                Week
             in
                 ( { model | date = Just date, calendarState = Calendar.init timespan date }
                 , createPlanningRequest date model.selectedGroup.slug
@@ -50,21 +54,28 @@ update msg model =
 
         SetCalendarState calendarMsg ->
             let
-                ( updatedCalendar, maybeMsg ) =
-                    Calendar.update eventConfig timeSlotConfig calendarMsg model.calendarState
+                updatedCalendar =
+                    Calendar.update calendarMsg model.calendarState
 
-                newModel =
-                    { model | calendarState = updatedCalendar }
             in
-                case maybeMsg of
-                    Nothing ->
-                        ( newModel, Cmd.none )
+                ( { model | calendarState = updatedCalendar }, Cmd.none )
 
-                    Just updateMsg ->
-                        update updateMsg newModel
+        PageForward ->
+            let
+                updatedCalendar =
+                    Calendar.update CalMsg.PageForward model.calendarState
 
-        SelectDate date ->
-            ( model, Cmd.none )
+            in
+                ( { model | calendarState = updatedCalendar }, Cmd.none )
+
+        PageBack ->
+            let
+                updatedCalendar =
+                    Calendar.update CalMsg.PageBack model.calendarState
+
+            in
+                ( { model | calendarState = updatedCalendar }, Cmd.none )
+
 
         WindowSize size ->
             ( { model | size = size }, Task.perform SetDate Date.now)
@@ -88,27 +99,3 @@ find predicate list =
                 Just first
             else
                 find predicate rest
-
-
-eventConfig : Calendar.EventConfig Msg
-eventConfig =
-    Calendar.eventConfig
-        { onClick = \_ -> Nothing
-        , onMouseEnter = \_ -> Nothing
-        , onMouseLeave = \_ -> Nothing
-        , onDragStart = \_ -> Nothing
-        , onDragging = \_ _ -> Nothing
-        , onDragEnd = \_ _ -> Nothing
-        }
-
-
-timeSlotConfig : Calendar.TimeSlotConfig Msg
-timeSlotConfig =
-    Calendar.timeSlotConfig
-        { onClick = \date pos -> Just <| SelectDate date
-        , onMouseEnter = \_ _ -> Nothing
-        , onMouseLeave = \_ _ -> Nothing
-        , onDragStart = \_ _ -> Nothing
-        , onDragging = \_ _ -> Nothing
-        , onDragEnd = \_ _ -> Nothing
-        }

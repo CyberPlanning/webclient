@@ -1,22 +1,14 @@
 module Calendar.Calendar
     exposing
         ( init
-        , State
-        , TimeSpan(..)
-        , Msg
         , update
         , page
         , changeTimeSpan
         , view
         , viewConfig
         , ViewConfig
-        , eventConfig
         , EventView
         , eventView
-        , EventConfig
-        , timeSlotConfig
-        , TimeSlotConfig
-        , subscriptions
         )
 
 {-|
@@ -36,86 +28,52 @@ Hey it's a calendar!
 import Html exposing (..)
 import Date exposing (Date)
 import Calendar.Config as Config
-import Calendar.Internal as Internal
-import Calendar.Msg as InternalMsg
-import Time exposing (Time)
-import Mouse
-
+import Calendar.Internal as Internal exposing (State)
+import Calendar.Msg as InternalMsg exposing (Msg, TimeSpan(..))
 
 {-| Create the calendar
 -}
 init : TimeSpan -> Date -> State
 init timeSpan viewing =
-    State <| Internal.init (toInternalTimespan timeSpan) viewing
-
-
-{-| I won't tell you what's in here
--}
-type State
-    = State Internal.State
-
-
-{-| All the time spans
--}
-type TimeSpan
-    = Week
-    | Day
-
-
-{-| Somehow update plz
--}
-type Msg
-    = Internal InternalMsg.Msg
+    Internal.init timeSpan viewing
 
 
 {-| oh yes, please solve my UI update problems
 -}
-update : EventConfig msg -> TimeSlotConfig msg -> Msg -> State -> ( State, Maybe msg )
-update (EventConfig eventConfig) (TimeSlotConfig timeSlotConfig) (Internal msg) (State state) =
+update : Msg -> State -> State
+update msg state =
     let
-        ( updatedCalendar, calendarMsg ) =
-            Internal.update eventConfig timeSlotConfig msg state
+        updatedCalendar =
+            Internal.update msg state
     in
-        ( State updatedCalendar, calendarMsg )
+        updatedCalendar
 
 
 {-| Page by some interval based on the current view: Month, Week, Day
 -}
 page : Int -> State -> State
-page step (State state) =
-    State <| Internal.page step state
+page step state =
+    Internal.page step state
 
 
 {-| Change between views like Month, Week, Day, etc.
 -}
 changeTimeSpan : TimeSpan -> State -> State
-changeTimeSpan timeSpan (State state) =
-    State <| Internal.changeTimeSpan (toInternalTimespan timeSpan) state
+changeTimeSpan timeSpan state =
+    Internal.changeTimeSpan timeSpan state
 
 
 {-| Show me the money
 -}
 view : ViewConfig event -> List event -> State -> Html Msg
-view (ViewConfig config) events (State state) =
-    Html.map Internal (Internal.view config events state)
+view (ViewConfig config) events state =
+    Internal.view config events state
 
 
 {-| configure view definition
 -}
 type ViewConfig event
     = ViewConfig (Config.ViewConfig event)
-
-
-{-| configure time slot interactions
--}
-type TimeSlotConfig msg
-    = TimeSlotConfig (Config.TimeSlotConfig msg)
-
-
-{-| configure event interactions
--}
-type EventConfig msg
-    = EventConfig (Config.EventConfig msg)
 
 
 {-| event view type
@@ -173,64 +131,3 @@ viewConfig { toId, title, start, end, classrooms, teachers, groups, event } =
             , groups = groups
             , event = eventView
             }
-
-
-{-| configure time slot interactions
--}
-timeSlotConfig :
-    { onClick : Date -> Mouse.Position -> Maybe msg
-    , onMouseEnter : Date -> Mouse.Position -> Maybe msg
-    , onMouseLeave : Date -> Mouse.Position -> Maybe msg
-    , onDragStart : Date -> Mouse.Position -> Maybe msg
-    , onDragging : Date -> Mouse.Position -> Maybe msg
-    , onDragEnd : Date -> Mouse.Position -> Maybe msg
-    }
-    -> TimeSlotConfig msg
-timeSlotConfig { onClick, onMouseEnter, onMouseLeave, onDragStart, onDragging, onDragEnd } =
-    TimeSlotConfig
-        { onClick = onClick
-        , onMouseEnter = onMouseEnter
-        , onMouseLeave = onMouseLeave
-        , onDragStart = onDragStart
-        , onDragging = onDragging
-        , onDragEnd = onDragEnd
-        }
-
-
-{-| configure event interactions
--}
-eventConfig :
-    { onClick : String -> Maybe msg
-    , onMouseEnter : String -> Maybe msg
-    , onMouseLeave : String -> Maybe msg
-    , onDragStart : String -> Maybe msg
-    , onDragging : String -> Time -> Maybe msg
-    , onDragEnd : String -> Time -> Maybe msg
-    }
-    -> EventConfig msg
-eventConfig { onClick, onMouseEnter, onMouseLeave, onDragStart, onDragging, onDragEnd } =
-    EventConfig
-        { onClick = onClick
-        , onMouseEnter = onMouseEnter
-        , onMouseLeave = onMouseLeave
-        , onDragStart = onDragStart
-        , onDragging = onDragging
-        , onDragEnd = onDragEnd
-        }
-
-
-{-| drag event subscriptions
--}
-subscriptions : State -> Sub Msg
-subscriptions (State state) =
-    Sub.map Internal (Internal.subscriptions state)
-
-
-toInternalTimespan : TimeSpan -> InternalMsg.TimeSpan
-toInternalTimespan timeSpan =
-    case timeSpan of
-        Week ->
-            InternalMsg.Week
-
-        Day ->
-            InternalMsg.Day

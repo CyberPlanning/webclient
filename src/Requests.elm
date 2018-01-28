@@ -4,19 +4,7 @@ import GraphQl
 import Json.Encode as Encode
 import Json.Decode as Decode exposing (Decoder, field)
 import Types exposing (Query, Event, decodeQuery)
-import Date
-import Http exposing (Error)
-import Window
-
-import Calendar.Calendar as Calendar
-
-type Msg
-    = GraphQlMsg (Result Error Query)
-    | SetDate Date.Date
-    | SetGroup String
-    | SetCalendarState Calendar.Msg
-    | SelectDate Date.Date
-    | WindowSize Window.Size
+import Msg exposing (Msg(..))
 
 
 planningRequest : GraphQl.Value GraphQl.Root

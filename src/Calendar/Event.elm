@@ -7,8 +7,6 @@ import Html.Attributes exposing (class, classList, style)
 import Html.Events exposing (..)
 import Calendar.Msg exposing (Msg(..), TimeSpan(..))
 import Calendar.Config exposing (ViewConfig)
-import Json.Decode as Json
-import Mouse
 import Calendar.Helpers as Helpers
 import MD5
 
@@ -173,7 +171,6 @@ eventSegment config event selectedId eventRange timeSpan =
             ([ onClick <| EventClick eventId
              , onMouseEnter <| EventMouseEnter eventId
              , onMouseLeave <| EventMouseLeave eventId
-             , on "mousedown" <| Json.map (EventDragStart eventId) Mouse.position
              ]
                 ++ eventStyling config event eventRange timeSpan classes
             )
