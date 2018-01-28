@@ -12,6 +12,7 @@ import Msg exposing ( Msg(..) )
 import Types exposing (..)
 
 import Calendar.Calendar as Calendar
+import Calendar.Event as CalEvent
 
 ---- VIEW ----
 
@@ -32,7 +33,7 @@ view model =
                     if List.isEmpty query.planning.events then
                         []
                     else
-                        query.planning.events
+                        toCalEvents query.planning.events
 
                 _ ->
                     []
@@ -41,9 +42,25 @@ view model =
         div [ class "main--container"]
             [ viewToolbar model.selectedGroup (Maybe.withDefault (Date.fromTime 0 )model.date)
             , div [ class "main--calendar" ]
-                [ Html.map SetCalendarState (Calendar.view viewConfig events model.calendarState) ]
+                [ Html.map SetCalendarState (Calendar.view events model.calendarState) ]
             ]
 
+
+toCalEvents : List Event -> List CalEvent.Event
+toCalEvents events =
+    List.map toCalEvent events
+
+
+toCalEvent : Event -> CalEvent.Event
+toCalEvent event =
+        { toId = event.title
+        , title = event.title
+        , start = parseDateEvent event.startDate
+        , end = parseDateEvent event.endDate
+        , classrooms = event.classrooms
+        , teachers = event.teachers
+        , groups = event.groups
+        }
 
 
 viewToolbar : Group -> Date.Date -> Html Msg
@@ -84,36 +101,8 @@ optionGroup group =
            [ text group.name ]
 
 
-parseDateEvent: (Event -> String) -> Event -> Date.Date
-parseDateEvent date ev =
-    (date ev) ++ "Z"
+parseDateEvent: String -> Date.Date
+parseDateEvent date =
+    date ++ "Z"
     |> Dateextra.fromIsoString
     |> Maybe.withDefault (Date.fromTime 0)
-
-
-viewConfig : Calendar.ViewConfig Event
-viewConfig =
-    Calendar.viewConfig
-        { toId = .title
-        , title = .title
-        , classrooms = .classrooms
-        , teachers = .teachers
-        , groups = .groups
-        , start = parseDateEvent .startDate
-        , end = parseDateEvent .endDate
-        , event =
-            \event isSelected ->
-                Calendar.eventView
-                    { nodeName = "div"
-                    , classes =
-                        [ ( "elm-calendar--event-content", True )
-                        , ( "elm-calendar--event-content--is-selected", isSelected )
-                        ]
-                    , children =
-                        [ div [] [ text <| event.title ]
-                        , div [ class "elm-calendar--event-sub" ] [ text <| String.join "," event.classrooms ]
-                        , div [ class "elm-calendar--event-sub" ] [ text <| String.join "," event.teachers ]
-                        , div [ class "elm-calendar--event-sub" ] [ text <| String.join "," event.groups ]
-                        ]
-                    }
-        }

@@ -6,10 +6,18 @@ import Html exposing (..)
 import Html.Attributes exposing (class, classList, style)
 import Html.Events exposing (..)
 import Calendar.Msg exposing (Msg(..), TimeSpan(..))
-import Calendar.Config exposing (ViewConfig)
 import Calendar.Helpers as Helpers
 import MD5
 
+type alias Event =
+    { toId: String
+    , title: String
+    , start: Date
+    , end: Date
+    , classrooms : (List String)
+    , teachers : (List String)
+    , groups : (List String)
+    }
 
 type EventRange
     = StartsAndEnds
@@ -59,22 +67,21 @@ rangeDescription start end interval date =
 
 
 eventStyling :
-    ViewConfig event
-    -> event
+    Event
     -> EventRange
     -> TimeSpan
     -> List ( String, Bool )
     -> List (Html.Attribute msg)
-eventStyling config event eventRange timeSpan customClasses =
+eventStyling event eventRange timeSpan customClasses =
     let
         eventStart =
-            config.start event
+            event.start
 
         eventEnd =
-            config.end event
+            event.end
 
         eventId =
-            config.toId event
+            event.toId
 
         classes =
             case eventRange of
@@ -144,37 +151,43 @@ styleDayEvent start end id =
             ]
 
 
-maybeViewDayEvent : ViewConfig event -> event -> Maybe String -> EventRange -> Maybe (Html Msg)
-maybeViewDayEvent config event selectedId eventRange =
+maybeViewDayEvent : Event -> Maybe String -> EventRange -> Maybe (Html Msg)
+maybeViewDayEvent event selectedId eventRange =
     case eventRange of
         ExistsOutside ->
             Nothing
 
         _ ->
-            Just <| eventSegment config event selectedId eventRange Day
+            Just <| eventSegment event selectedId eventRange Day
 
 
-eventSegment : ViewConfig event -> event -> Maybe String -> EventRange -> TimeSpan -> Html Msg
-eventSegment config event selectedId eventRange timeSpan =
+eventSegment : Event -> Maybe String -> EventRange -> TimeSpan -> Html Msg
+eventSegment event selectedId eventRange timeSpan =
     let
         eventId =
-            config.toId event
+            event.toId
 
         isSelected =
             Maybe.map ((==) eventId) selectedId
                 |> Maybe.withDefault False
 
-        { nodeName, classes, children } =
-            config.event event isSelected
+        classes =
+            [ ( "elm-calendar--event-content", True )
+            , ( "elm-calendar--event-content--is-selected", isSelected )
+            ]
     in
-        node nodeName
+        div
             ([ onClick <| EventClick eventId
              , onMouseEnter <| EventMouseEnter eventId
              , onMouseLeave <| EventMouseLeave eventId
              ]
-                ++ eventStyling config event eventRange timeSpan classes
+                ++ eventStyling event eventRange timeSpan classes
             )
-            children
+            [ div [] [ text event.title ]
+            , div [ class "elm-calendar--event-sub" ] [ text <| String.join "," event.classrooms ]
+            , div [ class "elm-calendar--event-sub" ] [ text <| String.join "," event.teachers ]
+            , div [ class "elm-calendar--event-sub" ] [ text <| String.join "," event.groups ]
+            ]
 
 
 cellWidth : Float

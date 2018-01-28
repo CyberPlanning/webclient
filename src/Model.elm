@@ -5,7 +5,6 @@ import Date
 import Date.Extra as Dateextra
 import Window
 
-import Calendar.Internal
 import Calendar.Msg
 import Calendar.Calendar as Calendar
 
@@ -23,7 +22,7 @@ type alias Model =
     , date : Maybe Date.Date
     , selectedGroup : Group
     , loading : Bool
-    , calendarState : Calendar.Internal.State
+    , calendarState : Calendar.State
     , size : Window.Size
     }
 

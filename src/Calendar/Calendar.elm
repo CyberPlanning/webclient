@@ -1,133 +1,89 @@
-module Calendar.Calendar
-    exposing
-        ( init
-        , update
-        , page
-        , changeTimeSpan
-        , view
-        , viewConfig
-        , ViewConfig
-        , EventView
-        , eventView
-        )
-
-{-|
-
-Hey it's a calendar!
-
-# Definition
-@docs init, State, TimeSpan
-
-# Update
-@docs Msg, update, page, changeTimeSpan, eventConfig, EventConfig, timeSlotConfig, TimeSlotConfig, subscriptions
-
-# View
-@docs view, viewConfig, ViewConfig, EventView, eventView
--}
+module Calendar.Calendar exposing (..)
 
 import Html exposing (..)
+import Html.Attributes exposing (class)
 import Date exposing (Date)
-import Calendar.Config as Config
-import Calendar.Internal as Internal exposing (State)
-import Calendar.Msg as InternalMsg exposing (Msg, TimeSpan(..))
+import Date.Extra
+import Calendar.Day as Day
+import Calendar.Week as Week
+import Calendar.Msg exposing (Msg(..), TimeSpan(..))
+import Calendar.Event exposing (Event)
 
-{-| Create the calendar
--}
+
+type alias State =
+    { timeSpan : TimeSpan
+    , viewing : Date
+    , hover : Maybe String
+    , selected : Maybe String
+    }
+
+
 init : TimeSpan -> Date -> State
 init timeSpan viewing =
-    Internal.init timeSpan viewing
+    { timeSpan = timeSpan
+    , viewing = viewing
+    , hover = Nothing
+    , selected = Nothing
+    }
 
 
-{-| oh yes, please solve my UI update problems
--}
 update : Msg -> State -> State
 update msg state =
-    let
-        updatedCalendar =
-            Internal.update msg state
-    in
-        updatedCalendar
+    -- case Debug.log "msg" msg of
+    case msg of
+        PageBack ->
+            page -1 state 
+
+        PageForward ->
+            page 1 state
+
+        ChangeTimeSpan timeSpan ->
+            changeTimeSpan timeSpan state
+
+        EventClick eventId ->
+            { state | selected = Just eventId }
+
+        EventMouseEnter eventId ->
+            { state | hover = Just eventId }
+
+        EventMouseLeave eventId ->
+            { state | hover = Nothing }
 
 
-{-| Page by some interval based on the current view: Month, Week, Day
--}
 page : Int -> State -> State
 page step state =
-    Internal.page step state
+    let
+        { timeSpan, viewing } =
+            state
+    in
+        case timeSpan of
+            Week ->
+                { state | viewing = Date.Extra.add Date.Extra.Week step viewing }
+
+            Day ->
+                { state | viewing = Date.Extra.add Date.Extra.Day step viewing }
 
 
-{-| Change between views like Month, Week, Day, etc.
--}
 changeTimeSpan : TimeSpan -> State -> State
 changeTimeSpan timeSpan state =
-    Internal.changeTimeSpan timeSpan state
+    { state | timeSpan = timeSpan }
 
 
-{-| Show me the money
--}
-view : ViewConfig event -> List event -> State -> Html Msg
-view (ViewConfig config) events state =
-    Internal.view config events state
-
-
-{-| configure view definition
--}
-type ViewConfig event
-    = ViewConfig (Config.ViewConfig event)
-
-
-{-| event view type
--}
-type EventView
-    = EventView Config.EventView
-
-
-{-| configure a custom event view
--}
-eventView :
-    { nodeName : String
-    , classes : List ( String, Bool )
-    , children : List (Html InternalMsg.Msg)
-    }
-    -> EventView
-eventView { nodeName, classes, children } =
-    EventView
-        { nodeName = nodeName
-        , classes = classes
-        , children = children
-        }
-
-
-{-| configure the view
--}
-viewConfig :
-    { toId : event -> String
-    , title : event -> String
-    , start : event -> Date
-    , end : event -> Date
-    , classrooms : event -> (List String)
-    , teachers : event -> (List String)
-    , groups : event -> (List String)
-    , event : event -> Bool -> EventView
-    }
-    -> ViewConfig event
-viewConfig { toId, title, start, end, classrooms, teachers, groups, event } =
+view : List Event -> State -> Html Msg
+view events { viewing, timeSpan, selected } =
     let
-        extractEventView eventView =
-            case eventView of
-                EventView eventView_ ->
-                    eventView_
+        calendarView =
+            case timeSpan of
+                Week ->
+                    Week.view events selected viewing
 
-        eventView id selected =
-            extractEventView <| event id selected
+                Day ->
+                    Day.view events selected viewing
     in
-        ViewConfig
-            { toId = toId
-            , title = title
-            , start = start
-            , end = end
-            , classrooms = classrooms
-            , teachers = teachers
-            , groups = groups
-            , event = eventView
-            }
+        div
+            [ class "elm-calendar--container"
+            , Html.Attributes.draggable "false"
+            ]
+            [ div [ class "elm-calendar--calendar" ]
+                [ calendarView ]
+            ]

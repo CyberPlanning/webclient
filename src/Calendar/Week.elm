@@ -5,52 +5,51 @@ import Html.Attributes exposing (..)
 import Date exposing (Date)
 import Calendar.Day exposing (viewTimeGutter, viewTimeGutterHeader, viewDate, viewDaySlotGroup, viewAllDayCell, viewDayEvents)
 import Calendar.Msg exposing (Msg)
-import Calendar.Config exposing (ViewConfig)
+import Calendar.Event exposing (Event)
 import Calendar.Helpers as Helpers
 
 
 viewWeekContent :
-    ViewConfig event
-    -> List event
+    List Event
     -> Maybe String
     -> Date
     -> List Date
     -> Html Msg
-viewWeekContent config events selectedId viewing days =
+viewWeekContent events selectedId viewing days =
     let
         timeGutter =
             viewTimeGutter viewing
 
         weekDays =
-            List.map (viewWeekDay config events selectedId) days
+            List.map (viewWeekDay events selectedId) days
     in
         div [ class "elm-calendar--week-content" ]
             (timeGutter :: weekDays)
 
 
-viewWeekDay : ViewConfig event -> List event -> Maybe String -> Date -> Html Msg
-viewWeekDay config events selectedId day =
+viewWeekDay : List Event -> Maybe String -> Date -> Html Msg
+viewWeekDay events selectedId day =
     let
         viewDaySlots =
             Helpers.hours day
                 |> List.map viewDaySlotGroup
 
         dayEvents =
-            viewDayEvents config events selectedId day
+            viewDayEvents events selectedId day
     in
         div [ class "elm-calendar--day" ]
             (viewDaySlots ++ dayEvents)
 
 
-view : ViewConfig event -> List event -> Maybe String -> Date -> Html Msg
-view config events selectedId viewing =
+view : List Event -> Maybe String -> Date -> Html Msg
+view events selectedId viewing =
     let
         weekRange =
             Helpers.dayRangeOfWeek viewing
     in
         div [ class "elm-calendar--week" ]
             [ viewWeekHeader weekRange
-            , viewWeekContent config events selectedId viewing weekRange
+            , viewWeekContent events selectedId viewing weekRange
             ]
 
 

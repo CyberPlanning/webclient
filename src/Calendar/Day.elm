@@ -4,19 +4,18 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Date exposing (Date)
 import Date.Extra
-import Calendar.Config exposing (ViewConfig)
 import Calendar.Helpers as Helpers
 import Calendar.Msg exposing (Msg(..))
-import Calendar.Event as Event exposing (rangeDescription)
+import Calendar.Event exposing (rangeDescription, maybeViewDayEvent, Event)
 
 
-view : ViewConfig event -> List event -> Maybe String -> Date -> Html Msg
-view config events selectedId day =
+view : List Event -> Maybe String -> Date -> Html Msg
+view events selectedId day =
     div [ class "elm-calendar--day" ]
         [ viewDayHeader day
         , div [ class "elm-calendar--day-content" ]
             [ viewTimeGutter day
-            , viewDaySlot config events selectedId day
+            , viewDaySlot events selectedId day
             ]
         ]
 
@@ -65,11 +64,11 @@ viewHourSlot date =
         [ span [ class "elm-calendar--time-slot-text" ] [ text <| Helpers.hourString date ] ]
 
 
-viewDaySlot : ViewConfig event -> List event -> Maybe String -> Date -> Html Msg
-viewDaySlot config events selectedId day =
+viewDaySlot : List Event -> Maybe String -> Date -> Html Msg
+viewDaySlot events selectedId day =
     Helpers.hours day
         |> List.map viewDaySlotGroup
-        |> (flip (++)) (viewDayEvents config events selectedId day)
+        |> (flip (++)) (viewDayEvents events selectedId day)
         |> div [ class "elm-calendar--day-slot" ]
 
 
@@ -88,18 +87,18 @@ viewTimeSlot date =
         []
 
 
-viewDayEvents : ViewConfig event -> List event -> Maybe String -> Date -> List (Html Msg)
-viewDayEvents config events selectedId day =
-    List.filterMap (viewDayEvent config day selectedId) events
+viewDayEvents : List Event -> Maybe String -> Date -> List (Html Msg)
+viewDayEvents events selectedId day =
+    List.filterMap (viewDayEvent day selectedId) events
 
 
-viewDayEvent : ViewConfig event -> Date -> Maybe String -> event -> Maybe (Html Msg)
-viewDayEvent config day selectedId event =
+viewDayEvent : Date -> Maybe String -> Event -> Maybe (Html Msg)
+viewDayEvent day selectedId event =
     let
         eventRange =
-            rangeDescription (config.start event) (config.end event) Date.Extra.Day day
+            rangeDescription event.start event.end Date.Extra.Day day
     in
-        Event.maybeViewDayEvent config event selectedId eventRange
+        maybeViewDayEvent event selectedId eventRange
 
 
 viewAllDayCell : List Date -> Html Msg
