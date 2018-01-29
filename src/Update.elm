@@ -85,8 +85,10 @@ update msg model =
                 updatedCalendar =
                     if code == 37 then
                         Calendar.update CalMsg.PageBack model.calendarState
-                    else
+                    else if code == 39 then
                         Calendar.update CalMsg.PageForward model.calendarState
+                    else
+                        model.calendarState
             in
                 ( { model | calendarState = updatedCalendar }, Cmd.none )
 
