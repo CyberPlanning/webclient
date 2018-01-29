@@ -65,33 +65,33 @@ toCalEvent event =
 
 viewToolbar : Group -> Date.Date -> Html Msg
 viewToolbar selected viewing =
-    div [ class "elm-calendar--toolbar" ]
+    div [ class "main--toolbar" ]
         [ viewPagination
         , viewTitle viewing
-        , select [ on "change" <| Json.map SetGroup targetValue, value selected.slug ] (List.map optionGroup allGroups)
+        , select [ class "main--selector", on "change" <| Json.map SetGroup targetValue, value selected.slug ] (List.map optionGroup allGroups)
         -- , viewTimeSpanSelection timeSpan
         ]
 
 
 viewTitle : Date.Date -> Html Msg
 viewTitle viewing =
-    div [ class "elm-calendar--month-title" ]
+    div [ class "main--month-title" ]
         [ h2 [] [ text <| Dateextra.toFormattedString "MMMM yyyy" viewing ] ]
 
 
 viewPagination : Html Msg
 viewPagination =
-    div [ class "elm-calendar--paginators" ]
-        [ button [ class "elm-calendar--button", onClick PageBack ] [ text "back" ]
-        , button [ class "elm-calendar--button", onClick PageForward ] [ text "next" ]
+    div [ class "main--paginators" ]
+        [ button [ class "main--navigatiors-button", onClick PageBack ] [ text "back" ]
+        , button [ class "main--navigatiors-button", onClick PageForward ] [ text "next" ]
         ]
 
 
 -- viewTimeSpanSelection : TimeSpan -> Html Msg
 -- viewTimeSpanSelection timeSpan =
---     div [ class "elm-calendar--time-spans" ]
---         [ button [ class "elm-calendar--button", onClick (ChangeTimeSpan Week) ] [ text "Week" ]
---         , button [ class "elm-calendar--button", onClick (ChangeTimeSpan Day) ] [ text "Day" ]
+--     div [ class "main--time-spans" ]
+--         [ button [ class "main--button", onClick (ChangeTimeSpan Week) ] [ text "Week" ]
+--         , button [ class "main--button", onClick (ChangeTimeSpan Day) ] [ text "Day" ]
 --         ]
 
 

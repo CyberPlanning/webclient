@@ -81,9 +81,5 @@ view events { viewing, timeSpan, selected } =
                     Day.view events selected viewing
     in
         div
-            [ class "elm-calendar--container"
-            , Html.Attributes.draggable "false"
-            ]
-            [ div [ class "elm-calendar--calendar" ]
-                [ calendarView ]
-            ]
+            [ class "calendar--calendar" ]
+            [ calendarView ]

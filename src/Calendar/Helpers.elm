@@ -7,7 +7,7 @@ import List.Extra
 
 hourString : Date -> String
 hourString date =
-    Date.Extra.toFormattedString "h:mm a" date
+    Date.Extra.toFormattedString "H:mm" date
 
 
 bumpMidnightBoundary : Date -> Date

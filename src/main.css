@@ -32,3 +32,30 @@ img {
   overflow: hidden;
   display: flex;
 }
+
+.main--toolbar {
+  display: flex;
+  position: relative;
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.main--month-title {
+  flex: 1;
+}
+
+.main--month-title h2 {
+  margin: 0;
+}
+
+.main--selector {
+  border: 1px solid #ccc;
+  padding: 5px;
+  background-color: white;
+}
+
+.main--navigatiors-button {
+  border: 1px solid #ccc;
+  padding: 5px;
+  background-color: white;
+}

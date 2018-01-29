@@ -11,11 +11,12 @@ import Calendar.Event exposing (rangeDescription, maybeViewDayEvent, Event)
 
 view : List Event -> Maybe String -> Date -> Html Msg
 view events selectedId day =
-    div [ class "elm-calendar--day" ]
+    div [ class "calendar--day" ]
         [ viewDayHeader day
-        , div [ class "elm-calendar--day-content" ]
+        , div [ class "calendar--day-content" ]
             [ viewTimeGutter day
-            , viewDaySlot events selectedId day
+            , div [ class "calendar--day" ]
+                  [ viewDaySlot events selectedId day ]
             ]
         ]
 
@@ -26,13 +27,13 @@ viewDate day =
         title day =
             Date.Extra.toFormattedString "EEEE dd MMM" day
     in
-        div [ class "elm-calendar--date-header" ]
-            [ a [ class "elm-calendar--date", href "#" ] [ text <| title day ] ]
+        div [ class "calendar--date-header" ]
+            [ a [ class "calendar--date", href "#" ] [ text <| title day ] ]
 
 
 viewDayHeader : Date -> Html Msg
 viewDayHeader day =
-    div [ class "elm-calendar--day-header" ]
+    div [ class "calendar--day-header" ]
         [ viewTimeGutterHeader
         , viewDate day
         ]
@@ -42,26 +43,26 @@ viewTimeGutter : Date -> Html Msg
 viewTimeGutter date =
     Helpers.hours date
         |> List.map viewTimeSlotGroup
-        |> div [ class "elm-calendar--time-gutter" ]
+        |> div [ class "calendar--time-gutter" ]
 
 
 viewTimeGutterHeader : Html Msg
 viewTimeGutterHeader =
-    div [ class "elm-calendar--time-gutter-header" ] []
+    div [ class "calendar--time-gutter" ] []
 
 
 viewTimeSlotGroup : Date -> Html Msg
 viewTimeSlotGroup date =
-    div [ class "elm-calendar--time-slot-group" ]
+    div [ class "calendar--time-slot-group" ]
         [ viewHourSlot date
-        , div [ class "elm-calendar--time-slot" ] []
+        , div [ class "calendar--time-slot" ] []
         ]
 
 
 viewHourSlot : Date -> Html Msg
 viewHourSlot date =
-    div [ class "elm-calendar--hour-slot" ]
-        [ span [ class "elm-calendar--time-slot-text" ] [ text <| Helpers.hourString date ] ]
+    div [ class "calendar--hour-slot" ]
+        [ span [ class "calendar--time-slot-text" ] [ text <| Helpers.hourString date ] ]
 
 
 viewDaySlot : List Event -> Maybe String -> Date -> Html Msg
@@ -69,12 +70,12 @@ viewDaySlot events selectedId day =
     Helpers.hours day
         |> List.map viewDaySlotGroup
         |> (flip (++)) (viewDayEvents events selectedId day)
-        |> div [ class "elm-calendar--day-slot" ]
+        |> div [ class "calendar--day-slot" ]
 
 
 viewDaySlotGroup : Date -> Html Msg
 viewDaySlotGroup date =
-    div [ class "elm-calendar--time-slot-group" ]
+    div [ class "calendar--time-slot-group" ]
         [ viewTimeSlot date
         , viewTimeSlot date
         ]
@@ -83,7 +84,7 @@ viewDaySlotGroup date =
 viewTimeSlot : Date -> Html Msg
 viewTimeSlot date =
     div
-        [ class "elm-calendar--time-slot" ]
+        [ class "calendar--time-slot" ]
         []
 
 
@@ -105,11 +106,11 @@ viewAllDayCell : List Date -> Html Msg
 viewAllDayCell days =
     let
         viewAllDayText =
-            div [ class "elm-calendar--all-day-text" ] [ text "All day" ]
+            div [ class "calendar--all-day-text" ] [ text "All day" ]
 
         viewAllDay day =
-            div [ class "elm-calendar--all-day" ]
+            div [ class "calendar--all-day" ]
                 []
     in
-        div [ class "elm-calendar--all-day-cell" ]
+        div [ class "calendar--all-day-cell" ]
             (viewAllDayText :: List.map viewAllDay days)

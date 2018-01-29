@@ -86,16 +86,16 @@ eventStyling event eventRange timeSpan customClasses =
         classes =
             case eventRange of
                 StartsAndEnds ->
-                    "elm-calendar--event elm-calendar--event-starts-and-ends"
+                    "calendar--event calendar--event-starts-and-ends"
 
                 ContinuesAfter ->
-                    "elm-calendar--event elm-calendar--event-continues-after"
+                    "calendar--event calendar--event-continues-after"
 
                 ContinuesPrior ->
-                    "elm-calendar--event elm-calendar--event-continues-prior"
+                    "calendar--event calendar--event-continues-prior"
 
                 ContinuesAfterAndPrior ->
-                    "elm-calendar--event"
+                    "calendar--event"
 
                 ExistsOutside ->
                     ""
@@ -172,8 +172,8 @@ eventSegment event selectedId eventRange timeSpan =
                 |> Maybe.withDefault False
 
         classes =
-            [ ( "elm-calendar--event-content", True )
-            , ( "elm-calendar--event-content--is-selected", isSelected )
+            [ ( "calendar--event-content", True )
+            , ( "calendar--event-content--is-selected", isSelected )
             ]
     in
         div
@@ -184,9 +184,9 @@ eventSegment event selectedId eventRange timeSpan =
                 ++ eventStyling event eventRange timeSpan classes
             )
             [ div [] [ text event.title ]
-            , div [ class "elm-calendar--event-sub" ] [ text <| String.join "," event.classrooms ]
-            , div [ class "elm-calendar--event-sub" ] [ text <| String.join "," event.teachers ]
-            , div [ class "elm-calendar--event-sub" ] [ text <| String.join "," event.groups ]
+            , div [ class "calendar--event-sub" ] [ text <| String.join "," event.classrooms ]
+            , div [ class "calendar--event-sub" ] [ text <| String.join "," event.teachers ]
+            , div [ class "calendar--event-sub" ] [ text <| String.join "," event.groups ]
             ]
 
 

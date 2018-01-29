@@ -23,7 +23,7 @@ viewWeekContent events selectedId viewing days =
         weekDays =
             List.map (viewWeekDay events selectedId) days
     in
-        div [ class "elm-calendar--week-content" ]
+        div [ class "calendar--week-content" ]
             (timeGutter :: weekDays)
 
 
@@ -37,8 +37,11 @@ viewWeekDay events selectedId day =
         dayEvents =
             viewDayEvents events selectedId day
     in
-        div [ class "elm-calendar--day" ]
-            (viewDaySlots ++ dayEvents)
+        div [ class "calendar--day" ]
+            [ div [ class "calendar--day-slot" ]
+                  (viewDaySlots ++ dayEvents)
+            ]
+            
 
 
 view : List Event -> Maybe String -> Date -> Html Msg
@@ -47,7 +50,7 @@ view events selectedId viewing =
         weekRange =
             Helpers.dayRangeOfWeek viewing
     in
-        div [ class "elm-calendar--week" ]
+        div [ class "calendar--week" ]
             [ viewWeekHeader weekRange
             , viewWeekContent events selectedId viewing weekRange
             ]
@@ -55,13 +58,13 @@ view events selectedId viewing =
 
 viewWeekHeader : List Date -> Html Msg
 viewWeekHeader days =
-    div [ class "elm-calendar--week-header" ]
+    div [ class "calendar--week-header" ]
         [ viewDates days ]
 
 
 viewDates : List Date -> Html Msg
 viewDates days =
-    div [ class "elm-calendar--dates-header" ]
+    div [ class "calendar--dates-header" ]
         [ viewTimeGutterHeader
-        , div [ class "elm-calendar--dates" ] <| List.map viewDate days
+        , div [ class "calendar--dates" ] <| List.map viewDate days
         ]
