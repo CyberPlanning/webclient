@@ -3,6 +3,7 @@ module Main exposing (..)
 import Html
 import Window
 import Task
+import Keyboard
 
 import View exposing (view)
 import Model exposing (Model, initialModel)
@@ -24,5 +25,5 @@ main =
         { view = view
         , init = init
         , update = update
-        , subscriptions = always Sub.none
+        , subscriptions = always (Keyboard.downs KeyDown)
         }

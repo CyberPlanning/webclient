@@ -2,12 +2,14 @@ module Calendar.Calendar exposing (..)
 
 import Html exposing (..)
 import Html.Attributes exposing (class)
+import Html.Events exposing (on, keyCode)
 import Date exposing (Date)
 import Date.Extra
 import Calendar.Day as Day
 import Calendar.Week as Week
 import Calendar.Msg exposing (Msg(..), TimeSpan(..))
 import Calendar.Event exposing (Event)
+import Json.Decode as Json
 
 
 type alias State =
@@ -83,3 +85,15 @@ view events { viewing, timeSpan, selected } =
         div
             [ class "calendar--calendar" ]
             [ calendarView ]
+
+
+onKeyDown : msg -> Attribute msg
+onKeyDown msg =
+    let
+        isEnter code =
+            if code == 13 then
+                Json.succeed msg
+            else
+                Json.fail "not ENTER"
+    in
+        on "keydown" (Json.andThen isEnter keyCode)

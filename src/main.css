@@ -5,7 +5,6 @@
 html, body, #root{
   padding: 0;
   margin: 0;
-  /* width: 100vw; */
   height: 100vh;
 }
 
@@ -15,11 +14,6 @@ body {
   margin: 0;
   text-align: center;
   color: #293c4b;
-}
-
-img {
-  margin: 20px 0;
-  max-width: 200px;
 }
 
 .main--container {
@@ -35,8 +29,6 @@ img {
 
 .main--toolbar {
   display: flex;
-  position: relative;
-  width: 100%;
   margin-bottom: 1rem;
 }
 

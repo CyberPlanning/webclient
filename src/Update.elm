@@ -80,11 +80,21 @@ update msg model =
         WindowSize size ->
             ( { model | size = size }, Task.perform SetDate Date.now)
 
+        KeyDown code ->
+            let
+                updatedCalendar =
+                    if code == 37 then
+                        Calendar.update CalMsg.PageBack model.calendarState
+                    else
+                        Calendar.update CalMsg.PageForward model.calendarState
+            in
+                ( { model | calendarState = updatedCalendar }, Cmd.none )
+
 
 createPlanningRequest: Date.Date -> String -> Cmd Msg
 createPlanningRequest date slug =
     -- sendRequest (toDatetime (Dateextra.add Dateextra.Month -7 date)) (toDatetime (Dateextra.add Dateextra.Month 7 date)) [ slug ]
-    sendRequest (toDatetime date) (toDatetime (Dateextra.add Dateextra.Month 2 date)) [ slug ]
+    sendRequest (toDatetime (Dateextra.floor Dateextra.Monday date)) (toDatetime (Dateextra.add Dateextra.Month 2 date)) [ slug ]
     -- Task.succeed (GraphQlMsg ( Ok createFakeQuery ) ) |> Task.perform identity
 
 

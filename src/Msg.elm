@@ -14,3 +14,4 @@ type Msg
     | WindowSize Window.Size
     | PageBack
     | PageForward
+    | KeyDown Int

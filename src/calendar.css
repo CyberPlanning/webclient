@@ -1,7 +1,6 @@
 .calendar--calendar {
   display: flex;
   flex: 1;
-  /* flex-direction: column; */
 }
 
 .calendar--time-gutter {
@@ -13,7 +12,6 @@
   min-height: 40px;
   display: flex;
   flex-flow: column nowrap;
-  min-width: 70px;
   border-left: 1px solid #d7d7d7;
 }
 
@@ -27,7 +25,6 @@
 .calendar--week-content {
   display: flex;
   border-top: 2px solid #DDD;
-  /* height: 600px; */
   overflow-y: auto;
 }
 
@@ -57,28 +54,16 @@
   text-decoration: none;
 }
 
-.calendar--day-slot {
-  border-bottom: 1px solid #f7f7f7;
-  flex: 1;
-  position: relative;
-}
-
 .calendar--day {
   display: flex;
   flex-flow: column nowrap;
   flex: 1;
 }
 
-.calendar--event-sub {
-  font-size: 11px;
-}
-
-.calendar--event {
-  font-size: 14px;  
-  padding: 2px 5px;
-  background-color: #5fb4ca;
-  color: white;
-  cursor: pointer;
+.calendar--day-slot {
+  border-bottom: 1px solid #f7f7f7;
+  flex: 1;
+  position: relative;
 }
 
 .calendar--day-content {
@@ -93,4 +78,23 @@
 .calendar--hour-slot {
   padding: 0 5px;
   flex: 1 0 0;
+}
+
+.calendar--event {
+  font-size: 14px;  
+  padding: 2px 5px;
+  background-color: #5fb4ca;
+  color: white;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.calendar--event-title {
+  font-weight: bold;
+  height: 2em;
+  line-height: 1em;
+}
+
+.calendar--event-sub {
+  font-size: 11px;
 }

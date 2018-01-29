@@ -183,7 +183,7 @@ eventSegment event selectedId eventRange timeSpan =
              ]
                 ++ eventStyling event eventRange timeSpan classes
             )
-            [ div [] [ text event.title ]
+            [ div [ class "calendar--event-title" ] [ text event.title ]
             , div [ class "calendar--event-sub" ] [ text <| String.join "," event.classrooms ]
             , div [ class "calendar--event-sub" ] [ text <| String.join "," event.teachers ]
             , div [ class "calendar--event-sub" ] [ text <| String.join "," event.groups ]
