@@ -2,11 +2,7 @@
     border-top: 1px solid #7f8c8d;
 }
 
-.calendar--time-gutter {
-    min-width: 50px;
-}
-
-.calendar--date-header{
+.calendar--dates-header{
     background-color: #34495e;
 }
 
@@ -44,6 +40,14 @@
 
 .main--navigatiors-button:hover, .main--selector:hover {
     background-color: #34495e;
+}
+
+main--navigatiors-button {
+    height: 100%;
+    color: #ecf0f1;
+    border: 0;
+    font-size: 15px;
+    padding: 5px 15px;
 }
 
 .calendar--date-header {
@@ -84,6 +88,6 @@ body {
     color: #ecf0f1;
 }
 
-.calendar--dates-header {
+calendar--dates-header {
     background-color: #232a2c;
 }

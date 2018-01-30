@@ -93,6 +93,7 @@
   font-weight: bold;
   height: 2em;
   line-height: 1em;
+  overflow: hidden;
 }
 
 .calendar--event-sub {
