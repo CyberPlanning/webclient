@@ -12,6 +12,7 @@ import Calendar.Msg
 import Calendar.Calendar as Calendar
 import Calendar.Msg as CalMsg exposing (TimeSpan(..))
 
+import Swipe
 
 ---- UPDATE ----
 
@@ -92,6 +93,33 @@ update msg model =
             in
                 ( { model | calendarState = updatedCalendar }, Cmd.none )
 
+        SwipeEvent msg ->
+            let
+                updatedSwipe =
+                    Swipe.update msg model.swipe
+
+                action = if updatedSwipe.state == Swipe.SwipeEnd then
+                    if distanceX updatedSwipe.c0 updatedSwipe.c1 > 70.0 then
+                        case updatedSwipe.direction of 
+                            Just Swipe.Left ->
+                                Task.succeed PageForward
+                                |> Task.perform identity
+
+                            Just Swipe.Right ->
+                                Task.succeed PageBack
+                                |> Task.perform identity
+
+                            _ ->
+                                Cmd.none
+                        
+                        else
+                            Cmd.none
+                    else
+                        Cmd.none
+
+            in
+                ( {model | swipe = updatedSwipe}, action )
+
 
 createPlanningRequest: Date.Date -> String -> Cmd Msg
 createPlanningRequest date slug =
@@ -111,3 +139,9 @@ find predicate list =
                 Just first
             else
                 find predicate rest
+
+
+distanceX : Swipe.Coordinates -> Swipe.Coordinates -> Float
+distanceX c0 c1 = 
+    abs (c0.clientX - c1.clientX)
+    |> Debug.log "Distance"

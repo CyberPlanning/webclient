@@ -8,6 +8,8 @@ import Window
 import Calendar.Msg
 import Calendar.Calendar as Calendar
 
+import Swipe
+
 import Http exposing (Error)
 import Types exposing (Query)
 
@@ -22,8 +24,9 @@ type alias Model =
     , date : Maybe Date.Date
     , selectedGroup : Group
     , loading : Bool
-    , calendarState : Calendar.State
     , size : Window.Size
+    , calendarState : Calendar.State
+    , swipe : Swipe.State
     }
 
 type alias Group =
@@ -58,4 +61,5 @@ initialModel =
     , loading = False
     , calendarState = Calendar.init Calendar.Msg.Week ( Dateextra.fromParts 2018 Date.Jan 1 1 0 0 0 )
     , size = { width = 1200, height = 800 }
+    , swipe = Swipe.init
     }

@@ -4,14 +4,16 @@ import Types exposing (Query)
 import Date
 import Http exposing (Error)
 import Window
-import Calendar.Msg
+import Calendar.Msg as Calendar
+import Swipe
 
 type Msg
     = GraphQlMsg (Result Error Query)
     | SetDate Date.Date
     | SetGroup String
-    | SetCalendarState Calendar.Msg.Msg
     | WindowSize Window.Size
     | PageBack
     | PageForward
     | KeyDown Int
+    | SetCalendarState Calendar.Msg
+    | SwipeEvent Swipe.Msg

@@ -11,6 +11,8 @@ import Model exposing ( Model, Group, allGroups, toDatetime )
 import Msg exposing ( Msg(..) )
 import Types exposing (..)
 
+import Swipe exposing ( onSwipe )
+
 import Calendar.Calendar as Calendar
 import Calendar.Event as CalEvent
 
@@ -38,13 +40,16 @@ view model =
                 _ ->
                     []
 
+        attrs = (Swipe.onSwipe SwipeEvent)
+               ++
+               [ class "main--container" ]
+
     in
-        div [ class "main--container"]
-            [ viewToolbar model.selectedGroup (Maybe.withDefault (Date.fromTime 0 )model.date)
+        div attrs
+            [ viewToolbar model.selectedGroup (Maybe.withDefault (Date.fromTime 0 ) model.date)
             , div [ class "main--calendar" ]
                 [ Html.map SetCalendarState (Calendar.view events model.calendarState) ]
             ]
-
 
 toCalEvents : List Event -> List CalEvent.Event
 toCalEvents events =
