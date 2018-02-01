@@ -23,12 +23,8 @@ view events selectedId day =
 
 viewDate : Date -> Html Msg
 viewDate day =
-    let
-        title day =
-            Date.Extra.toFormattedString "EEEE dd MMM" day
-    in
-        div [ class "calendar--date-header" ]
-            [ a [ class "calendar--date", href "#" ] [ text <| title day ] ]
+    div [ class "calendar--date-header" ]
+            [ a [ class "calendar--date", href "#" ] [ text <| Helpers.dateString day ] ]
 
 
 viewDayHeader : Date -> Html Msg

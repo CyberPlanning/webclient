@@ -7,7 +7,8 @@ import Html.Attributes exposing (class, classList, style)
 import Html.Events exposing (..)
 import Calendar.Msg exposing (Msg(..), TimeSpan(..))
 import Calendar.Helpers as Helpers
-import MD5
+import Hex
+import Color exposing (Color)
 
 type alias Event =
     { toId: String
@@ -17,6 +18,7 @@ type alias Event =
     , classrooms : (List String)
     , teachers : (List String)
     , groups : (List String)
+    , color : Color
     }
 
 type EventRange
@@ -80,8 +82,8 @@ eventStyling event eventRange timeSpan customClasses =
         eventEnd =
             event.end
 
-        eventId =
-            event.toId
+        eventColor =
+            event.color
 
         classes =
             case eventRange of
@@ -106,7 +108,7 @@ eventStyling event eventRange timeSpan customClasses =
                     style []
 
                 Day ->
-                    styleDayEvent eventStart eventEnd eventId
+                    styleDayEvent eventStart eventEnd eventColor
     in
         [ classList (( classes, True ) :: customClasses), styles ]
 
@@ -121,8 +123,8 @@ percentDay date min max =
     ((Date.Extra.fractionalDay date) - min ) / (max-min)
 
 
-styleDayEvent : Date -> Date -> String -> Html.Attribute msg
-styleDayEvent start end id =
+styleDayEvent : Date -> Date -> Color -> Html.Attribute msg
+styleDayEvent start end color =
     let
         startPercent =
             100 * percentDay start (7/24) (20/24)
@@ -136,10 +138,6 @@ styleDayEvent start end id =
         startPercentage =
             (toString startPercent) ++ "%"
 
-        bgColor =
-            MD5.hex id
-            |> String.right 6
-            |> (++) "#"
     in
         style
             [ "top" => startPercentage
@@ -147,7 +145,7 @@ styleDayEvent start end id =
             , "left" => "2%"
             , "width" => "96%"
             , "position" => "absolute"
-            , "background-color" => bgColor
+            , "background-color" => Helpers.colorToHex color
             ]
 
 
@@ -177,9 +175,9 @@ eventSegment event selectedId eventRange timeSpan =
             ]
     in
         div
-            ([ onClick <| EventClick eventId
-             , onMouseEnter <| EventMouseEnter eventId
+            ([ onMouseEnter <| EventMouseEnter eventId
              , onMouseLeave <| EventMouseLeave eventId
+            --  , onClick <| EventClick eventId
              ]
                 ++ eventStyling event eventRange timeSpan classes
             )

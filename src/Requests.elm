@@ -23,6 +23,7 @@ planningRequest =
             , GraphQl.field "classrooms"
             , GraphQl.field "teachers"
             , GraphQl.field "groups"
+            , GraphQl.field "eventId"
             ]
         ]
     ]

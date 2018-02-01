@@ -1,0 +1,13 @@
+
+.tooltip--event {
+    position: absolute;
+    font-size: 15px;
+    width: 70%;
+    max-width: 200px;
+    bottom: 0;
+    padding: 5px;
+}
+
+.tooltip--event-title {
+    font-size: 1.3em;
+}

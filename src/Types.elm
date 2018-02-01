@@ -15,6 +15,7 @@ type alias Event =
     , classrooms : (List String)
     , teachers : (List String)
     , groups : (List String)
+    , eventId : String
     }
 
 
@@ -31,13 +32,14 @@ decodePlanning =
 
 decodeEvent : Decoder Event
 decodeEvent =
-  Decode.map6 Event
+  Decode.map7 Event
     (field "title" string)
     (field "startDate" string)
     (field "endDate" string)
     (field "classrooms" (Decode.list string))
     (field "teachers" (Decode.list string))
     (field "groups" (Decode.list string))
+    (field "eventId" string)
 
 
 decodeQuery : Decoder Query

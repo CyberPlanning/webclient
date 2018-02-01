@@ -1,7 +1,3 @@
-.calendar--week-content{
-    border-top: 1px solid #7f8c8d;
-}
-
 .calendar--dates-header{
     background-color: #34495e;
 }
@@ -64,9 +60,14 @@ main--navigatiors-button {
     border: 0;
 }
 
-.calendar--week-header {
+.calendar--week-header, .calendar--day .calendar--date-header {
     background-color: #34495e;
     padding: 2px 0;
+    border-bottom: 1px solid #7f8c8d;
+}
+
+.calendar--week-content{
+    border-top: 0;
 }
 
 .calendar--dates-header {

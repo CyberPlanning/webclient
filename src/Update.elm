@@ -4,7 +4,7 @@ import Task
 import Date
 import Date.Extra as Dateextra
 
-import Model exposing (Model, allGroups, toDatetime)
+import Model exposing (Model, allGroups, toDatetime, toCalEvents)
 import Requests exposing (sendRequest)
 import Msg exposing (Msg(..))
 import Calendar.Msg
@@ -32,7 +32,19 @@ update msg model =
                 )
 
         GraphQlMsg response ->
-            ( { model | data = Just response, loading = False }, Cmd.none )
+            let
+                query = Result.toMaybe response
+
+                data = case query of
+                    Just query ->
+                        query.planning.events
+                        |> toCalEvents
+                        |> Just
+
+                    _ ->
+                        Nothing
+            in
+                ( { model | data = data, loading = False }, Cmd.none )
 
         SetGroup slug ->
             let
@@ -119,6 +131,14 @@ update msg model =
 
             in
                 ( {model | swipe = updatedSwipe}, action )
+
+        ClickToday ->
+            let
+                date = model.date |> Maybe.withDefault (Date.fromTime 0)
+                calendarState = model.calendarState
+                newCalendarState = { calendarState | viewing = date }
+            in
+                ( { model | calendarState = newCalendarState }, Cmd.none )
 
 
 createPlanningRequest: Date.Date -> String -> Cmd Msg

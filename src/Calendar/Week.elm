@@ -8,7 +8,6 @@ import Calendar.Msg exposing (Msg)
 import Calendar.Event exposing (Event)
 import Calendar.Helpers as Helpers
 
-
 viewWeekContent :
     List Event
     -> Maybe String

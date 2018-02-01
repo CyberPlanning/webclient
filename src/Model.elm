@@ -4,14 +4,18 @@ import String exposing(dropRight)
 import Date
 import Date.Extra as Dateextra
 import Window
+import Color exposing (Color)
+import Hex
+import MD5
 
 import Calendar.Msg
 import Calendar.Calendar as Calendar
+import Calendar.Event as CalEvent
 
 import Swipe
 
 import Http exposing (Error)
-import Types exposing (Query)
+import Types exposing (Query, Event)
 
 ---- MODEL ----
 
@@ -20,7 +24,7 @@ type alias PlanningResponse =
 
 
 type alias Model =
-    { data : Maybe PlanningResponse --Maybe (Result String Query)
+    { data : Maybe (List CalEvent.Event) --Maybe (Result String Query)
     , date : Maybe Date.Date
     , selectedGroup : Group
     , loading : Bool
@@ -63,3 +67,49 @@ initialModel =
     , size = { width = 1200, height = 800 }
     , swipe = Swipe.init
     }
+
+toCalEvents : List Event -> List CalEvent.Event
+toCalEvents events =
+    List.map toCalEvent events
+
+
+toCalEvent : Event -> CalEvent.Event
+toCalEvent event =
+        { toId = event.eventId
+        , title = event.title
+        , start = parseDateEvent event.startDate
+        , end = parseDateEvent event.endDate
+        , classrooms = event.classrooms
+        , teachers = event.teachers
+        , groups = event.groups
+        , color = computeColor event.title
+        }
+
+
+parseDateEvent: String -> Date.Date
+parseDateEvent date =
+    date ++ "Z"
+    |> Dateextra.fromIsoString
+    |> Maybe.withDefault (Date.fromTime 0)
+
+
+computeColor : String -> Color
+computeColor text =
+    let
+        hex = MD5.hex text
+            |> String.right 6
+
+        red = String.slice 0 2 hex
+            |> Hex.fromString
+            |> Result.withDefault 0
+
+        green = String.slice 2 4 hex
+            |> Hex.fromString
+            |> Result.withDefault 0
+
+        blue = String.slice 4 6 hex
+            |> Hex.fromString
+            |> Result.withDefault 0
+    in
+        Color.rgb red green blue
+

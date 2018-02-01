@@ -6,6 +6,7 @@ html, body, #root{
   padding: 0;
   margin: 0;
   height: 100vh;
+  overflow: hidden
 }
 
 body {
@@ -34,6 +35,7 @@ body {
 
 .main--month-title {
   flex: 1;
+  cursor: pointer;
 }
 
 .main--month-title h2 {

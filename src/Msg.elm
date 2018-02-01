@@ -17,3 +17,4 @@ type Msg
     | KeyDown Int
     | SetCalendarState Calendar.Msg
     | SwipeEvent Swipe.Msg
+    | ClickToday

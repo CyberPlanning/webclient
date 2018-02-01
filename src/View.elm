@@ -6,6 +6,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (on, targetValue, onClick)
 import Json.Decode as Json
+import Color exposing (Color)
 
 import Model exposing ( Model, Group, allGroups, toDatetime )
 import Msg exposing ( Msg(..) )
@@ -15,6 +16,7 @@ import Swipe exposing ( onSwipe )
 
 import Calendar.Calendar as Calendar
 import Calendar.Event as CalEvent
+import Calendar.Helpers exposing (colorToHex)
 
 ---- VIEW ----
 
@@ -30,15 +32,8 @@ view model =
                 Nothing ->
                     "Nothing"
 
-        events = case model.data of
-                Just (Ok query) ->
-                    if List.isEmpty query.planning.events then
-                        []
-                    else
-                        toCalEvents query.planning.events
-
-                _ ->
-                    []
+        events =
+            model.data |> Maybe.withDefault []
 
         attrs = (Swipe.onSwipe SwipeEvent)
                ++
@@ -46,26 +41,12 @@ view model =
 
     in
         div attrs
-            [ viewToolbar model.selectedGroup (Maybe.withDefault (Date.fromTime 0 ) model.date)
+            [ viewToolbar model.selectedGroup model.calendarState.viewing
             , div [ class "main--calendar" ]
-                [ Html.map SetCalendarState (Calendar.view events model.calendarState) ]
+                [ Html.map SetCalendarState (Calendar.view events model.calendarState)
+                ]
+            , viewTooltip model.calendarState.hover events
             ]
-
-toCalEvents : List Event -> List CalEvent.Event
-toCalEvents events =
-    List.map toCalEvent events
-
-
-toCalEvent : Event -> CalEvent.Event
-toCalEvent event =
-        { toId = event.title
-        , title = event.title
-        , start = parseDateEvent event.startDate
-        , end = parseDateEvent event.endDate
-        , classrooms = event.classrooms
-        , teachers = event.teachers
-        , groups = event.groups
-        }
 
 
 viewToolbar : Group -> Date.Date -> Html Msg
@@ -80,7 +61,7 @@ viewToolbar selected viewing =
 
 viewTitle : Date.Date -> Html Msg
 viewTitle viewing =
-    div [ class "main--month-title" ]
+    div [ class "main--month-title", onClick ClickToday ]
         [ h2 [] [ text <| Dateextra.toFormattedString "MMMM yyyy" viewing ] ]
 
 
@@ -106,8 +87,35 @@ optionGroup group =
            [ text group.name ]
 
 
-parseDateEvent: String -> Date.Date
-parseDateEvent date =
-    date ++ "Z"
-    |> Dateextra.fromIsoString
-    |> Maybe.withDefault (Date.fromTime 0)
+viewTooltip : Maybe String -> List CalEvent.Event -> Html Msg
+viewTooltip selectedId events =
+    let
+        content = case selectedId of
+            Just id ->
+                List.filter (\e -> e.toId == id) events
+                |> List.head
+                |> viewTooltipContent
+
+            _ ->
+                []
+    in
+        div [ class "tooltip" ] content
+
+viewTooltipContent : Maybe CalEvent.Event -> List (Html Msg)
+viewTooltipContent event =
+    case event of
+        Just event ->
+            [ div [ class "tooltip--event", (tooltipStyle event.color)]
+                [ div [ class "tooltip--event-title" ] [ text event.title ]
+                , div [ class "tooltip--event-sub" ] [ text <| String.join "," event.classrooms ]
+                , div [ class "tooltip--event-sub" ] [ text <| String.join "," event.teachers ]
+                , div [ class "tooltip--event-sub" ] [ text <| String.join "," event.groups ]
+                ]
+            ]
+        _ ->
+            []
+
+
+tooltipStyle : Color -> Html.Attribute Msg
+tooltipStyle color =
+        style [ ("background-color", colorToHex color) ]

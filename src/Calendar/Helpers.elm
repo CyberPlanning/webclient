@@ -3,11 +3,18 @@ module Calendar.Helpers exposing (..)
 import Date exposing (Date)
 import Date.Extra
 import List.Extra
+import Color exposing (Color)
+import Hex
 
 
 hourString : Date -> String
-hourString date =
-    Date.Extra.toFormattedString "H:mm" date
+hourString =
+    Date.Extra.toFormattedString "H:mm"
+
+
+dateString : Date -> String
+dateString =
+    Date.Extra.toFormattedString "EEEE dd"
 
 
 bumpMidnightBoundary : Date -> Date
@@ -60,3 +67,14 @@ dayRangeOfWeek date =
             1
             (Date.Extra.floor Date.Extra.Monday weekDate)
             (Date.Extra.ceiling Date.Extra.Saturday weekDate)
+
+colorToHex : Color -> String
+colorToHex color =
+    let
+        rgb =
+            Color.toRgb color
+
+        toHex =
+            Hex.toString >> String.padLeft 2 '0'
+    in
+        "#" ++ (toHex rgb.red) ++ (toHex rgb.green) ++ (toHex rgb.blue)
