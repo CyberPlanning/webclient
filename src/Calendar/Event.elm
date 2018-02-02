@@ -7,8 +7,6 @@ import Html.Attributes exposing (class, classList, style)
 import Html.Events exposing (..)
 import Calendar.Msg exposing (Msg(..), TimeSpan(..))
 import Calendar.Helpers as Helpers
-import Hex
-import Color exposing (Color)
 
 type alias Event =
     { toId: String
@@ -18,7 +16,7 @@ type alias Event =
     , classrooms : (List String)
     , teachers : (List String)
     , groups : (List String)
-    , color : Color
+    , color : String
     }
 
 type EventRange
@@ -123,7 +121,7 @@ percentDay date min max =
     ((Date.Extra.fractionalDay date) - min ) / (max-min)
 
 
-styleDayEvent : Date -> Date -> Color -> Html.Attribute msg
+styleDayEvent : Date -> Date -> String -> Html.Attribute msg
 styleDayEvent start end color =
     let
         startPercent =
@@ -145,7 +143,8 @@ styleDayEvent start end color =
             , "left" => "2%"
             , "width" => "96%"
             , "position" => "absolute"
-            , "background-color" => Helpers.colorToHex color
+            , "background-color" => color
+            -- , "color" => if Helpers.isBright color then "black" else "white"
             ]
 
 
@@ -177,7 +176,7 @@ eventSegment event selectedId eventRange timeSpan =
         div
             ([ onMouseEnter <| EventMouseEnter eventId
              , onMouseLeave <| EventMouseLeave eventId
-            --  , onClick <| EventClick eventId
+             , onClick <| EventMouseEnter eventId
              ]
                 ++ eventStyling event eventRange timeSpan classes
             )

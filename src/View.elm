@@ -11,12 +11,12 @@ import Color exposing (Color)
 import Model exposing ( Model, Group, allGroups, toDatetime )
 import Msg exposing ( Msg(..) )
 import Types exposing (..)
+import Tooltip
 
 import Swipe exposing ( onSwipe )
 
 import Calendar.Calendar as Calendar
 import Calendar.Event as CalEvent
-import Calendar.Helpers exposing (colorToHex)
 
 ---- VIEW ----
 
@@ -45,7 +45,7 @@ view model =
             , div [ class "main--calendar" ]
                 [ Html.map SetCalendarState (Calendar.view events model.calendarState)
                 ]
-            , viewTooltip model.calendarState.hover events
+            , Tooltip.viewTooltip model.calendarState.hover events
             ]
 
 
@@ -54,7 +54,7 @@ viewToolbar selected viewing =
     div [ class "main--toolbar" ]
         [ viewPagination
         , viewTitle viewing
-        , select [ class "main--selector", on "change" <| Json.map SetGroup targetValue, value selected.slug ] (List.map optionGroup allGroups)
+        , select [ id "groupSelect", class "main--selector", on "change" <| Json.map SetGroup targetValue, value selected.slug ] (List.map optionGroup allGroups)
         -- , viewTimeSpanSelection timeSpan
         ]
 
@@ -85,37 +85,3 @@ optionGroup: Group -> Html Msg
 optionGroup group =
     option [ value group.slug ]
            [ text group.name ]
-
-
-viewTooltip : Maybe String -> List CalEvent.Event -> Html Msg
-viewTooltip selectedId events =
-    let
-        content = case selectedId of
-            Just id ->
-                List.filter (\e -> e.toId == id) events
-                |> List.head
-                |> viewTooltipContent
-
-            _ ->
-                []
-    in
-        div [ class "tooltip" ] content
-
-viewTooltipContent : Maybe CalEvent.Event -> List (Html Msg)
-viewTooltipContent event =
-    case event of
-        Just event ->
-            [ div [ class "tooltip--event", (tooltipStyle event.color)]
-                [ div [ class "tooltip--event-title" ] [ text event.title ]
-                , div [ class "tooltip--event-sub" ] [ text <| String.join "," event.classrooms ]
-                , div [ class "tooltip--event-sub" ] [ text <| String.join "," event.teachers ]
-                , div [ class "tooltip--event-sub" ] [ text <| String.join "," event.groups ]
-                ]
-            ]
-        _ ->
-            []
-
-
-tooltipStyle : Color -> Html.Attribute Msg
-tooltipStyle color =
-        style [ ("background-color", colorToHex color) ]

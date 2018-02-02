@@ -1,6 +1,7 @@
 module Update exposing (..)
 
 import Task
+import Dom
 import Date
 import Date.Extra as Dateextra
 
@@ -44,7 +45,8 @@ update msg model =
                     _ ->
                         Nothing
             in
-                ( { model | data = data, loading = False }, Cmd.none )
+                -- ( { model | data = data, loading = False }, Task.perform (always Cmd.none) (Dom.blur "groupSelect"))
+                ( { model | data = data, loading = False }, Cmd.none)
 
         SetGroup slug ->
             let

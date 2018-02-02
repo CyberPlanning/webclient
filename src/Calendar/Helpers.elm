@@ -68,6 +68,8 @@ dayRangeOfWeek date =
             (Date.Extra.floor Date.Extra.Monday weekDate)
             (Date.Extra.ceiling Date.Extra.Saturday weekDate)
 
+
+
 colorToHex : Color -> String
 colorToHex color =
     let
@@ -78,3 +80,18 @@ colorToHex color =
             Hex.toString >> String.padLeft 2 '0'
     in
         "#" ++ (toHex rgb.red) ++ (toHex rgb.green) ++ (toHex rgb.blue)
+
+
+noBright : Color -> Color
+noBright color =
+    let
+        hsl = 
+            Color.toHsl color
+
+        newLightness =
+            if hsl.lightness > 0.5 then
+                0.5
+            else
+                hsl.lightness
+    in
+        Color.hsl hsl.hue hsl.saturation newLightness

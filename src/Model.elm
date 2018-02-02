@@ -11,6 +11,7 @@ import MD5
 import Calendar.Msg
 import Calendar.Calendar as Calendar
 import Calendar.Event as CalEvent
+import Calendar.Helpers exposing (colorToHex, noBright)
 
 import Swipe
 
@@ -93,7 +94,7 @@ parseDateEvent date =
     |> Maybe.withDefault (Date.fromTime 0)
 
 
-computeColor : String -> Color
+computeColor : String -> String
 computeColor text =
     let
         hex = MD5.hex text
@@ -112,4 +113,6 @@ computeColor text =
             |> Result.withDefault 0
     in
         Color.rgb red green blue
+        |> noBright
+        |> colorToHex
 
