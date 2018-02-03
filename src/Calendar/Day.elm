@@ -7,6 +7,7 @@ import Date.Extra
 import Calendar.Helpers as Helpers
 import Calendar.Msg exposing (Msg(..))
 import Calendar.Event exposing (rangeDescription, maybeViewDayEvent, Event)
+import Html.Events exposing (onClick)
 
 
 view : List Event -> Maybe String -> Date -> Html Msg
@@ -24,7 +25,14 @@ view events selectedId day =
 viewDate : Date -> Html Msg
 viewDate day =
     div [ class "calendar--date-header" ]
-            [ a [ class "calendar--date", href "#" ] [ text <| Helpers.dateString day ] ]
+        [ button [ class "calendar--navigations-week", onClick WeekBack ] [ text "<<" ]
+        , div [ class "calendar--date-header-content" ]
+              [ button [ class "calendar--navigations-day", onClick PageBack ] [ text "<" ]
+              , a [ class "calendar--date", href "#" ] [ text <| Helpers.dateString day ]
+              , button [ class "calendar--navigations-day", onClick PageForward ] [ text ">" ]
+              ]
+        , button [ class "calendar--navigations-week", onClick WeekForward ] [ text ">>" ]
+        ]
 
 
 viewDayHeader : Date -> Html Msg

@@ -8,7 +8,8 @@ import Calendar.Msg as Calendar
 import Swipe
 
 type Msg
-    = GraphQlMsg (Result Error Query)
+    = Noop
+    | GraphQlMsg (Result Error Query)
     | SetDate Date.Date
     | SetGroup String
     | WindowSize Window.Size

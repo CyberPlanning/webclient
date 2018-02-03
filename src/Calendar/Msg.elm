@@ -8,6 +8,8 @@ type TimeSpan
 type Msg
     = PageBack
     | PageForward
+    | WeekForward
+    | WeekBack
     | ChangeTimeSpan TimeSpan
     | EventClick String
     | EventMouseEnter String

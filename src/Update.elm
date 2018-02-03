@@ -21,6 +21,8 @@ import Swipe
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        Noop -> ( model, Cmd.none )
+
         SetDate date ->
             let
                 timespan = if model.size.width < 720 then
@@ -45,8 +47,8 @@ update msg model =
                     _ ->
                         Nothing
             in
-                -- ( { model | data = data, loading = False }, Task.perform (always Cmd.none) (Dom.blur "groupSelect"))
-                ( { model | data = data, loading = False }, Cmd.none)
+                ( { model | data = data, loading = False }, Task.attempt (always Noop) (Dom.blur "groupSelect"))
+                -- ( { model | data = data, loading = False }, Cmd.none)
 
         SetGroup slug ->
             let

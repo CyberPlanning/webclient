@@ -13,29 +13,76 @@
 .main--toolbar{
     background-color: #2c3e50;
     margin-bottom: 0;
-    padding: 5px 0;
+    padding: 0;
 }
 
 .main--month-title h2{
+    padding: 5px 0;
     font-size: 22px;
+    white-space: nowrap;
 }
 
-.main--navigatiors-button, .main--selector {
+.main--selector {
+    border: 0;
+    padding: 0;
+    background-color: transparent;
+}
+
+.main--paginators, .main--selector {
+    flex: 1;
+}
+
+.main--month-title {
+    flex: 2;
+}
+
+.main--navigatiors-button, .main--selector-select {
+    border: 0;
+    padding: 0;
+    height: 100%;
+    background-color: #2c3e50;
+    color: #ecf0f1;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.main--selector-select {
+    appearance: none;
+}
+
+.main--navigatiors-button{
+    padding: 0 10px;
+    text-transform: uppercase;
+}
+
+.main--navigatiors-button:hover, .main--selector-select:hover {
+    background-color: #34495e;
+}
+
+.calendar--date-header {
+    display: flex;
+    align-items: center;
+}
+
+.calendar--date-header-content {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.calendar--navigations-day, .calendar--navigations-week {
     border: 0;
     padding: 0 15px;
-    background-color: #2c3e50;
+    background-color: transparent;
     height: 100%;
     color: #ecf0f1;
     font-size: 15px;
     cursor: pointer;
 }
 
-.main--navigatiors-button{
-    text-transform: uppercase;
-}
-
-.main--navigatiors-button:hover, .main--selector:hover {
-    background-color: #34495e;
+.calendar--navigations-day:hover, .calendar--navigations-week:hover {
+    font-weight: bold;
 }
 
 main--navigatiors-button {

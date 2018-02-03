@@ -3,10 +3,11 @@ module Calendar.Week exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Date exposing (Date)
-import Calendar.Day exposing (viewTimeGutter, viewTimeGutterHeader, viewDate, viewDaySlotGroup, viewAllDayCell, viewDayEvents)
-import Calendar.Msg exposing (Msg)
+import Calendar.Day exposing (viewTimeGutter, viewTimeGutterHeader, viewDaySlotGroup, viewAllDayCell, viewDayEvents)
+import Calendar.Msg exposing (Msg(..))
 import Calendar.Event exposing (Event)
 import Calendar.Helpers as Helpers
+
 
 viewWeekContent :
     List Event
@@ -67,3 +68,9 @@ viewDates days =
         [ viewTimeGutterHeader
         , div [ class "calendar--dates" ] <| List.map viewDate days
         ]
+
+
+viewDate : Date -> Html Msg
+viewDate day =
+    div [ class "calendar--date-header" ]
+            [ a [ class "calendar--date", href "#" ] [ text <| Helpers.dateString day ] ]

@@ -39,6 +39,12 @@ update msg state =
         PageForward ->
             page 1 state
 
+        WeekBack ->
+            page -7 state 
+
+        WeekForward ->
+            page 7 state
+
         ChangeTimeSpan timeSpan ->
             changeTimeSpan timeSpan state
 

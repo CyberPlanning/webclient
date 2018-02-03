@@ -6,17 +6,15 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (on, targetValue, onClick)
 import Json.Decode as Json
-import Color exposing (Color)
 
 import Model exposing ( Model, Group, allGroups, toDatetime )
 import Msg exposing ( Msg(..) )
-import Types exposing (..)
 import Tooltip
 
 import Swipe exposing ( onSwipe )
 
 import Calendar.Calendar as Calendar
-import Calendar.Event as CalEvent
+import Calendar.Msg exposing (TimeSpan(..))
 
 ---- VIEW ----
 
@@ -41,7 +39,7 @@ view model =
 
     in
         div attrs
-            [ viewToolbar model.selectedGroup model.calendarState.viewing
+            [ viewToolbar model.selectedGroup model.calendarState.viewing (model.calendarState.timeSpan == Week)
             , div [ class "main--calendar" ]
                 [ Html.map SetCalendarState (Calendar.view events model.calendarState)
                 ]
@@ -49,12 +47,12 @@ view model =
             ]
 
 
-viewToolbar : Group -> Date.Date -> Html Msg
-viewToolbar selected viewing =
+viewToolbar : Group -> Date.Date -> Bool -> Html Msg
+viewToolbar selected viewing all =
     div [ class "main--toolbar" ]
-        [ viewPagination
+        [ viewPagination all
         , viewTitle viewing
-        , select [ id "groupSelect", class "main--selector", on "change" <| Json.map SetGroup targetValue, value selected.slug ] (List.map optionGroup allGroups)
+        , viewSelector selected
         -- , viewTimeSpanSelection timeSpan
         ]
 
@@ -65,12 +63,23 @@ viewTitle viewing =
         [ h2 [] [ text <| Dateextra.toFormattedString "MMMM yyyy" viewing ] ]
 
 
-viewPagination : Html Msg
-viewPagination =
-    div [ class "main--paginators" ]
-        [ button [ class "main--navigatiors-button", onClick PageBack ] [ text "back" ]
-        , button [ class "main--navigatiors-button", onClick PageForward ] [ text "next" ]
-        ]
+viewPagination : Bool -> Html Msg
+viewPagination all =
+    let
+        btns =
+            if all then
+                [ button [ class "main--navigatiors-button", onClick PageBack ] [ text "back" ]
+                , button [ class "main--navigatiors-button", onClick PageForward ] [ text "next" ]
+                ]
+            else
+                []
+
+    in
+        div [ class "main--paginators" ]
+            ( btns 
+              ++
+              [ button [ class "main--navigatiors-button", onClick ClickToday ] [ text "today" ] ]
+            )
 
 
 -- viewTimeSpanSelection : TimeSpan -> Html Msg
@@ -79,6 +88,15 @@ viewPagination =
 --         [ button [ class "main--button", onClick (ChangeTimeSpan Week) ] [ text "Week" ]
 --         , button [ class "main--button", onClick (ChangeTimeSpan Day) ] [ text "Day" ]
 --         ]
+
+
+viewSelector : Group -> Html Msg
+viewSelector selected =
+    div [  class "main--selector" ]
+        [ select [ class "main--selector-select" , id "groupSelect", on "change" <| Json.map SetGroup targetValue, value selected.slug ]
+                 (List.map optionGroup allGroups)
+        ]
+    
 
 
 optionGroup: Group -> Html Msg
