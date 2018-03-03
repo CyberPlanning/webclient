@@ -9,6 +9,7 @@ import View exposing (view)
 import Model exposing (Model, initialModel)
 import Update exposing ( update )
 import Msg exposing ( Msg(..) )
+import Storage
 
 
 ---- PROGRAM ----
@@ -25,5 +26,14 @@ main =
         { view = view
         , init = init
         , update = update
-        , subscriptions = always (Keyboard.downs KeyDown)
+        , subscriptions = subscriptions
         }
+
+
+subscriptions : Model -> Sub Msg
+subscriptions model = 
+    Sub.batch
+        [ Storage.load LoadGroup
+        , Storage.saved SavedGroup
+        , Keyboard.downs KeyDown
+        ]

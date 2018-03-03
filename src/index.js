@@ -2,11 +2,19 @@ import '../bower_components/normalize-css/normalize.css'
 import './css/main.css';
 import './css/tooltip.css';
 import './css/calendar.css';
-import './css/calendar.black.css';
 import { Main } from './Main.elm';
 import registerServiceWorker from './service/registerServiceWorker';
 
-Main.embed(document.getElementById('root'));
+const app = Main.embed(document.getElementById('root'));
+
+const storageKey = "group";
+app.ports.save.subscribe(function(value) {
+    localStorage.setItem(storageKey, value);
+    app.ports.saved.send("ok");
+});
+app.ports.doload.subscribe(function() {
+    app.ports.load.send(localStorage.getItem(storageKey) || "");
+});
 
 registerServiceWorker();
 

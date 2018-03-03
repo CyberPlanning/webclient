@@ -5,6 +5,7 @@ import Dom
 import Date
 import Date.Extra as Dateextra
 
+import Storage
 import Model exposing (Model, allGroups, toDatetime, toCalEvents)
 import Requests exposing (sendRequest)
 import Msg exposing (Msg(..))
@@ -54,20 +55,8 @@ update msg model =
             let
                 group =
                     Maybe.withDefault { slug = "12", name = "Cyber1 TD2" } <| find (\x -> x.slug == slug) allGroups
-
-                cmd =
-                    if model.loading then
-                        Cmd.none
-                    else
-                        case model.date of
-                            Just date ->
-                                createPlanningRequest date slug
-
-                            Nothing ->
-                                Cmd.none
-                
             in
-                ( { model | selectedGroup = group, loading = True }, cmd )
+                ( { model | selectedGroup = group}, Storage.save slug )
 
         SetCalendarState calendarMsg ->
             let
@@ -95,7 +84,8 @@ update msg model =
 
 
         WindowSize size ->
-            ( { model | size = size }, Task.perform SetDate Date.now)
+            ( { model | size = size }, Storage.doload () )
+            -- ( { model | size = size }, Task.perform SetDate Date.now)
 
         KeyDown code ->
             let
@@ -143,6 +133,28 @@ update msg model =
                 newCalendarState = { calendarState | viewing = date }
             in
                 ( { model | calendarState = newCalendarState }, Cmd.none )
+
+        LoadGroup slug ->
+            let
+                group =
+                    Maybe.withDefault { slug = "12", name = "Cyber1 TD2" } <| find (\x -> x.slug == slug) allGroups
+            in
+                ( {model | selectedGroup = group}, Task.perform SetDate Date.now )
+
+        SavedGroup ok ->
+            let
+                cmd =
+                    if model.loading then
+                        Cmd.none
+                    else
+                        case model.date of
+                            Just date ->
+                                createPlanningRequest date model.selectedGroup.slug
+
+                            Nothing ->
+                                Cmd.none
+            in
+                ( {model | loading = True }, cmd)
 
 
 createPlanningRequest: Date.Date -> String -> Cmd Msg

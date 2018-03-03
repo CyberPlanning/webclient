@@ -14,7 +14,8 @@ body {
   font-size: 20px;
   margin: 0;
   text-align: center;
-  color: #293c4b;
+  background-color: #2d3436;
+  color: #ecf0f1;
 }
 
 .main--container {
@@ -30,26 +31,44 @@ body {
 
 .main--toolbar {
   display: flex;
-  margin-bottom: 1rem;
+  background-color: #2c3e50;
+  padding: 0;
 }
 
 .main--month-title {
-  flex: 1;
+  flex: 2;
   cursor: pointer;
 }
 
 .main--month-title h2 {
   margin: 0;
+  padding: 5px 0;
+  font-size: 22px;
+  white-space: nowrap;
 }
 
-.main--selector {
-  border: 1px solid #ccc;
-  padding: 5px;
-  background-color: white;
+.main--navigatiors-button, .main--selector-select {
+  height: 100%;
+  border: 0;
+  background-color: #2c3e50;
+  color: #ecf0f1;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.main--navigatiors-button:hover, .main--selector-select:hover {
+  background-color: #34495e;
 }
 
 .main--navigatiors-button {
-  border: 1px solid #ccc;
-  padding: 5px;
-  background-color: white;
+  padding: 0 8px;
+  text-transform: uppercase;
+}
+
+.main--paginators, .main--selector {
+  flex: 1;
+}
+
+.main--selector-select {
+  appearance: none;
 }

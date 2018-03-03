@@ -19,3 +19,5 @@ type Msg
     | SetCalendarState Calendar.Msg
     | SwipeEvent Swipe.Msg
     | ClickToday
+    | LoadGroup String
+    | SavedGroup String
