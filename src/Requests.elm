@@ -14,6 +14,7 @@ planningRequest =
       |> GraphQl.withArgument "fromDate" (GraphQl.variable "from")
       |> GraphQl.withArgument "toDate" (GraphQl.variable "to")
       |> GraphQl.withArgument "affiliationGroups" (GraphQl.variable "grs")
+      |> GraphQl.withArgument "collection" (GraphQl.variable "collection")
       |> GraphQl.withSelectors
         [ GraphQl.field "events"
           |> GraphQl.withSelectors
@@ -30,6 +31,7 @@ planningRequest =
     |> GraphQl.withVariable "from" "DateTime!"
     |> GraphQl.withVariable "to" "DateTime!"
     |> GraphQl.withVariable "grs" "[String]"
+    |> GraphQl.withVariable "collection" "String!"
 
 
 baseRequest : GraphQl.Value GraphQl.Root -> Decoder a -> GraphQl.Request a
@@ -44,5 +46,6 @@ sendRequest from to groups =
     |> GraphQl.addVariables [ ("from", Encode.string from)
                             , ("to", Encode.string to)
                             , ("grs", Encode.list (List.map Encode.string groups))
+                            , ("collection", Encode.string "planning_cyber")
                             ]
     |> GraphQl.send GraphQlMsg
