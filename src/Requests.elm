@@ -36,7 +36,7 @@ planningRequest =
 
 baseRequest : GraphQl.Value GraphQl.Root -> Decoder a -> GraphQl.Request a
 baseRequest =
-  GraphQl.query "http://cyberplanning.fr/graphql/"
+  GraphQl.query "https://cyberplanning.fr/graphql/"
   -- GraphQl.query "http://ensibs.planningiut.fr/graphql/"
 
 

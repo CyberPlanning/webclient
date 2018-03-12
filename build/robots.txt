@@ -34,4 +34,7 @@ Disallow: /admin/
 # (:   _) \  /   /    |: |_)  :)(:      "||:  __   \     (:   _) \    \:  |   (:  (      
 #  \_______)|___/     (_______/  \_______)|__|  \___)     \_______)    \__|    \__/      
 #                                                                                        
-# WIP
+#                                                                                        
+# 3 flag sont cachés sur le site
+# 
+# Tu peux valider un flag sur /flags/<flag>
