@@ -5,6 +5,7 @@ import Json.Encode as Encode
 import Json.Decode as Decode exposing (Decoder, field)
 import Types exposing (Query, Event, decodeQuery)
 import Msg exposing (Msg(..))
+import Config
 
 
 planningRequest : GraphQl.Value GraphQl.Root
@@ -36,8 +37,7 @@ planningRequest =
 
 baseRequest : GraphQl.Value GraphQl.Root -> Decoder a -> GraphQl.Request a
 baseRequest =
-  GraphQl.query "https://cyberplanning.fr/graphql/"
-  -- GraphQl.query "http://ensibs.planningiut.fr/graphql/"
+  GraphQl.query Config.apiUrl
 
 
 sendRequest : String -> String -> List String -> Cmd Msg

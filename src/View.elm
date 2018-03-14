@@ -7,9 +7,10 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (on, targetValue, onClick)
 import Json.Decode as Json
 
-import Model exposing ( Model, Group, allGroups, toDatetime )
+import Model exposing ( Model, Group, toDatetime )
 import Msg exposing ( Msg(..) )
 import Tooltip
+import Config exposing (allGroups)
 
 import Swipe exposing ( onSwipe )
 
@@ -22,14 +23,6 @@ import Calendar.Msg exposing (TimeSpan(..))
 view : Model -> Html Msg
 view model =
     let
-        datetime =
-            case model.date of
-                Just date ->
-                    toDatetime date
-
-                Nothing ->
-                    "Nothing"
-
         events =
             model.data |> Maybe.withDefault []
 
@@ -39,18 +32,19 @@ view model =
 
     in
         div attrs
-            [ viewToolbar model.selectedGroup model.calendarState.viewing (model.calendarState.timeSpan == Week)
+            [ viewToolbar model.selectedGroup model.calendarState.viewing (model.calendarState.timeSpan == Week) model.loading
             , div [ class "main--calendar" ]
                 [ Html.map SetCalendarState (Calendar.view events model.calendarState)
                 ]
+            , div [ (class ("main--message " ++ if model.loading then "" else "hidden")) ] ([] ++ if model.loading then [ text "Loading..." ] else [])
             , Tooltip.viewTooltip model.calendarState.hover events
             ]
 
 
-viewToolbar : Group -> Date.Date -> Bool -> Html Msg
-viewToolbar selected viewing all =
+viewToolbar : Group -> Date.Date -> Bool -> Bool -> Html Msg
+viewToolbar selected viewing all loop =
     div [ class "main--toolbar" ]
-        [ viewPagination all
+        [ viewPagination all loop
         , viewTitle viewing
         , viewSelector selected
         -- , viewTimeSpanSelection timeSpan
@@ -63,8 +57,8 @@ viewTitle viewing =
         [ h2 [] [ text <| Dateextra.toFormattedString "MMMM yyyy" viewing ] ]
 
 
-viewPagination : Bool -> Html Msg
-viewPagination all =
+viewPagination : Bool -> Bool -> Html Msg
+viewPagination all loop =
     let
         btns =
             if all then
@@ -78,16 +72,10 @@ viewPagination all =
         div [ class "main--paginators" ]
             ( btns 
               ++
-              [ button [ class "main--navigatiors-button", onClick ClickToday ] [ text "today" ] ]
+              [ button [ class "main--navigatiors-button", onClick ClickToday ] [ text "today" ]
+              , reloadButton loop
+              ]
             )
-
-
--- viewTimeSpanSelection : TimeSpan -> Html Msg
--- viewTimeSpanSelection timeSpan =
---     div [ class "main--time-spans" ]
---         [ button [ class "main--button", onClick (ChangeTimeSpan Week) ] [ text "Week" ]
---         , button [ class "main--button", onClick (ChangeTimeSpan Day) ] [ text "Day" ]
---         ]
 
 
 viewSelector : Group -> Html Msg
@@ -103,3 +91,17 @@ optionGroup: Group -> Html Msg
 optionGroup group =
     option [ value group.slug ]
            [ text group.name ]
+
+
+reloadButton: Bool -> Html Msg
+reloadButton loop =
+    button [ classList 
+                [ ("main--navigatiors-button", True)
+                , ("main--navigatiors-reload", True)
+                , ("loop", loop)
+                ]
+           , style [ ("font-size", "1.2em") ]
+           , onClick (SavedGroup "ok")
+           ]
+           [ span [] [ text "⟳" ]
+           ]

@@ -1,15 +1,18 @@
 module Update exposing (..)
 
 import Task
+import Time
+import Process
 import Dom
 import Date
 import Date.Extra as Dateextra
 
 import Storage
-import Model exposing (Model, allGroups, toDatetime, toCalEvents)
+import Model exposing (Model, toDatetime, toCalEvents)
 import Requests exposing (sendRequest)
 import Msg exposing (Msg(..))
 import Calendar.Msg
+import Config exposing (allGroups)
 
 import Calendar.Calendar as Calendar
 import Calendar.Msg as CalMsg exposing (TimeSpan(..))
@@ -67,21 +70,10 @@ update msg model =
                 ( { model | calendarState = updatedCalendar }, Cmd.none )
 
         PageForward ->
-            let
-                updatedCalendar =
-                    Calendar.update CalMsg.PageForward model.calendarState
-
-            in
-                ( { model | calendarState = updatedCalendar }, Cmd.none )
+            calendarMove model CalMsg.PageForward
 
         PageBack ->
-            let
-                updatedCalendar =
-                    Calendar.update CalMsg.PageBack model.calendarState
-
-            in
-                ( { model | calendarState = updatedCalendar }, Cmd.none )
-
+            calendarMove model CalMsg.PageBack
 
         WindowSize size ->
             ( { model | size = size }, Storage.doload () )
@@ -144,24 +136,23 @@ update msg model =
         SavedGroup ok ->
             let
                 cmd =
-                    if model.loading then
-                        Cmd.none
-                    else
-                        case model.date of
-                            Just date ->
-                                createPlanningRequest date model.selectedGroup.slug
+                    createPlanningRequest model.calendarState.viewing model.selectedGroup.slug
 
-                            Nothing ->
-                                Cmd.none
             in
                 ( {model | loading = True }, cmd)
 
 
 createPlanningRequest: Date.Date -> String -> Cmd Msg
 createPlanningRequest date slug =
-    -- sendRequest (toDatetime (Dateextra.add Dateextra.Month -7 date)) (toDatetime (Dateextra.add Dateextra.Month 7 date)) [ slug ]
-    sendRequest (toDatetime (Dateextra.floor Dateextra.Monday date)) (toDatetime (Dateextra.add Dateextra.Month 2 date)) [ slug ]
-    -- Task.succeed (GraphQlMsg ( Ok createFakeQuery ) ) |> Task.perform identity
+    let
+        monthBegin = Dateextra.floor Dateextra.Month date
+
+        dateFrom = toDatetime (Dateextra.floor Dateextra.Monday monthBegin)
+
+        dateTo = toDatetime (Dateextra.ceiling Dateextra.Month date)
+    in
+        sendRequest dateFrom dateTo [ slug ]
+        -- Task.succeed (GraphQlMsg ( Ok createFakeQuery ) ) |> Task.perform identity
 
 
 find : (a -> Bool) -> List a -> Maybe a
@@ -181,3 +172,20 @@ distanceX : Swipe.Coordinates -> Swipe.Coordinates -> Float
 distanceX c0 c1 = 
     abs (c0.clientX - c1.clientX)
     |> Debug.log "Distance"
+
+
+calendarMove: Model -> CalMsg.Msg -> ( Model, Cmd Msg )
+calendarMove model calMsg =
+    let
+        updatedCalendar =
+            Calendar.update calMsg model.calendarState
+            
+        (cmd, loading) =
+            if (Date.month updatedCalendar.viewing) /= (Date.month model.calendarState.viewing) then
+                ( createPlanningRequest updatedCalendar.viewing model.selectedGroup.slug
+                , True
+                )
+            else
+                (Cmd.none, False)
+    in
+        ( { model | calendarState = updatedCalendar, loading = loading }, cmd )

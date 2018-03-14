@@ -34,20 +34,12 @@ type alias Model =
     , swipe : Swipe.State
     }
 
+
 type alias Group =
     { name : String
     , slug : String
     }
 
-allGroups: List Group
-allGroups =
-    [ { name = "Cyber1 TD1", slug = "11" }
-    , { name = "Cyber1 TD2", slug = "12" }
-    , { name = "Cyber2 TD1", slug = "21" }
-    , { name = "Cyber2 TD2", slug = "22" }
-    , { name = "Cyber3 TD1", slug = "31" }
-    , { name = "Cyber3 TD2", slug = "32" }
-    ]
 
 toDatetime : Date.Date -> String
 toDatetime date =
@@ -63,7 +55,7 @@ initialModel =
     { data = Nothing
     , date = Nothing
     , selectedGroup = { name = "Cyber1 TD2", slug = "12" }
-    , loading = False
+    , loading = True
     , calendarState = Calendar.init Calendar.Msg.Week ( Dateextra.fromParts 2018 Date.Jan 1 1 0 0 0 )
     , size = { width = 1200, height = 800 }
     , swipe = Swipe.init
