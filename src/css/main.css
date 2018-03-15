@@ -81,9 +81,9 @@ body {
 
   transform-origin: center center;
   animation-name: none;
-  animation-duration: 1200ms;
+  animation-duration: 1000ms;
   animation-timing-function: ease-in-out;
-  animation-iteration-count: infinite;
+  animation-iteration-count: 1;
 }
 
 .main--navigatiors-reload.loop span {

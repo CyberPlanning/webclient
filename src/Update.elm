@@ -131,15 +131,22 @@ update msg model =
                 group =
                     Maybe.withDefault { slug = "12", name = "Cyber1 TD2" } <| find (\x -> x.slug == slug) allGroups
             in
-                ( {model | selectedGroup = group}, Task.perform SetDate Date.now )
+                ( { model | selectedGroup = group }, Task.perform SetDate Date.now )
 
         SavedGroup ok ->
             let
                 cmd =
                     createPlanningRequest model.calendarState.viewing model.selectedGroup.slug
 
+                timeout =
+                    Process.sleep (1 * Time.second)
+                    |> Task.perform StopReloadIcon
+
             in
-                ( {model | loading = True }, cmd)
+                ( { model | loading = True, loop = True }, Cmd.batch [ cmd, timeout ])
+
+        StopReloadIcon _ ->
+            ( { model | loop = False }, Cmd.none )
 
 
 createPlanningRequest: Date.Date -> String -> Cmd Msg

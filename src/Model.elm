@@ -32,6 +32,7 @@ type alias Model =
     , size : Window.Size
     , calendarState : Calendar.State
     , swipe : Swipe.State
+    , loop : Bool
     }
 
 
@@ -59,6 +60,7 @@ initialModel =
     , calendarState = Calendar.init Calendar.Msg.Week ( Dateextra.fromParts 2018 Date.Jan 1 1 0 0 0 )
     , size = { width = 1200, height = 800 }
     , swipe = Swipe.init
+    , loop = False
     }
 
 toCalEvents : List Event -> List CalEvent.Event
