@@ -29,7 +29,7 @@ update msg model =
 
         SetDate date ->
             let
-                timespan = if model.size.width < 720 then
+                timespan = if model.size.width < Config.minWeekWidth then
                                 Day
                            else
                                 Week
@@ -51,7 +51,7 @@ update msg model =
                     _ ->
                         Nothing
             in
-                ( { model | data = data, loading = False }, Task.attempt (always Noop) (Dom.blur "groupSelect"))
+                ( { model | data = data, loading = False }, Task.attempt (always Noop) (Dom.blur "groupSelect") )
                 -- ( { model | data = data, loading = False }, Cmd.none)
 
         SetGroup slug ->
@@ -81,23 +81,27 @@ update msg model =
 
         KeyDown code ->
             let
-                updatedCalendar =
-                    if code == 37 then
-                        Calendar.update CalMsg.PageBack model.calendarState
-                    else if code == 39 then
-                        Calendar.update CalMsg.PageForward model.calendarState
-                    else
-                        model.calendarState
+                cmd = case code of
+                    39 ->
+                        Task.succeed PageForward
+                        |> Task.perform identity
+
+                    37 ->
+                        Task.succeed PageBack
+                        |> Task.perform identity
+
+                    _ ->
+                        Cmd.none
             in
-                ( { model | calendarState = updatedCalendar }, Cmd.none )
+                ( model, cmd )
 
         SwipeEvent msg ->
             let
                 updatedSwipe =
                     Swipe.update msg model.swipe
 
-                action = if updatedSwipe.state == Swipe.SwipeEnd then
-                    if distanceX updatedSwipe.c0 updatedSwipe.c1 > 70.0 then
+                action =
+                    if (updatedSwipe.state == Swipe.SwipeEnd) && (distanceX updatedSwipe.c0 updatedSwipe.c1 > 70.0) then
                         case updatedSwipe.direction of 
                             Just Swipe.Left ->
                                 Task.succeed PageForward
@@ -109,9 +113,6 @@ update msg model =
 
                             _ ->
                                 Cmd.none
-                        
-                        else
-                            Cmd.none
                     else
                         Cmd.none
 
@@ -121,29 +122,43 @@ update msg model =
         ClickToday ->
             let
                 date = model.date |> Maybe.withDefault (Date.fromTime 0)
+                
                 calendarState = model.calendarState
                 newCalendarState = { calendarState | viewing = date }
+
+                (cmd, loading) =
+                    if (Date.month date) /= (Date.month model.calendarState.viewing) then
+                        ( createPlanningRequest newCalendarState.viewing model.selectedGroup.slug
+                        , True
+                        )
+                    else
+                        (Cmd.none, False)
             in
-                ( { model | calendarState = newCalendarState }, Cmd.none )
+                ( { model | calendarState = newCalendarState, loading = loading }, cmd )
 
         LoadGroup slug ->
             let
                 group =
-                    Maybe.withDefault { slug = "12", name = "Cyber1 TD2" } <| find (\x -> x.slug == slug) allGroups
+                    find (\x -> x.slug == slug) allGroups
+                    |> Maybe.withDefault { slug = "12", name = "Cyber1 TD2" }
             in
                 ( { model | selectedGroup = group }, Task.perform SetDate Date.now )
 
         SavedGroup ok ->
             let
-                cmd =
-                    createPlanningRequest model.calendarState.viewing model.selectedGroup.slug
-
-                timeout =
-                    Process.sleep (1 * Time.second)
-                    |> Task.perform StopReloadIcon
+                state =
+                    if (model.loading == False) && (model.loop == False) then
+                        ( { model | loading = True, loop = True }, Cmd.batch
+                            [ createPlanningRequest model.calendarState.viewing model.selectedGroup.slug
+                            , Process.sleep (1 * Time.second)
+                                |> Task.perform StopReloadIcon
+                            ]
+                        )
+                    else
+                        ( model, Cmd.none )
 
             in
-                ( { model | loading = True, loop = True }, Cmd.batch [ cmd, timeout ])
+                state
 
         StopReloadIcon _ ->
             ( { model | loop = False }, Cmd.none )
@@ -178,7 +193,7 @@ find predicate list =
 distanceX : Swipe.Coordinates -> Swipe.Coordinates -> Float
 distanceX c0 c1 = 
     abs (c0.clientX - c1.clientX)
-    |> Debug.log "Distance"
+    -- |> Debug.log "Distance"
 
 
 calendarMove: Model -> CalMsg.Msg -> ( Model, Cmd Msg )

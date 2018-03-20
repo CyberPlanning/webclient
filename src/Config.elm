@@ -4,7 +4,7 @@ import Model exposing (Group)
 
 
 apiUrl: String
-apiUrl= "https://cyberplanning.fr/graphql/"
+apiUrl = "https://cyberplanning.fr/graphql/"
 
 
 allGroups: List Group
@@ -16,3 +16,7 @@ allGroups =
     , { name = "Cyber3 TD1", slug = "31" }
     , { name = "Cyber3 TD2", slug = "32" }
     ]
+
+
+minWeekWidth: Int
+minWeekWidth = 598
