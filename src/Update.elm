@@ -122,19 +122,17 @@ update msg model =
         ClickToday ->
             let
                 date = model.date |> Maybe.withDefault (Date.fromTime 0)
-                
-                calendarState = model.calendarState
-                newCalendarState = { calendarState | viewing = date }
-
+                updatedCalendar = Calendar.init model.calendarState.timeSpan date
+                    
                 (cmd, loading) =
-                    if (Date.month date) /= (Date.month model.calendarState.viewing) then
-                        ( createPlanningRequest newCalendarState.viewing model.selectedGroup.slug
+                    if (Date.month updatedCalendar.viewing) /= (Date.month model.calendarState.viewing) then
+                        ( createPlanningRequest updatedCalendar.viewing model.selectedGroup.slug
                         , True
                         )
                     else
                         (Cmd.none, False)
             in
-                ( { model | calendarState = newCalendarState, loading = loading }, cmd )
+                ( { model | calendarState = updatedCalendar, loading = loading }, cmd )
 
         LoadGroup slug ->
             let
