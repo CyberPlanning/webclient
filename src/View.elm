@@ -1,6 +1,7 @@
 module View exposing (..)
 
 import Date
+import Http
 import Date.Extra as Dateextra
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -36,7 +37,7 @@ view model =
             , div [ class "main--calendar" ]
                 [ Html.map SetCalendarState (Calendar.view events model.calendarState)
                 ]
-            , div [ (class ("main--message " ++ if model.loading then "" else "hidden")) ] ([] ++ if model.loading then [ text "Loading..." ] else [])
+            , viewMessage model
             , Tooltip.viewTooltip model.calendarState.hover events
             ]
 
@@ -105,3 +106,36 @@ reloadButton loop =
            ]
            [ span [] [ text "⟳" ]
            ]
+
+
+viewMessage: Model -> Html Msg
+viewMessage model =
+    let
+        (message, display) =
+            case model.error of
+                Just err ->
+                    (errorMessage err, True)
+                _ ->
+                    if model.loading then
+                        ("Loading...", True)
+                    else
+                        ("", False)
+    in
+        div [ (class ("main--message " ++ if display then "" else "hidden")) ]
+            [ text message
+            ]
+
+
+errorMessage : Http.Error -> String
+errorMessage error =
+    case error of
+        Http.BadUrl _ ->
+            "BadUrl"
+        Http.Timeout ->
+            "Timeout"
+        Http.NetworkError ->
+            "Network Error"
+        Http.BadStatus _ ->
+            "BadStatus"
+        Http.BadPayload _ _ ->
+            "BadPayload"

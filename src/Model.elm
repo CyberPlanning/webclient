@@ -26,6 +26,7 @@ type alias PlanningResponse =
 
 type alias Model =
     { data : Maybe (List CalEvent.Event) --Maybe (Result String Query)
+    , error : Maybe Error
     , date : Maybe Date.Date
     , selectedGroup : Group
     , loading : Bool
@@ -54,6 +55,7 @@ toDatetime date =
 initialModel : Model
 initialModel = 
     { data = Nothing
+    , error = Nothing 
     , date = Nothing
     , selectedGroup = { name = "Cyber1 TD2", slug = "12" }
     , loading = True

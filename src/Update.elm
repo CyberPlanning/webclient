@@ -6,6 +6,8 @@ import Process
 import Dom
 import Date
 import Date.Extra as Dateextra
+import Http exposing (Error)
+
 
 import Storage
 import Model exposing (Model, toDatetime, toCalEvents)
@@ -39,20 +41,19 @@ update msg model =
                 )
 
         GraphQlMsg response ->
-            let
-                query = Result.toMaybe response
+            case response of
+                Ok query ->
+                    let
+                        data =
+                            query.planning.events
+                            |> toCalEvents
+                            |> Just
+                        
+                    in
+                        ( { model | data = data, loading = False }, Task.attempt (always Noop) (Dom.blur "groupSelect") )
 
-                data = case query of
-                    Just query ->
-                        query.planning.events
-                        |> toCalEvents
-                        |> Just
-
-                    _ ->
-                        Nothing
-            in
-                ( { model | data = data, loading = False }, Task.attempt (always Noop) (Dom.blur "groupSelect") )
-                -- ( { model | data = data, loading = False }, Cmd.none)
+                Err err ->
+                    ( { model | error = Just (Debug.log "Network" err), loading = False }, Cmd.none )
 
         SetGroup slug ->
             let
