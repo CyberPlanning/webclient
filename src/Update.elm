@@ -166,11 +166,19 @@ update msg model =
 createPlanningRequest: Date.Date -> String -> Cmd Msg
 createPlanningRequest date slug =
     let
-        monthBegin = Dateextra.floor Dateextra.Month date
+        monthBegin =  date
 
-        dateFrom = toDatetime (Dateextra.floor Dateextra.Monday monthBegin)
+        dateFrom = 
+            date
+            |> Dateextra.floor Dateextra.Month
+            |> Dateextra.floor Dateextra.Monday
+            |> toDatetime
 
-        dateTo = toDatetime (Dateextra.ceiling Dateextra.Month date)
+        dateTo = 
+            date
+            |> Dateextra.ceiling Dateextra.Month
+            |> Dateextra.ceiling Dateextra.Sunday
+            |> toDatetime
     in
         sendRequest dateFrom dateTo [ slug ]
         -- Task.succeed (GraphQlMsg ( Ok createFakeQuery ) ) |> Task.perform identity
