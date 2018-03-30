@@ -50,7 +50,7 @@ update msg model =
                             |> Just
                         
                     in
-                        ( { model | data = data, loading = False }, Task.attempt (always Noop) (Dom.blur "groupSelect") )
+                        ( { model | data = data, loading = False, error = Nothing }, Task.attempt (always Noop) (Dom.blur "groupSelect") )
 
                 Err err ->
                     ( { model | error = Just (Debug.log "Network" err), loading = False }, Cmd.none )
