@@ -3,6 +3,7 @@ module Calendar.Week exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Date exposing (Date)
+import Dict exposing (Dict)
 import Calendar.Day exposing (viewTimeGutter, viewTimeGutterHeader, viewDaySlotGroup, viewAllDayCell, viewDayEvents)
 import Calendar.Msg exposing (Msg(..))
 import Calendar.Event exposing (Event)
@@ -14,28 +15,29 @@ viewWeekContent :
     -> Maybe String
     -> Date
     -> List Date
+    -> Dict String Date
     -> Html Msg
-viewWeekContent events selectedId viewing days =
+viewWeekContent events selectedId viewing days feries =
     let
         timeGutter =
             viewTimeGutter viewing
 
         weekDays =
-            List.map (viewWeekDay events selectedId) days
+            List.map (viewWeekDay events selectedId feries ) days
     in
         div [ class "calendar--week-content" ]
             (timeGutter :: weekDays)
 
 
-viewWeekDay : List Event -> Maybe String -> Date -> Html Msg
-viewWeekDay events selectedId day =
+viewWeekDay : List Event -> Maybe String -> Dict String Date -> Date -> Html Msg
+viewWeekDay events selectedId feries day =
     let
         viewDaySlots =
             Helpers.hours day
                 |> List.map viewDaySlotGroup
 
         dayEvents =
-            viewDayEvents events selectedId day
+            viewDayEvents events selectedId day feries
     in
         div [ class "calendar--day" ]
             [ div [ class "calendar--day-slot" ]
@@ -44,15 +46,15 @@ viewWeekDay events selectedId day =
             
 
 
-view : List Event -> Maybe String -> Date -> Html Msg
-view events selectedId viewing =
+view : List Event -> Maybe String -> Date -> Dict String Date -> Html Msg
+view events selectedId viewing feries =
     let
         weekRange =
             Helpers.dayRangeOfWeek viewing
     in
         div [ class "calendar--week" ]
             [ viewWeekHeader weekRange
-            , viewWeekContent events selectedId viewing weekRange
+            , viewWeekContent events selectedId viewing weekRange feries
             ]
 
 
