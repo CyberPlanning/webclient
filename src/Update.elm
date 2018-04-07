@@ -9,7 +9,7 @@ import Date.Extra as Dateextra
 
 import Storage
 import Model exposing (Model, toDatetime, toCalEvents)
-import Requests exposing (sendRequest)
+import Query exposing (sendRequest)
 import Msg exposing (Msg(..))
 import Config exposing (allGroups)
 
