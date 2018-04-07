@@ -87,7 +87,7 @@ parseDateEvent: String -> Date.Date
 parseDateEvent date =
     date ++ "Z"
     |> Dateextra.fromIsoString
-    |> Maybe.withDefault (Date.fromTime 0)
+    |> Result.withDefault (Date.fromTime 0)
 
 
 computeColor : String -> String

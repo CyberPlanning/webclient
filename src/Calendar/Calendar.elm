@@ -4,12 +4,14 @@ import Html exposing (..)
 import Html.Attributes exposing (class)
 import Html.Events exposing (on, keyCode)
 import Date exposing (Date)
+import Dict exposing (Dict)
 import Date.Extra
 import Calendar.Day as Day
 import Calendar.Week as Week
 import Calendar.Msg exposing (Msg(..), TimeSpan(..))
 import Calendar.Event exposing (Event)
 import Json.Decode as Json
+import Calendar.JourFerie exposing (getAllJourFerie)
 
 
 type alias State =
@@ -17,6 +19,7 @@ type alias State =
     , viewing : Date
     , hover : Maybe String
     , selected : Maybe String
+    , joursFeries : Dict String Date
     }
 
 
@@ -26,6 +29,7 @@ init timeSpan viewing =
     , viewing = viewing
     , hover = Nothing
     , selected = Nothing
+    , joursFeries = getAllJourFerie (Date.year viewing)
     }
 
 
@@ -40,13 +44,16 @@ update msg state =
             page 1 state
 
         WeekBack ->
-            page -7 state 
+            page -7 state
 
         WeekForward ->
             page 7 state
 
         ChangeTimeSpan timeSpan ->
-            changeTimeSpan timeSpan state
+            { state | timeSpan = timeSpan }
+
+        ChangeViewing viewing ->
+            { state | viewing = viewing }
 
         EventClick eventId ->
             { state | selected = Just eventId }
@@ -66,40 +73,23 @@ page step state =
     in
         case timeSpan of
             Week ->
-                { state | viewing = Date.Extra.add Date.Extra.Week step viewing }
+                { state | viewing = Date.Extra.add Date.Extra.Week step viewing, hover = Nothing }
 
             Day ->
-                { state | viewing = Date.Extra.add Date.Extra.Day step viewing }
-
-
-changeTimeSpan : TimeSpan -> State -> State
-changeTimeSpan timeSpan state =
-    { state | timeSpan = timeSpan }
+                { state | viewing = Date.Extra.add Date.Extra.Day step viewing, hover = Nothing }
 
 
 view : List Event -> State -> Html Msg
-view events { viewing, timeSpan, selected } =
+view events { viewing, timeSpan, selected, joursFeries } =
     let
         calendarView =
             case timeSpan of
                 Week ->
-                    Week.view events selected viewing
+                    Week.view events selected viewing joursFeries
 
                 Day ->
-                    Day.view events selected viewing
+                    Day.view events selected viewing joursFeries
     in
         div
             [ class "calendar--calendar" ]
             [ calendarView ]
-
-
-onKeyDown : msg -> Attribute msg
-onKeyDown msg =
-    let
-        isEnter code =
-            if code == 13 then
-                Json.succeed msg
-            else
-                Json.fail "not ENTER"
-    in
-        on "keydown" (Json.andThen isEnter keyCode)

@@ -3,21 +3,23 @@ module Calendar.Day exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Date exposing (Date)
+import Dict exposing (Dict)
 import Date.Extra
 import Calendar.Helpers as Helpers
 import Calendar.Msg exposing (Msg(..))
 import Calendar.Event exposing (rangeDescription, maybeViewDayEvent, Event)
 import Html.Events exposing (onClick)
 
+import Calendar.JourFerie exposing (jourFerie)
 
-view : List Event -> Maybe String -> Date -> Html Msg
-view events selectedId day =
+view : List Event -> Maybe String -> Date -> Dict String Date -> Html Msg
+view events selectedId day feries =
     div [ class "calendar--day" ]
         [ viewDayHeader day
         , div [ class "calendar--day-content" ]
             [ viewTimeGutter day
             , div [ class "calendar--day" ]
-                  [ viewDaySlot events selectedId day ]
+                  [ viewDaySlot events selectedId day feries ]
             ]
         ]
 
@@ -69,11 +71,11 @@ viewHourSlot date =
         [ span [ class "calendar--time-slot-text" ] [ text <| Helpers.hourString date ] ]
 
 
-viewDaySlot : List Event -> Maybe String -> Date -> Html Msg
-viewDaySlot events selectedId day =
+viewDaySlot : List Event -> Maybe String -> Date -> Dict String Date -> Html Msg
+viewDaySlot events selectedId day feries =
     Helpers.hours day
         |> List.map viewDaySlotGroup
-        |> (flip (++)) (viewDayEvents events selectedId day)
+        |> (flip (++)) (viewDayEvents events selectedId day feries)
         |> div [ class "calendar--day-slot" ]
 
 
@@ -92,9 +94,24 @@ viewTimeSlot date =
         []
 
 
-viewDayEvents : List Event -> Maybe String -> Date -> List (Html Msg)
-viewDayEvents events selectedId day =
-    List.filterMap (viewDayEvent day selectedId) events
+viewDayEvents : List Event -> Maybe String -> Date -> Dict String Date -> List (Html Msg)
+viewDayEvents events selectedId day feries =
+    let
+        extra =
+            case jourFerie feries day of
+                Just name ->
+                    text name
+                    |> List.singleton
+                    |> div [ class "calendar--jour-ferie" ]
+                    |> List.singleton
+
+                Nothing ->
+                    []
+
+        eventsHtml = 
+            List.filterMap (viewDayEvent day selectedId) events
+    in
+        extra ++ eventsHtml
 
 
 viewDayEvent : Date -> Maybe String -> Event -> Maybe (Html Msg)
