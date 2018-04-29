@@ -128,3 +128,13 @@
 .calendar--navigations-day:hover, .calendar--navigations-week:hover {
   font-weight: bold;
 }
+
+.calendar--jour-ferie {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  background-color: #262D2F;
+  width: 100%;
+  color: #657277;
+  padding: 100px 0;
+}
