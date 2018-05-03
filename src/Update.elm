@@ -100,7 +100,7 @@ update msg model =
                     Swipe.update msg model.swipe
 
                 action =
-                    if (updatedSwipe.state == Swipe.SwipeEnd) && (distanceX updatedSwipe.c0 updatedSwipe.c1 > 70.0) then
+                    if (updatedSwipe.state == Swipe.SwipeEnd) && (swipeOK updatedSwipe.c0 updatedSwipe.c1) then
                         case updatedSwipe.direction of 
                             Just Swipe.Left ->
                                 Task.succeed PageForward
@@ -188,6 +188,17 @@ find predicate list =
 distanceX : Swipe.Coordinates -> Swipe.Coordinates -> Float
 distanceX c0 c1 = 
     abs (c0.clientX - c1.clientX)
+
+
+distanceY : Swipe.Coordinates -> Swipe.Coordinates -> Float
+distanceY c0 c1 = 
+    abs (c0.clientY - c1.clientY)
+
+
+swipeOK: Swipe.Coordinates -> Swipe.Coordinates -> Bool
+swipeOK p0 p1 =
+    distanceX p0 p1 > 70.0
+    && distanceY p0 p1 < 50.0
 
 
 calendarAction: Model -> CalMsg.Msg -> ( Model, Cmd Msg )
