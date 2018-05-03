@@ -62,12 +62,7 @@ update msg model =
                 ( { model | selectedGroup = group}, Storage.save slug )
 
         SetCalendarState calendarMsg ->
-            let
-                updatedCalendar =
-                    Calendar.update calendarMsg model.calendarState
-
-            in
-                ( { model | calendarState = updatedCalendar }, Cmd.none )
+            calendarAction model calendarMsg
 
         PageForward ->
             calendarAction model CalMsg.PageForward
