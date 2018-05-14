@@ -14,6 +14,7 @@ import Calendar.Event as CalEvent
 import Calendar.Helpers exposing (colorToHex, noBright)
 
 import Swipe
+import Secret
 
 import Http exposing (Error)
 import Types exposing (Query, Event)
@@ -34,6 +35,7 @@ type alias Model =
     , calendarState : Calendar.State
     , swipe : Swipe.State
     , loop : Bool
+    , secret : Secret.State
     }
 
 
@@ -53,9 +55,9 @@ toDatetime date =
 
 
 initialModel : Model
-initialModel = 
+initialModel =
     { data = Nothing
-    , error = Nothing 
+    , error = Nothing
     , date = Nothing
     , selectedGroup = { name = "Cyber1 TD2", slug = "12" }
     , loading = True
@@ -63,6 +65,7 @@ initialModel =
     , size = { width = 1200, height = 800 }
     , swipe = Swipe.init
     , loop = False
+    , secret = Secret.createState
     }
 
 toCalEvents : List Event -> List CalEvent.Event

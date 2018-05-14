@@ -17,6 +17,7 @@ import Calendar.Calendar as Calendar
 import Calendar.Msg as CalMsg exposing (TimeSpan(..))
 
 import Swipe
+import Secret
 
 ---- UPDATE ----
 
@@ -46,7 +47,7 @@ update msg model =
                             query.planning.events
                             |> toCalEvents
                             |> Just
-                        
+
                     in
                         ( { model | data = data, loading = False }, Task.attempt (always Noop) (Dom.blur "groupSelect") )
 
@@ -86,8 +87,12 @@ update msg model =
 
                     _ ->
                         Cmd.none
+
+                updatedModel =
+                    { model | secret = Secret.update code model.secret }
+
             in
-                ( model, cmd )
+                ( updatedModel, cmd )
 
         SwipeEvent msg ->
             let
@@ -96,7 +101,7 @@ update msg model =
 
                 action =
                     if (updatedSwipe.state == Swipe.SwipeEnd) && (swipeOK updatedSwipe.c0 updatedSwipe.c1) then
-                        case updatedSwipe.direction of 
+                        case updatedSwipe.direction of
                             Just Swipe.Left ->
                                 Task.succeed PageForward
                                 |> Task.perform identity
@@ -152,13 +157,13 @@ createPlanningRequest date slug =
     let
         monthBegin =  date
 
-        dateFrom = 
+        dateFrom =
             date
             |> Dateextra.floor Dateextra.Month
             |> Dateextra.floor Dateextra.Monday
             |> toDatetime
 
-        dateTo = 
+        dateTo =
             date
             |> Dateextra.ceiling Dateextra.Month
             |> Dateextra.ceiling Dateextra.Sunday
@@ -181,12 +186,12 @@ find predicate list =
 
 
 distanceX : Swipe.Coordinates -> Swipe.Coordinates -> Float
-distanceX c0 c1 = 
+distanceX c0 c1 =
     abs (c0.clientX - c1.clientX)
 
 
 distanceY : Swipe.Coordinates -> Swipe.Coordinates -> Float
-distanceY c0 c1 = 
+distanceY c0 c1 =
     abs (c0.clientY - c1.clientY)
 
 
@@ -201,7 +206,7 @@ calendarAction model calMsg =
     let
         updatedCalendar =
             Calendar.update calMsg model.calendarState
-            
+
         (cmd, loading) =
             if (Date.month updatedCalendar.viewing) /= (Date.month model.calendarState.viewing) then
                 ( createPlanningRequest updatedCalendar.viewing model.selectedGroup.slug

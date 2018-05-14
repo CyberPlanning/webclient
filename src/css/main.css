@@ -2,7 +2,9 @@
   box-sizing: border-box;
 }
 
-html, body, #root{
+html,
+body,
+#root {
   padding: 0;
   margin: 0;
   height: 100vh;
@@ -56,7 +58,8 @@ body {
   white-space: nowrap;
 }
 
-.main--navigatiors-button, .main--selector-select {
+.main--navigatiors-button,
+.main--selector-select {
   height: 100%;
   border: 0;
   background-color: transparent;
@@ -66,7 +69,8 @@ body {
   vertical-align: top;
 }
 
-.main--navigatiors-button:hover, .main--selector-select:hover {
+.main--navigatiors-button:hover,
+.main--selector-select:hover {
   background-color: #34495e;
 }
 
@@ -78,7 +82,6 @@ body {
 .main--navigatiors-reload span {
   display: block;
   padding-left: 4px;
-
   transform-origin: center center;
   animation-name: none;
   animation-duration: 1000ms;
@@ -90,13 +93,13 @@ body {
   animation-name: loop;
 }
 
-
 .main--navigatiors-button {
   padding: 0 8px;
   text-transform: uppercase;
 }
 
-.main--paginators, .main--selector {
+.main--paginators,
+.main--selector {
   z-index: 1;
 }
 
@@ -113,6 +116,21 @@ body {
   align-items: center;
 }
 
+.fun .calendar--week-content .calendar--day:nth-child(odd) .calendar--event:nth-child(odd) {
+  animation: linear infinite 4s 0.3s fun !important;
+}
+
+.fun .calendar--week-content .calendar--day:nth-child(odd) .calendar--event:nth-child(even) {
+  animation: linear infinite 4s 0.1s fun !important;
+}
+
+.fun .calendar--week-content .calendar--day:nth-child(even) .calendar--event:nth-child(odd) {
+  animation: linear infinite 4s fun reverse !important;
+}
+
+.fun .calendar--week-content .calendar--day:nth-child(even) .calendar--event:nth-child(even) {
+  animation: linear infinite 4s 0.2s fun reverse !important;
+}
 
 @keyframes loop {
   from {
@@ -120,5 +138,17 @@ body {
   }
   to {
     transform: rotate(360deg);
+  }
+}
+
+@keyframes fun {
+  0% {
+    transform: rotate(0) scale(0.8);
+  }
+  50% {
+    transform: rotate(180deg) scale(1.2);
+  }
+  100% {
+    transform: rotate(360deg) scale(0.8);
   }
 }

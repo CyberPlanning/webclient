@@ -14,6 +14,7 @@ import Tooltip
 import Config exposing (allGroups)
 
 import Swipe exposing ( onSwipe )
+import Secret
 
 import Calendar.Calendar as Calendar
 import Calendar.Msg exposing (TimeSpan(..))
@@ -34,7 +35,7 @@ view model =
     in
         div attrs
             [ viewToolbar model.selectedGroup model.calendarState.viewing (model.calendarState.timeSpan == Week) model.loop
-            , div [ class "main--calendar" ]
+            , div [ classList [ ("main--calendar", True), ("fun", Secret.activated model.secret) ] ]
                 [ Html.map SetCalendarState (Calendar.view events model.calendarState)
                 ]
             , viewMessage model
@@ -71,7 +72,7 @@ viewPagination all loop =
 
     in
         div [ class "main--paginators" ]
-            ( btns 
+            ( btns
               ++
               [ button [ class "main--navigatiors-button", onClick ClickToday ] [ text "today" ]
               , reloadButton loop
@@ -85,7 +86,7 @@ viewSelector selected =
         [ select [ class "main--selector-select" , id "groupSelect", on "change" <| Json.map SetGroup targetValue, value selected.slug ]
                  (List.map optionGroup allGroups)
         ]
-    
+
 
 
 optionGroup: Group -> Html Msg
@@ -96,7 +97,7 @@ optionGroup group =
 
 reloadButton: Bool -> Html Msg
 reloadButton loop =
-    button [ classList 
+    button [ classList
                 [ ("main--navigatiors-button", True)
                 , ("main--navigatiors-reload", True)
                 , ("loop", loop)
