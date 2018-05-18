@@ -12,7 +12,7 @@
   display: flex;
   flex-flow: column nowrap;
   border-bottom: 1px solid #363e41;
-    border-left: 1px solid #363e41;
+  border-left: 1px solid #363e41;
 }
 
 .calendar--time-slot-text {
@@ -31,7 +31,8 @@
   overflow-y: auto;
 }
 
-.calendar--week-header, .calendar--day .calendar--date-header {
+.calendar--week-header,
+.calendar--day .calendar--date-header {
   background-color: #34495e;
   padding: 2px 0;
   border-bottom: 1px solid #7f8c8d;
@@ -96,12 +97,13 @@
 }
 
 .calendar--event {
-  font-size: 14px;  
+  font-size: 14px;
   padding: 2px 5px;
   background-color: #5fb4ca;
   color: white;
   cursor: pointer;
   overflow: hidden;
+  border-bottom: 1px solid #2d3436
 }
 
 .calendar--event-title {
@@ -115,7 +117,8 @@
   font-size: 11px;
 }
 
-.calendar--navigations-day, .calendar--navigations-week {
+.calendar--navigations-day,
+.calendar--navigations-week {
   border: 0;
   padding: 0 15px;
   background-color: transparent;
@@ -125,7 +128,8 @@
   cursor: pointer;
 }
 
-.calendar--navigations-day:hover, .calendar--navigations-week:hover {
+.calendar--navigations-day:hover,
+.calendar--navigations-week:hover {
   font-weight: bold;
 }
 
