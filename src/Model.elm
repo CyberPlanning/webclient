@@ -96,7 +96,8 @@ parseDateEvent date =
 computeColor : String -> String
 computeColor text =
     let
-        hex = MD5.hex text
+        hex = String.dropRight 1 text
+            |> MD5.hex
             |> String.right 6
 
         red = String.slice 0 2 hex
