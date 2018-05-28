@@ -136,7 +136,7 @@ update msg model =
             let
                 state =
                     if (model.loading == False) && (model.loop == False) then
-                        ( { model | loading = True, loop = True }, Cmd.batch
+                        ( { model | loading = True, loop = True, error = Nothing }, Cmd.batch
                             [ createPlanningRequest model.calendarState.viewing model.selectedGroup.slug
                             , Process.sleep (1 * Time.second)
                                 |> Task.perform StopReloadIcon
