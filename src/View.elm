@@ -55,7 +55,7 @@ viewToolbar selected viewing all loop =
 
 viewTitle : Date.Date -> Html Msg
 viewTitle viewing =
-    div [ class "main--month-title", onClick ClickToday ]
+    div [ class "main--month-title" ]
         [ h2 [] [ text <| Dateextra.toFormattedString "MMMM yyyy" viewing ] ]
 
 
