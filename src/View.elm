@@ -30,17 +30,23 @@ view model =
 
         attrs = (Swipe.onSwipe SwipeEvent)
                ++
-               [ class "main--container" ]
+               [ classList [ ("main--container", True), ("fun", Secret.activated model.secret) ] ]
+
+        funThings =
+            if Secret.activated model.secret then
+                [ Secret.view ]
+            else
+                []
 
     in
         div attrs
-            [ viewToolbar model.selectedGroup model.calendarState.viewing (model.calendarState.timeSpan == Week) model.loop
-            , div [ classList [ ("main--calendar", True), ("fun", Secret.activated model.secret) ] ]
+            ([ viewToolbar model.selectedGroup model.calendarState.viewing (model.calendarState.timeSpan == Week) model.loop
+            , div [ class "main--calendar" ]
                 [ Html.map SetCalendarState (Calendar.view events model.calendarState)
                 ]
             , viewMessage model
             , Tooltip.viewTooltip model.calendarState.hover events
-            ]
+            ] ++ funThings)
 
 
 viewToolbar : Group -> Date.Date -> Bool -> Bool -> Html Msg

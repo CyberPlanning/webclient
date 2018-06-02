@@ -28,7 +28,8 @@
 
 .calendar--week-content {
   display: flex;
-  overflow-y: auto;
+  /* overflow-y: auto; */
+  overflow: hidden;
 }
 
 .calendar--week-header,

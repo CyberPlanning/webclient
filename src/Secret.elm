@@ -2,6 +2,8 @@ module Secret exposing (..)
 
 import Array exposing(Array)
 
+import Html exposing(Html, iframe)
+import Html.Attributes exposing(width, height, src, attribute)
 
 type alias State =
     { code : Array Int
@@ -31,6 +33,17 @@ update code state =
 
             Nothing ->
                 {state | index = 0}
+
+view: Html msg
+view =
+    iframe [ width 0
+           , height 0
+           , src "https://www.youtube.com/embed/-iYBIsLFbKo?rel=0&amp;controls=0&amp;showinfo=0&amp;autoplay=1&amp;start=6"
+           , attribute "frameborder" "0"
+           , attribute "allow" "autoplay; encrypted-media"
+           , attribute "allowfullscreen" "1"
+           ]
+           []
 
 
 activated: State -> Bool
