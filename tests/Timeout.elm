@@ -1,3 +1,5 @@
+module Timeout exposing (..)
+
 import Html exposing (..)
 import Html.Events exposing (..)
 import Html as App
@@ -41,8 +43,8 @@ update msg model =
                         "clicked"
                     else
                         "not clickeed"
-                        
-                cmd = 
+
+                cmd =
                     if model == "not clicked" then
                         myTask
                     else
