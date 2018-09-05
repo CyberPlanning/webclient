@@ -50,7 +50,7 @@ update msgSource model =
                     ( { model | data = data, loading = False, error = Nothing }, Task.attempt (always Noop) (Browser.Dom.blur "groupSelect") )
 
                 Err err ->
-                    ( { model | error = Just (Debug.log "Network" err), loading = False }, Cmd.none )
+                    ( { model | error = Just err, loading = False }, Cmd.none )
 
         SetGroup slug ->
             let
