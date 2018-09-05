@@ -1,23 +1,22 @@
-module View exposing (..)
-
-import Date
-import Http
-import Date.Extra as Dateextra
-import Html exposing (..)
-import Html.Attributes exposing (..)
-import Html.Events exposing (on, targetValue, onClick)
-import Json.Decode as Json
-
-import Model exposing ( Model, Group, toDatetime )
-import Msg exposing ( Msg(..) )
-import Tooltip
-import Config exposing (allGroups)
-
-import Swipe exposing ( onSwipe )
-import Secret
+module View exposing (errorMessage, optionGroup, reloadButton, view, viewMessage, viewPagination, viewSelector, viewTitle, viewToolbar)
 
 import Calendar.Calendar as Calendar
 import Calendar.Msg exposing (TimeSpan(..))
+import Config exposing (allGroups)
+import Date
+import Date.Extra as Dateextra
+import Html exposing (..)
+import Html.Attributes exposing (..)
+import Html.Events exposing (on, onClick, targetValue)
+import Http
+import Json.Decode as Json
+import Model exposing (Group, Model, toDatetime)
+import Msg exposing (Msg(..))
+import Secret
+import Swipe exposing (onSwipe)
+import Tooltip
+
+
 
 ---- VIEW ----
 
@@ -28,25 +27,30 @@ view model =
         events =
             model.data |> Maybe.withDefault []
 
-        attrs = (Swipe.onSwipe SwipeEvent)
-               ++
-               [ classList [ ("main--container", True), ("fun", Secret.activated model.secret) ] ]
+        attrs =
+            Swipe.onSwipe SwipeEvent
+                ++ [ classList [ ( "main--container", True ), ( "fun", Secret.activated model.secret ) ] ]
 
         funThings =
-            if Secret.activated model.secret then
-                [ Secret.view ]
+            if Secret.activated model.secret1 then
+                [ Secret.view model.secret1.yt ]
+
+            else if Secret.activated model.secret2 then
+                [ Secret.view model.secret2.yt ]
+
             else
                 []
-
     in
-        div attrs
-            ([ viewToolbar model.selectedGroup model.calendarState.viewing (model.calendarState.timeSpan == Week) model.loop
-            , div [ class "main--calendar" ]
-                [ Html.map SetCalendarState (Calendar.view events model.calendarState)
-                ]
-            , viewMessage model
-            , Tooltip.viewTooltip model.calendarState.hover events
-            ] ++ funThings)
+    div attrs
+        ([ viewToolbar model.selectedGroup model.calendarState.viewing (model.calendarState.timeSpan == Week) model.loop
+         , div [ class "main--calendar" ]
+            [ Html.map SetCalendarState (Calendar.view events model.calendarState)
+            ]
+         , viewMessage model
+         , Tooltip.viewTooltip model.calendarState.hover events
+         ]
+            ++ funThings
+        )
 
 
 viewToolbar : Group -> Date.Date -> Bool -> Bool -> Html Msg
@@ -55,6 +59,7 @@ viewToolbar selected viewing all loop =
         [ viewPagination all loop
         , viewTitle viewing
         , viewSelector selected
+
         -- , viewTimeSpanSelection timeSpan
         ]
 
@@ -73,64 +78,75 @@ viewPagination all loop =
                 [ button [ class "main--navigatiors-button", onClick PageBack ] [ text "back" ]
                 , button [ class "main--navigatiors-button", onClick PageForward ] [ text "next" ]
                 ]
+
             else
                 []
-
     in
-        div [ class "main--paginators" ]
-            ( btns
-              ++
-              [ button [ class "main--navigatiors-button", onClick ClickToday ] [ text "today" ]
-              , reloadButton loop
-              ]
-            )
+    div [ class "main--paginators" ]
+        (btns
+            ++ [ button [ class "main--navigatiors-button", onClick ClickToday ] [ text "today" ]
+               , reloadButton loop
+               ]
+        )
 
 
 viewSelector : Group -> Html Msg
 viewSelector selected =
-    div [  class "main--selector" ]
-        [ select [ class "main--selector-select" , id "groupSelect", on "change" <| Json.map SetGroup targetValue, value selected.slug ]
-                 (List.map optionGroup allGroups)
+    div [ class "main--selector" ]
+        [ select [ class "main--selector-select", id "groupSelect", on "change" <| Json.map SetGroup targetValue, value selected.slug ]
+            (List.map optionGroup allGroups)
         ]
 
 
-
-optionGroup: Group -> Html Msg
+optionGroup : Group -> Html Msg
 optionGroup group =
     option [ value group.slug ]
-           [ text group.name ]
+        [ text group.name ]
 
 
-reloadButton: Bool -> Html Msg
+reloadButton : Bool -> Html Msg
 reloadButton loop =
-    button [ classList
-                [ ("main--navigatiors-button", True)
-                , ("main--navigatiors-reload", True)
-                , ("loop", loop)
-                ]
-           , style [ ("font-size", "1.2em") ]
-           , onClick (SavedGroup "ok")
-           ]
-           [ span [] [ text "⟳" ]
-           ]
+    button
+        [ classList
+            [ ( "main--navigatiors-button", True )
+            , ( "main--navigatiors-reload", True )
+            , ( "loop", loop )
+            ]
+        , style [ ( "font-size", "1.2em" ) ]
+        , onClick (SavedGroup "ok")
+        ]
+        [ span [] [ text "⟳" ]
+        ]
 
 
-viewMessage: Model -> Html Msg
+viewMessage : Model -> Html Msg
 viewMessage model =
     let
-        (message, display) =
+        ( message, display ) =
             case model.error of
                 Just err ->
-                    (errorMessage err, True)
+                    ( errorMessage err, True )
+
                 _ ->
                     if model.loading then
-                        ("Loading...", True)
+                        ( "Loading...", True )
+
                     else
-                        ("", False)
+                        ( "", False )
     in
-        div [ (class ("main--message " ++ if display then "" else "hidden")) ]
-            [ text message
-            ]
+    div
+        [ class
+            ("main--message "
+                ++ (if display then
+                        ""
+
+                    else
+                        "hidden"
+                   )
+            )
+        ]
+        [ text message
+        ]
 
 
 errorMessage : Http.Error -> String
@@ -138,11 +154,15 @@ errorMessage error =
     case error of
         Http.BadUrl _ ->
             "BadUrl"
+
         Http.Timeout ->
             "Timeout"
+
         Http.NetworkError ->
             "Network Error"
+
         Http.BadStatus _ ->
             "BadStatus"
+
         Http.BadPayload _ _ ->
             "BadPayload"
