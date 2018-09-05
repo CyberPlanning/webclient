@@ -40,7 +40,7 @@ body>div {
 .main--calendar {
   overflow: hidden;
   display: flex;
-  flex: 1;
+  /* flex: 1; */
 }
 
 .main--toolbar {
