@@ -13,7 +13,9 @@ type alias Event =
     { toId : String
     , title : String
     , start : Date
+    , startTime : Int
     , end : Date
+    , endTime : Int
     , classrooms : List String
     , teachers : List String
     , groups : List String
@@ -90,10 +92,10 @@ eventStyling :
 eventStyling event eventRange timeSpan customClasses =
     let
         eventStart =
-            event.start
+            event.startTime
 
         eventEnd =
-            event.end
+            event.endTime
 
         eventColor =
             event.color
@@ -126,25 +128,26 @@ eventStyling event eventRange timeSpan customClasses =
     [ classList (( classes, True ) :: customClasses) ] ++ styles
 
 
-fractionalDay : Date -> Float
-fractionalDay _ =
-    0.5
+fractionalDay : Int -> Float
+fractionalDay seconds =
+    toFloat seconds / (24 * 60 * 60)
 
 
-percentDay : Date -> Float -> Float -> Float
+percentDay : Int -> Float -> Float -> Float
 percentDay date min max =
     (fractionalDay date - min) / (max - min)
 
 
-styleDayEvent : Date -> Date -> String -> List (Html.Attribute msg)
+{-| Date can be just time
+-}
+styleDayEvent : Int -> Int -> String -> List (Html.Attribute msg)
 styleDayEvent start end color =
     let
         startPercent =
             100 * percentDay start (7 / 24) (20 / 24)
 
         endPercent =
-            -- TODO: remove + 0.2 tmp
-            100 * (percentDay end (7 / 24) (20 / 24) + 0.2)
+            100 * percentDay end (7 / 24) (20 / 24)
 
         height =
             (String.fromFloat <| endPercent - startPercent) ++ "%"

@@ -89,7 +89,9 @@ toCalEvent event =
     { toId = event.eventId
     , title = event.title
     , start = parseDateEvent event.startDate
+    , startTime = extractTimeIsoString event.startDate
     , end = parseDateEvent event.endDate
+    , endTime = extractTimeIsoString event.endDate
     , classrooms = event.classrooms
     , teachers = event.teachers
     , groups = event.groups
@@ -109,7 +111,8 @@ computeColor : String -> String
 computeColor text =
     let
         hex =
-            MD5.hex text
+            String.dropRight 1 text
+                |> MD5.hex
                 |> String.right 6
 
         red =
@@ -130,3 +133,33 @@ computeColor text =
     Color.rgb red green blue
         |> noBright
         |> colorToHex
+
+
+extractTimeIsoString : String -> Int
+extractTimeIsoString dateString =
+    let
+        timeString =
+            dateString
+                |> String.dropLeft 11
+
+        hours =
+            timeString
+                |> String.dropRight 6
+                |> String.toInt
+                |> Maybe.withDefault 0
+                |> (+) 2
+
+        minutes =
+            timeString
+                |> String.dropRight 3
+                |> String.dropLeft 3
+                |> String.toInt
+                |> Maybe.withDefault 0
+
+        seconds =
+            timeString
+                |> String.dropLeft 6
+                |> String.toInt
+                |> Maybe.withDefault 0
+    in
+    hours * 3600 + minutes * 60 + seconds
