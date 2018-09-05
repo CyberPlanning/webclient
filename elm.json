@@ -15,7 +15,6 @@
             "elm-community/list-extra": "8.0.0",
             "justinmimbs/date": "2.0.1",
             "rtfeldman/elm-hex": "1.0.0",
-            "the-sett/elm-color": "1.0.0",
             "truqu/elm-md5": "1.0.1"
         },
         "indirect": {
