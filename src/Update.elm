@@ -1,11 +1,10 @@
-module Update exposing (calendarAction, createPlanningRequest, distanceX, distanceY, find, swipeOK, update)
+module Update exposing (calendarAction, createPlanningRequest, distanceX, find, update)
 
+import Browser.Dom
 import Calendar.Calendar as Calendar
 import Calendar.Msg as CalMsg exposing (TimeSpan(..))
 import Config exposing (allGroups)
 import Date
-import Date.Extra as Dateextra
-import Dom
 import Model exposing (Model, toCalEvents, toDatetime)
 import Msg exposing (Msg(..))
 import Process
@@ -14,7 +13,6 @@ import Secret
 import Storage
 import Swipe
 import Task
-import Time
 
 
 
@@ -22,8 +20,8 @@ import Time
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
-    case msg of
+update msgSource model =
+    case msgSource of
         Noop ->
             ( model, Cmd.none )
 
@@ -49,7 +47,7 @@ update msg model =
                                 |> toCalEvents
                                 |> Just
                     in
-                    ( { model | data = data, loading = False, error = Nothing }, Task.attempt (always Noop) (Dom.blur "groupSelect") )
+                    ( { model | data = data, loading = False, error = Nothing }, Task.attempt (always Noop) (Browser.Dom.blur "groupSelect") )
 
                 Err err ->
                     ( { model | error = Just (Debug.log "Network" err), loading = False }, Cmd.none )
@@ -63,7 +61,11 @@ update msg model =
             ( { model | selectedGroup = group }, Storage.save slug )
 
         SetCalendarState calendarMsg ->
-            calendarAction model calendarMsg
+            let
+                updatedCalendar =
+                    Calendar.update calendarMsg model.calendarState
+            in
+            ( { model | calendarState = updatedCalendar }, Cmd.none )
 
         PageForward ->
             calendarAction model CalMsg.PageForward
@@ -71,8 +73,8 @@ update msg model =
         PageBack ->
             calendarAction model CalMsg.PageBack
 
-        WindowSize size ->
-            ( { model | size = size }, Storage.doload () )
+        WindowSize view ->
+            ( { model | size = { width = round view.viewport.width, height = round view.viewport.height } }, Storage.doload () )
 
         KeyDown code ->
             let
@@ -100,7 +102,7 @@ update msg model =
                     Swipe.update msg model.swipe
 
                 action =
-                    if (updatedSwipe.state == Swipe.SwipeEnd) && swipeOK updatedSwipe.c0 updatedSwipe.c1 then
+                    if (updatedSwipe.state == Swipe.SwipeEnd) && (distanceX updatedSwipe.c0 updatedSwipe.c1 > 70.0) then
                         case updatedSwipe.direction of
                             Just Swipe.Left ->
                                 Task.succeed PageForward
@@ -121,7 +123,7 @@ update msg model =
         ClickToday ->
             let
                 date =
-                    model.date |> Maybe.withDefault (Date.fromTime 0)
+                    model.date |> Maybe.withDefault (Date.fromOrdinalDate 0 0)
             in
             calendarAction model (CalMsg.ChangeViewing date)
 
@@ -131,16 +133,16 @@ update msg model =
                     find (\x -> x.slug == slug) allGroups
                         |> Maybe.withDefault { slug = "12", name = "Cyber1 TD2" }
             in
-            ( { model | selectedGroup = group }, Task.perform SetDate Date.now )
+            ( { model | selectedGroup = group }, Task.perform SetDate Date.today )
 
         SavedGroup ok ->
             let
                 state =
                     if (model.loading == False) && (model.loop == False) then
-                        ( { model | loading = True, loop = True, error = Nothing }
+                        ( { model | loading = True, loop = True }
                         , Cmd.batch
                             [ createPlanningRequest model.calendarState.viewing model.selectedGroup.slug
-                            , Process.sleep (1 * Time.second)
+                            , Process.sleep (1 * 1000)
                                 |> Task.perform StopReloadIcon
                             ]
                         )
@@ -162,14 +164,14 @@ createPlanningRequest date slug =
 
         dateFrom =
             date
-                |> Dateextra.floor Dateextra.Month
-                |> Dateextra.floor Dateextra.Monday
+                |> Date.floor Date.Month
+                |> Date.floor Date.Monday
                 |> toDatetime
 
         dateTo =
             date
-                |> Dateextra.ceiling Dateextra.Month
-                |> Dateextra.ceiling Dateextra.Sunday
+                |> Date.ceiling Date.Month
+                |> Date.ceiling Date.Sunday
                 |> toDatetime
     in
     sendRequest dateFrom dateTo [ slug ]
@@ -192,19 +194,6 @@ find predicate list =
 distanceX : Swipe.Coordinates -> Swipe.Coordinates -> Float
 distanceX c0 c1 =
     abs (c0.clientX - c1.clientX)
-
-
-distanceY : Swipe.Coordinates -> Swipe.Coordinates -> Float
-distanceY c0 c1 =
-    abs (c0.clientY - c1.clientY)
-
-
-swipeOK : Swipe.Coordinates -> Swipe.Coordinates -> Bool
-swipeOK p0 p1 =
-    distanceX p0 p1
-        > 70.0
-        && distanceY p0 p1
-        < 50.0
 
 
 calendarAction : Model -> CalMsg.Msg -> ( Model, Cmd Msg )

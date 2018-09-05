@@ -1,23 +1,25 @@
-module Calendar.Event exposing (..)
+module Calendar.Event exposing (Event, EventRange(..), cellWidth, eventSegment, eventStyling, maybeViewDayEvent, offsetLength, offsetPercentage, percentDay, rangeDescription, rowSegment, styleDayEvent, styleRowSegment)
 
+import Calendar.Helpers as Helpers
+import Calendar.Msg exposing (Msg(..), TimeSpan(..))
 import Date exposing (Date)
-import Date.Extra
 import Html exposing (..)
 import Html.Attributes exposing (class, classList, style)
 import Html.Events exposing (..)
-import Calendar.Msg exposing (Msg(..), TimeSpan(..))
-import Calendar.Helpers as Helpers
+import String
+
 
 type alias Event =
-    { toId: String
-    , title: String
-    , start: Date
-    , end: Date
-    , classrooms : (List String)
-    , teachers : (List String)
-    , groups : (List String)
+    { toId : String
+    , title : String
+    , start : Date
+    , end : Date
+    , classrooms : List String
+    , teachers : List String
+    , groups : List String
     , color : String
     }
+
 
 type EventRange
     = StartsAndEnds
@@ -27,43 +29,56 @@ type EventRange
     | ExistsOutside
 
 
-rangeDescription : Date -> Date -> Date.Extra.Interval -> Date -> EventRange
+rangeDescription : Date -> Date -> Date.Interval -> Date -> EventRange
 rangeDescription start end interval date =
     let
+        -- TODO
+        -- Helpers.bumpMidnightBoundary date
         day =
-            Helpers.bumpMidnightBoundary date
+            date
 
         begInterval =
-            Date.Extra.floor interval day
+            Date.floor interval day
 
+        -- TODO
+        -- |> Date.add Date.Millisecond -1
         endInterval =
-            Date.Extra.ceiling interval day
-                |> Date.Extra.add Date.Extra.Millisecond -1
+            Date.ceiling interval day
 
+        -- TODO
         startsThisInterval =
-            Date.Extra.isBetween begInterval endInterval start
+            isBetween begInterval endInterval start
 
+        -- TODO
         endsThisInterval =
-            Date.Extra.isBetween begInterval endInterval end
+            isBetween begInterval endInterval end
 
+        -- TODO
+        -- Date.diff Date.Millisecond begInterval start
+        --     |> (>) 0
         startsBeforeInterval =
-            Date.Extra.diff Date.Extra.Millisecond begInterval start
-                |> (>) 0
+            False
 
+        -- TODO
+        -- Date.diff Date.Millisecond end endInterval
+        --     |> (>) 0
         endsAfterInterval =
-            Date.Extra.diff Date.Extra.Millisecond end endInterval
-                |> (>) 0
+            False
     in
-        if startsThisInterval && endsThisInterval then
-            StartsAndEnds
-        else if startsBeforeInterval && endsAfterInterval then
-            ContinuesAfterAndPrior
-        else if startsThisInterval && endsAfterInterval then
-            ContinuesAfter
-        else if endsThisInterval && startsBeforeInterval then
-            ContinuesPrior
-        else
-            ExistsOutside
+    if startsThisInterval && endsThisInterval then
+        StartsAndEnds
+
+    else if startsBeforeInterval && endsAfterInterval then
+        ContinuesAfterAndPrior
+
+    else if startsThisInterval && endsAfterInterval then
+        ContinuesAfter
+
+    else if endsThisInterval && startsBeforeInterval then
+        ContinuesPrior
+
+    else
+        ExistsOutside
 
 
 eventStyling :
@@ -103,49 +118,49 @@ eventStyling event eventRange timeSpan customClasses =
         styles =
             case timeSpan of
                 Week ->
-                    style []
+                    []
 
                 Day ->
                     styleDayEvent eventStart eventEnd eventColor
     in
-        [ classList (( classes, True ) :: customClasses), styles ]
+    [ classList (( classes, True ) :: customClasses) ] ++ styles
 
 
-(=>) : a -> b -> ( a, b )
-(=>) =
-    (,)
+fractionalDay : Date -> Float
+fractionalDay _ =
+    0.5
 
 
-percentDay: Date -> Float -> Float -> Float
-percentDay date min max = 
-    ((Date.Extra.fractionalDay date) - min ) / (max-min)
+percentDay : Date -> Float -> Float -> Float
+percentDay date min max =
+    (fractionalDay date - min) / (max - min)
 
 
-styleDayEvent : Date -> Date -> String -> Html.Attribute msg
+styleDayEvent : Date -> Date -> String -> List (Html.Attribute msg)
 styleDayEvent start end color =
     let
         startPercent =
-            100 * percentDay start (7/24) (20/24)
+            100 * percentDay start (7 / 24) (20 / 24)
 
         endPercent =
-            100 * percentDay end (7/24) (20/24)
+            -- TODO: remove + 0.2 tmp
+            100 * (percentDay end (7 / 24) (20 / 24) + 0.2)
 
         height =
-            (toString <| endPercent - startPercent) ++ "%"
+            (String.fromFloat <| endPercent - startPercent) ++ "%"
 
         startPercentage =
-            (toString startPercent) ++ "%"
-
+            String.fromFloat startPercent ++ "%"
     in
-        style
-            [ "top" => startPercentage
-            , "height" => height
-            , "left" => "2%"
-            , "width" => "96%"
-            , "position" => "absolute"
-            , "background-color" => color
-            -- , "color" => if Helpers.isBright color then "black" else "white"
-            ]
+    [ style "top" startPercentage
+    , style "height" height
+    , style "left" "2%"
+    , style "width" "96%"
+    , style "position" "absolute"
+    , style "background-color" color
+
+    -- , ( "color" , if Helpers.isBright color then "black" else "white")
+    ]
 
 
 maybeViewDayEvent : Event -> Maybe String -> EventRange -> Maybe (Html Msg)
@@ -173,18 +188,18 @@ eventSegment event selectedId eventRange timeSpan =
             , ( "calendar--event-content--is-selected", isSelected )
             ]
     in
-        div
-            ([ onMouseEnter <| EventMouseEnter eventId
-             , onMouseLeave <| EventMouseLeave eventId
-             , onClick <| EventMouseEnter eventId
-             ]
-                ++ eventStyling event eventRange timeSpan classes
-            )
-            [ div [ class "calendar--event-title" ] [ text event.title ]
-            , div [ class "calendar--event-sub" ] [ text <| String.join "," event.classrooms ]
-            , div [ class "calendar--event-sub" ] [ text <| String.join "," event.teachers ]
-            , div [ class "calendar--event-sub" ] [ text <| String.join "," event.groups ]
-            ]
+    div
+        ([ onMouseEnter <| EventMouseEnter eventId
+         , onMouseLeave <| EventMouseLeave eventId
+         , onClick <| EventMouseEnter eventId
+         ]
+            ++ eventStyling event eventRange timeSpan classes
+        )
+        [ div [ class "calendar--event-title" ] [ text event.title ]
+        , div [ class "calendar--event-sub" ] [ text <| String.join "," event.classrooms ]
+        , div [ class "calendar--event-sub" ] [ text <| String.join "," event.teachers ]
+        , div [ class "calendar--event-sub" ] [ text <| String.join "," event.groups ]
+        ]
 
 
 cellWidth : Float
@@ -194,8 +209,7 @@ cellWidth =
 
 offsetLength : Date -> Float
 offsetLength date =
-    (Date.Extra.weekdayNumber date)
-        % 7
+    modBy 7 (Date.weekdayNumber date)
         |> toFloat
         |> (*) cellWidth
 
@@ -203,19 +217,33 @@ offsetLength date =
 offsetPercentage : Date -> String
 offsetPercentage date =
     (offsetLength date
-        |> toString
+        |> String.fromFloat
     )
         ++ "%"
 
 
-styleRowSegment : String -> Html.Attribute msg
+styleRowSegment : String -> List (Html.Attribute msg)
 styleRowSegment widthPercentage =
-    style
-        [ ( "flex-basis", widthPercentage )
-        , ( "max-width", widthPercentage )
-        ]
+    [ style "flex-basis" widthPercentage
+    , style "max-width" widthPercentage
+    ]
 
 
 rowSegment : String -> List (Html Msg) -> Html Msg
 rowSegment widthPercentage children =
-    div [ styleRowSegment widthPercentage ] children
+    div (styleRowSegment widthPercentage) children
+
+
+isBetween : Date -> Date -> Date -> Bool
+isBetween start end current =
+    let
+        startInt =
+            Date.toRataDie start
+
+        endInt =
+            Date.toRataDie end
+
+        currentInt =
+            Date.toRataDie current
+    in
+    startInt <= currentInt && endInt >= currentInt

@@ -1,13 +1,13 @@
-module Calendar.Week exposing (..)
+module Calendar.Week exposing (view, viewDate, viewDates, viewWeekContent, viewWeekDay, viewWeekHeader)
 
-import Html exposing (..)
-import Html.Attributes exposing (..)
-import Date exposing (Date)
-import Dict exposing (Dict)
-import Calendar.Day exposing (viewTimeGutter, viewTimeGutterHeader, viewDaySlotGroup, viewAllDayCell, viewDayEvents)
-import Calendar.Msg exposing (Msg(..))
+import Calendar.Day exposing (viewAllDayCell, viewDayEvents, viewDaySlotGroup, viewTimeGutter, viewTimeGutterHeader)
 import Calendar.Event exposing (Event)
 import Calendar.Helpers as Helpers
+import Calendar.Msg exposing (Msg(..))
+import Date exposing (Date)
+import Dict exposing (Dict)
+import Html exposing (..)
+import Html.Attributes exposing (..)
 
 
 viewWeekContent :
@@ -23,10 +23,10 @@ viewWeekContent events selectedId viewing days feries =
             viewTimeGutter viewing
 
         weekDays =
-            List.map (viewWeekDay events selectedId feries ) days
+            List.map (viewWeekDay events selectedId feries) days
     in
-        div [ class "calendar--week-content" ]
-            (timeGutter :: weekDays)
+    div [ class "calendar--week-content" ]
+        (timeGutter :: weekDays)
 
 
 viewWeekDay : List Event -> Maybe String -> Dict String Date -> Date -> Html Msg
@@ -39,11 +39,10 @@ viewWeekDay events selectedId feries day =
         dayEvents =
             viewDayEvents events selectedId day feries
     in
-        div [ class "calendar--day" ]
-            [ div [ class "calendar--day-slot" ]
-                  (viewDaySlots ++ dayEvents)
-            ]
-            
+    div [ class "calendar--day" ]
+        [ div [ class "calendar--day-slot" ]
+            (viewDaySlots ++ dayEvents)
+        ]
 
 
 view : List Event -> Maybe String -> Date -> Dict String Date -> Html Msg
@@ -52,10 +51,10 @@ view events selectedId viewing feries =
         weekRange =
             Helpers.dayRangeOfWeek viewing
     in
-        div [ class "calendar--week" ]
-            [ viewWeekHeader weekRange
-            , viewWeekContent events selectedId viewing weekRange feries
-            ]
+    div [ class "calendar--week" ]
+        [ viewWeekHeader weekRange
+        , viewWeekContent events selectedId viewing weekRange feries
+        ]
 
 
 viewWeekHeader : List Date -> Html Msg
@@ -75,4 +74,4 @@ viewDates days =
 viewDate : Date -> Html Msg
 viewDate day =
     div [ class "calendar--date-header" ]
-            [ a [ class "calendar--date", href "#" ] [ text <| Helpers.dateString day ] ]
+        [ a [ class "calendar--date", href "#" ] [ text <| Helpers.dateString day ] ]

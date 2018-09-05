@@ -1,13 +1,14 @@
-module FakeQuery exposing (..)
+module FakeQuery exposing (createFakeQuery)
 
 import Json.Decode as Json
-import Types exposing (Query, Event, Planning, decodeQuery)
+import Types exposing (Event, Planning, Query, decodeQuery)
+import Debug
 
-
-createFakeQuery: Query
+createFakeQuery : Query
 createFakeQuery =
     let
-        res = Json.decodeString decodeQuery """
+        res =
+            Json.decodeString decodeQuery """
 {
     "planning": {
         "events": [
@@ -66,8 +67,9 @@ createFakeQuery =
     }
 }"""
     in
-        case res of
-            Ok query ->
-                query
-            Err error ->
-                Query (Planning [ Event (toString error) "" "" [] [] [] ])
+    case res of
+        Ok query ->
+            query
+
+        Err error ->
+            Query (Planning [ Event (Debug.toString error) "" "" [] [] [] ])

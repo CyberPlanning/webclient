@@ -1,9 +1,9 @@
-module Swipe exposing 
-    ( Msg
-    , State
+module Swipe exposing
+    ( Coordinates
     , Direction(..)
+    , Msg
+    , State
     , SwipeState(..)
-    , Coordinates
     , init
     , onSwipe
     , update
@@ -14,8 +14,8 @@ import Html.Events as Events
 import Json.Decode as Decode exposing (Decoder)
 
 
-type Msg =
-    Start Touch
+type Msg
+    = Start Touch
     | Move Touch
     | End Touch
     | Cancel Touch
@@ -30,8 +30,8 @@ type alias State =
     }
 
 
-type SwipeState = 
-    SwipeStart
+type SwipeState
+    = SwipeStart
     | Swiping
     | SwipeEnd
 
@@ -48,13 +48,13 @@ type alias Coordinates =
     }
 
 
-type Direction =
-    Left
+type Direction
+    = Left
     | Right
 
 
 init : State
-init = 
+init =
     { c0 = emptyCoordinates
     , c1 = emptyCoordinates
     , id = 0
@@ -76,45 +76,48 @@ update msg state =
 
         Move touch ->
             let
-                dir = direction <| subCoordinates touch.coordinates state.c0
+                dir =
+                    direction <| subCoordinates touch.coordinates state.c0
             in
-                { state | direction = dir, c1 = touch.coordinates, id = touch.identifier, state = Swiping }
+            { state | direction = dir, c1 = touch.coordinates, id = touch.identifier, state = Swiping }
 
         End touch ->
             let
-                dir = direction <| subCoordinates touch.coordinates state.c0
+                dir =
+                    direction <| subCoordinates touch.coordinates state.c0
             in
-                { state | direction = dir, c1 = touch.coordinates, id = touch.identifier, state = SwipeEnd }
+            { state | direction = dir, c1 = touch.coordinates, id = touch.identifier, state = SwipeEnd }
 
         Cancel touch ->
-                { c0 = touch.coordinates
-                , c1 = emptyCoordinates
-                , id = touch.identifier
-                , direction = Nothing
-                , state = SwipeEnd
-                }
-            
-
-
-    
+            { c0 = touch.coordinates
+            , c1 = emptyCoordinates
+            , id = touch.identifier
+            , direction = Nothing
+            , state = SwipeEnd
+            }
 
 
 direction : Coordinates -> Maybe Direction
 direction { clientX, clientY } =
     if clientX > 0 then
         Just Right
+
     else if clientX < 0 then
         Just Left
+
     else
         Nothing
-    -- if abs clientX > abs clientY then
-    -- else
-    --     if clientY > 0 then
-    --         Just Down
-    --     else if clientY < 0 then
-    --         Just Up
-    --     else
-    --         Nothing
+
+
+
+-- if abs clientX > abs clientY then
+-- else
+--     if clientY > 0 then
+--         Just Down
+--     else if clientY < 0 then
+--         Just Up
+--     else
+--         Nothing
 
 
 subCoordinates : Coordinates -> Coordinates -> Coordinates
@@ -131,14 +134,17 @@ emptyCoordinates =
     }
 
 
+
 -- TOUCH EVENTS ##################################################
 
 
 onSwipe : (Msg -> msg) -> List (Html.Attribute msg)
-onSwipe tag = 
+onSwipe tag =
     [ onStart Start tag
+
     -- , onMove Move tag
     , onEnd End tag
+
     -- , onCancel Cancel tag
     ]
 
@@ -163,21 +169,24 @@ onCancel tag =
     on "touchcancel" tag
 
 
+
 -- HELPER FUNCTIONS ##################################################
-
-
-stopOptions : Events.Options
-stopOptions =
-    { stopPropagation = False
-    , preventDefault = False
-    }
+-- stopOptions : Events.Options
+-- stopOptions =
+--     { stopPropagation = False
+--     , preventDefault = False
+--     }
 
 
 on : String -> (Touch -> Msg) -> (Msg -> msg) -> Html.Attribute msg
 on event msg tag =
+    -- Decoder Msg
     Decode.map msg decodeCoordinates
+        -- Decoder msg
         |> Decode.map tag
-        |> Events.onWithOptions event stopOptions
+        -- Decoder (msg, Bool)
+        |> Decode.map (\m -> ( m, True ))
+        |> Events.stopPropagationOn event
 
 
 decodeCoordinates : Decoder Touch

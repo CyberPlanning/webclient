@@ -1,15 +1,16 @@
-module Calendar.Calendar exposing (..)
+module Calendar.Calendar exposing (State, init, page, update, view)
 
-import Html exposing (..)
-import Html.Attributes exposing (class)
-import Date exposing (Date)
-import Dict exposing (Dict)
-import Date.Extra
 import Calendar.Day as Day
-import Calendar.Week as Week
-import Calendar.Msg exposing (Msg(..), TimeSpan(..))
 import Calendar.Event exposing (Event)
 import Calendar.JourFerie exposing (getAllJourFerie)
+import Calendar.Msg exposing (Msg(..), TimeSpan(..))
+import Calendar.Week as Week
+import Date exposing (Date)
+import Dict exposing (Dict)
+import Html exposing (..)
+import Html.Attributes exposing (class)
+import Html.Events exposing (keyCode, on)
+import Json.Decode as Json
 
 
 type alias State =
@@ -36,7 +37,7 @@ update msg state =
     -- case Debug.log "msg" msg of
     case msg of
         PageBack ->
-            page -1 state 
+            page -1 state
 
         PageForward ->
             page 1 state
@@ -69,12 +70,12 @@ page step state =
         { timeSpan, viewing } =
             state
     in
-        case timeSpan of
-            Week ->
-                { state | viewing = Date.Extra.add Date.Extra.Week step viewing, hover = Nothing }
+    case timeSpan of
+        Week ->
+            { state | viewing = Date.add Date.Weeks step viewing, hover = Nothing }
 
-            Day ->
-                { state | viewing = Date.Extra.add Date.Extra.Day step viewing, hover = Nothing }
+        Day ->
+            { state | viewing = Date.add Date.Days step viewing, hover = Nothing }
 
 
 view : List Event -> State -> Html Msg
@@ -88,6 +89,6 @@ view events { viewing, timeSpan, selected, joursFeries } =
                 Day ->
                     Day.view events selected viewing joursFeries
     in
-        div
-            [ class "calendar--calendar" ]
-            [ calendarView ]
+    div
+        [ class "calendar--calendar" ]
+        [ calendarView ]

@@ -1,11 +1,9 @@
-module Timeout exposing (..)
+module Main exposing (Model, Msg(..), main, model, myTask, update, view)
 
-import Html exposing (..)
+import Html as App exposing (..)
 import Html.Events exposing (..)
-import Html as App
-import Task
 import Process
-import Time
+import Task
 
 
 type alias Model =
@@ -19,9 +17,9 @@ model =
 
 myTask : Cmd Msg
 myTask =
-    Process.sleep (2 * Time.second)
-    |> Task.andThen (\_ -> Task.succeed (Debug.log "timeout" "not clicked"))
-    |> Task.perform Foo
+    Process.sleep (2 * 1000)
+        |> Task.andThen (\_ -> Task.succeed (Debug.log "timeout" "not clicked"))
+        |> Task.perform Foo
 
 
 type Msg
@@ -41,16 +39,18 @@ update msg model =
                 txt =
                     if model == "not clicked" then
                         "clicked"
+
                     else
                         "not clickeed"
 
                 cmd =
                     if model == "not clicked" then
                         myTask
+
                     else
                         Cmd.none
             in
-                ( txt, cmd )
+            ( txt, cmd )
 
         NoOp _ ->
             ( model, Cmd.none )

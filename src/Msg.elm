@@ -1,18 +1,19 @@
-module Msg exposing (..)
+module Msg exposing (Msg(..))
 
-import Types exposing (Query)
+import Browser.Dom exposing (Viewport)
+import Calendar.Msg as Calendar
 import Date
 import Http exposing (Error)
-import Window
-import Calendar.Msg as Calendar
 import Swipe
+import Types exposing (Query)
+
 
 type Msg
     = Noop
     | GraphQlMsg (Result Error Query)
     | SetDate Date.Date
     | SetGroup String
-    | WindowSize Window.Size
+    | WindowSize Viewport
     | PageBack
     | PageForward
     | KeyDown Int

@@ -1,16 +1,15 @@
-module Calendar.Day exposing (..)
+module Calendar.Day exposing (view, viewAllDayCell, viewDate, viewDayEvent, viewDayEvents, viewDayHeader, viewDaySlot, viewDaySlotGroup, viewHourSlot, viewTimeGutter, viewTimeGutterHeader, viewTimeSlot, viewTimeSlotGroup)
 
-import Html exposing (..)
-import Html.Attributes exposing (..)
+import Calendar.Event exposing (Event, maybeViewDayEvent, rangeDescription)
+import Calendar.Helpers as Helpers
+import Calendar.JourFerie exposing (jourFerie)
+import Calendar.Msg exposing (Msg(..))
 import Date exposing (Date)
 import Dict exposing (Dict)
-import Date.Extra
-import Calendar.Helpers as Helpers
-import Calendar.Msg exposing (Msg(..))
-import Calendar.Event exposing (rangeDescription, maybeViewDayEvent, Event)
+import Html exposing (..)
+import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
 
-import Calendar.JourFerie exposing (jourFerie)
 
 view : List Event -> Maybe String -> Date -> Dict String Date -> Html Msg
 view events selectedId day feries =
@@ -19,7 +18,7 @@ view events selectedId day feries =
         , div [ class "calendar--day-content" ]
             [ viewTimeGutter day
             , div [ class "calendar--day" ]
-                  [ viewDaySlot events selectedId day feries ]
+                [ viewDaySlot events selectedId day feries ]
             ]
         ]
 
@@ -29,10 +28,10 @@ viewDate day =
     div [ class "calendar--date-header" ]
         [ button [ class "calendar--navigations-week", onClick WeekBack ] [ text "<<" ]
         , div [ class "calendar--date-header-content" ]
-              [ button [ class "calendar--navigations-day", onClick PageBack ] [ text "<" ]
-              , a [ class "calendar--date", href "#" ] [ text <| Helpers.dateString day ]
-              , button [ class "calendar--navigations-day", onClick PageForward ] [ text ">" ]
-              ]
+            [ button [ class "calendar--navigations-day", onClick PageBack ] [ text "<" ]
+            , a [ class "calendar--date", href "#" ] [ text <| Helpers.dateString day ]
+            , button [ class "calendar--navigations-day", onClick PageForward ] [ text ">" ]
+            ]
         , button [ class "calendar--navigations-week", onClick WeekForward ] [ text ">>" ]
         ]
 
@@ -75,7 +74,7 @@ viewDaySlot : List Event -> Maybe String -> Date -> Dict String Date -> Html Msg
 viewDaySlot events selectedId day feries =
     Helpers.hours day
         |> List.map viewDaySlotGroup
-        |> (flip (++)) (viewDayEvents events selectedId day feries)
+        |> (\b a -> (++) a b) (viewDayEvents events selectedId day feries)
         |> div [ class "calendar--day-slot" ]
 
 
@@ -101,26 +100,26 @@ viewDayEvents events selectedId day feries =
             case jourFerie feries day of
                 Just name ->
                     text name
-                    |> List.singleton
-                    |> div [ class "calendar--jour-ferie" ]
-                    |> List.singleton
+                        |> List.singleton
+                        |> div [ class "calendar--jour-ferie" ]
+                        |> List.singleton
 
                 Nothing ->
                     []
 
-        eventsHtml = 
+        eventsHtml =
             List.filterMap (viewDayEvent day selectedId) events
     in
-        extra ++ eventsHtml
+    extra ++ eventsHtml
 
 
 viewDayEvent : Date -> Maybe String -> Event -> Maybe (Html Msg)
 viewDayEvent day selectedId event =
     let
         eventRange =
-            rangeDescription event.start event.end Date.Extra.Day day
+            rangeDescription event.start event.end Date.Day day
     in
-        maybeViewDayEvent event selectedId eventRange
+    maybeViewDayEvent event selectedId eventRange
 
 
 viewAllDayCell : List Date -> Html Msg
@@ -133,5 +132,5 @@ viewAllDayCell days =
             div [ class "calendar--all-day" ]
                 []
     in
-        div [ class "calendar--all-day-cell" ]
-            (viewAllDayText :: List.map viewAllDay days)
+    div [ class "calendar--all-day-cell" ]
+        (viewAllDayText :: List.map viewAllDay days)

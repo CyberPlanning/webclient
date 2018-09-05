@@ -20,6 +20,13 @@ body {
   color: #ecf0f1;
 }
 
+body>div {
+  padding: 0;
+  margin: 0;
+  height: 100vh;
+  overflow: hidden
+}
+
 .hidden {
   display: none !important;
 }
@@ -33,6 +40,7 @@ body {
 .main--calendar {
   overflow: hidden;
   display: flex;
+  flex: 1;
 }
 
 .main--toolbar {
@@ -140,6 +148,7 @@ body {
   from {
     transform: rotate(0);
   }
+
   to {
     transform: rotate(360deg);
   }
@@ -149,9 +158,11 @@ body {
   0% {
     transform: rotate(0) scale(0.8);
   }
+
   50% {
     transform: rotate(20deg) scale(1.2);
   }
+
   100% {
     transform: rotate(-720deg) scale(0.8);
   }

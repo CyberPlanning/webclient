@@ -1,28 +1,29 @@
-module Main exposing (..)
+module Main exposing (init, main, subscriptions)
 
-import Html
-import Window
-import Task
-import Keyboard
-
-import View exposing (view)
+import Browser
+import Browser.Dom
+import Browser.Events
+import Json.Decode as Decode
 import Model exposing (Model, initialModel)
-import Update exposing ( update )
-import Msg exposing ( Msg(..) )
+import Msg exposing (Msg(..))
 import Storage
+import Task
+import Update exposing (update)
+import View exposing (view)
+
 
 
 ---- PROGRAM ----
 
 
-init : ( Model, Cmd Msg )
-init =
-    ( initialModel, Task.perform WindowSize Window.size )
+init : () -> ( Model, Cmd Msg )
+init _ =
+    ( initialModel, Task.perform WindowSize Browser.Dom.getViewport )
 
 
-main : Program Never Model Msg
+main : Program () Model Msg
 main =
-    Html.program
+    Browser.element
         { view = view
         , init = init
         , update = update
@@ -31,9 +32,14 @@ main =
 
 
 subscriptions : Model -> Sub Msg
-subscriptions model = 
+subscriptions _ =
     Sub.batch
         [ Storage.load LoadGroup
         , Storage.saved SavedGroup
-        , Keyboard.downs KeyDown
+        , Browser.Events.onKeyDown (Decode.map KeyDown keyDecoder)
         ]
+
+
+keyDecoder : Decode.Decoder Int
+keyDecoder =
+    Decode.field "keyCode" Decode.int

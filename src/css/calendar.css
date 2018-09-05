@@ -29,6 +29,7 @@
 .calendar--week-content {
   display: flex;
   /* overflow-y: auto; */
+  flex: 1;
   overflow: hidden;
 }
 

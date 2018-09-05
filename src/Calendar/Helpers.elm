@@ -1,73 +1,79 @@
-module Calendar.Helpers exposing (..)
+module Calendar.Helpers exposing (colorToHex, dateString, dayRangeOfWeek, hourString, hours, noBright, weekRangesFromMonth)
 
-import Date exposing (Date)
-import Date.Extra
-import List.Extra
 import Color exposing (Color)
+import Date exposing (Date)
 import Hex
+import List.Extra
 
 
 hourString : Date -> String
 hourString =
-    Date.Extra.toFormattedString "H:mm"
+    Date.format "H:mm"
 
 
 dateString : Date -> String
 dateString =
-    Date.Extra.toFormattedString "EEEE dd"
+    Date.format "EEEE dd"
 
 
-bumpMidnightBoundary : Date -> Date
-bumpMidnightBoundary date =
-    if Date.Extra.fractionalDay date == 0 then
-        Date.Extra.add Date.Extra.Millisecond 1 date
-    else
-        date
+
+-- TODO
+-- bumpMidnightBoundary : Date -> Date
+-- bumpMidnightBoundary date =
+--     if Date.fractionalDay date == 0 then
+--         Date.add Date.Millisecond 1 date
+--     else
+--         date
 
 
 hours : Date -> List Date
 hours date =
     let
+        -- bumpMidnightBoundary date
         day =
-            bumpMidnightBoundary date
+            date
 
-        midnight =
-            Date.Extra.floor Date.Extra.Day day |> Date.Extra.add Date.Extra.Hour 7
+        -- TODO
+        -- |> Date.add Date.Hour 7
+        morning =
+            Date.floor Date.Day day
 
+        -- TODO
+        -- |> Date.add Date.Hour -4
         lastHour =
-            Date.Extra.ceiling Date.Extra.Day day |> Date.Extra.add Date.Extra.Hour -4
+            Date.ceiling Date.Day day
     in
-        Date.Extra.range Date.Extra.Hour 1 midnight lastHour
+    Date.range Date.Day 1 morning lastHour
 
 
 weekRangesFromMonth : Int -> Date.Month -> List (List Date)
 weekRangesFromMonth year month =
     let
         firstOfMonth =
-            Date.Extra.fromCalendarDate year month 1
+            Date.fromCalendarDate year month 1
 
         firstOfNextMonth =
-            Date.Extra.add Date.Extra.Month 1 firstOfMonth
+            Date.add Date.Months 1 firstOfMonth
     in
-        Date.Extra.range Date.Extra.Day
-            1
-            (Date.Extra.floor Date.Extra.Sunday firstOfMonth)
-            (Date.Extra.ceiling Date.Extra.Sunday firstOfNextMonth)
-            |> List.Extra.groupsOf 7
+    Date.range Date.Day
+        1
+        (Date.floor Date.Sunday firstOfMonth)
+        (Date.ceiling Date.Sunday firstOfNextMonth)
+        |> List.Extra.groupsOf 7
 
 
 dayRangeOfWeek : Date -> List Date
 dayRangeOfWeek date =
     let
-        weekDate = date
-                 |> Date.Extra.add Date.Extra.Day 2
-                 |> Date.Extra.floor Date.Extra.Monday
+        weekDate =
+            date
+                |> Date.add Date.Days 2
+                |> Date.floor Date.Monday
     in
-        Date.Extra.range Date.Extra.Day
-            1
-            (Date.Extra.floor Date.Extra.Monday weekDate)
-            (Date.Extra.ceiling Date.Extra.Saturday weekDate)
-
+    Date.range Date.Day
+        1
+        (Date.floor Date.Monday weekDate)
+        (Date.ceiling Date.Saturday weekDate)
 
 
 colorToHex : Color -> String
@@ -79,7 +85,7 @@ colorToHex color =
         toHex =
             Hex.toString >> String.padLeft 2 '0'
     in
-        "#" ++ (toHex rgb.red) ++ (toHex rgb.green) ++ (toHex rgb.blue)
+    "#" ++ toHex rgb.red ++ toHex rgb.green ++ toHex rgb.blue
 
 
 noBright : Color -> Color
@@ -91,11 +97,14 @@ noBright color =
         newLightness =
             if hsl.lightness > 0.4 then
                 0.4
+
             else
                 hsl.lightness
 
         newSaturation =
             hsl.saturation * 0.85
-
     in
-        Color.hsl hsl.hue newSaturation newLightness
+    -- TODO
+    -- Color.hsl hsl.hue hsl.saturation newLightness
+    -- Color.hsl (degrees 0) 0.7 0.7
+    color

@@ -4,7 +4,6 @@ import Calendar.Calendar as Calendar
 import Calendar.Msg exposing (TimeSpan(..))
 import Config exposing (allGroups)
 import Date
-import Date.Extra as Dateextra
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (on, onClick, targetValue)
@@ -29,7 +28,8 @@ view model =
 
         attrs =
             Swipe.onSwipe SwipeEvent
-                ++ [ classList [ ( "main--container", True ), ( "fun", Secret.activated model.secret ) ] ]
+                -- TODO css for secret2
+                ++ [ classList [ ( "main--container", True ), ( "fun", Secret.activated model.secret1 ) ] ]
 
         funThings =
             if Secret.activated model.secret1 then
@@ -67,7 +67,7 @@ viewToolbar selected viewing all loop =
 viewTitle : Date.Date -> Html Msg
 viewTitle viewing =
     div [ class "main--month-title" ]
-        [ h2 [] [ text <| Dateextra.toFormattedString "MMMM yyyy" viewing ] ]
+        [ h2 [] [ text <| Date.format "MMMM yyyy" viewing ] ]
 
 
 viewPagination : Bool -> Bool -> Html Msg
@@ -112,7 +112,7 @@ reloadButton loop =
             , ( "main--navigatiors-reload", True )
             , ( "loop", loop )
             ]
-        , style [ ( "font-size", "1.2em" ) ]
+        , style "font-size" "1.2em"
         , onClick (SavedGroup "ok")
         ]
         [ span [] [ text "⟳" ]

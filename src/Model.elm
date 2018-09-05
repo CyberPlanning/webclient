@@ -1,20 +1,19 @@
-module Model exposing (Group, Model, PlanningResponse, computeColor, initialModel, parseDateEvent, toCalEvent, toCalEvents, toDatetime)
+module Model exposing (Group, Model, PlanningResponse, WindowSize, computeColor, initialModel, parseDateEvent, toCalEvent, toCalEvents, toDatetime)
 
 import Calendar.Calendar as Calendar
 import Calendar.Event as CalEvent
 import Calendar.Helpers exposing (colorToHex, noBright)
 import Calendar.Msg
-import Color exposing (Color)
+import Color
 import Date
-import Date.Extra as Dateextra
 import Hex
 import Http exposing (Error)
 import MD5
 import Secret
 import String exposing (dropRight)
 import Swipe
+import Time
 import Types exposing (Event, Query)
-import Window
 
 
 
@@ -25,13 +24,19 @@ type alias PlanningResponse =
     Result Error Query
 
 
+type alias WindowSize =
+    { width : Int
+    , height : Int
+    }
+
+
 type alias Model =
     { data : Maybe (List CalEvent.Event) --Maybe (Result String Query)
     , error : Maybe Error
     , date : Maybe Date.Date
     , selectedGroup : Group
     , loading : Bool
-    , size : Window.Size
+    , size : WindowSize
     , calendarState : Calendar.State
     , swipe : Swipe.State
     , loop : Bool
@@ -49,13 +54,13 @@ type alias Group =
 toDatetime : Date.Date -> String
 toDatetime date =
     date
-        |> Dateextra.add Dateextra.Hour -1
-        |> Dateextra.toUtcIsoString
-        |> dropRight 1
+        -- |> Date.add Date.Hour -1
+        -- |> dropRight 1
+        |> Date.toIsoString
 
 
 
--- Dateextra.toFormattedString "y-MM-ddTHH:mm:ss.000"
+-- Date.format "y-MM-ddTHH:mm:ss.000"
 
 
 initialModel : Model
@@ -65,7 +70,7 @@ initialModel =
     , date = Nothing
     , selectedGroup = { name = "Cyber1 TD2", slug = "12" }
     , loading = True
-    , calendarState = Calendar.init Calendar.Msg.Week (Dateextra.fromParts 2018 Date.Jan 1 1 0 0 0)
+    , calendarState = Calendar.init Calendar.Msg.Week (Date.fromCalendarDate 2018 Time.Jan 1)
     , size = { width = 1200, height = 800 }
     , swipe = Swipe.init
     , loop = False
@@ -95,17 +100,16 @@ toCalEvent event =
 parseDateEvent : String -> Date.Date
 parseDateEvent date =
     date
-        ++ "Z"
-        |> Dateextra.fromIsoString
-        |> Result.withDefault (Date.fromTime 0)
+        |> String.dropRight 9
+        |> Date.fromIsoString
+        |> Result.withDefault (Date.fromOrdinalDate 0 0)
 
 
 computeColor : String -> String
 computeColor text =
     let
         hex =
-            String.dropRight 1 text
-                |> MD5.hex
+            MD5.hex text
                 |> String.right 6
 
         red =

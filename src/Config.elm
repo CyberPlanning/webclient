@@ -1,13 +1,14 @@
-module Config exposing (..)
+module Config exposing (allGroups, apiUrl, minWeekWidth)
 
 import Model exposing (Group)
 
 
-apiUrl: String
-apiUrl = "https://cyberplanning.fr/graphql/"
+apiUrl : String
+apiUrl =
+    "https://cyberplanning.fr/graphql/"
 
 
-allGroups: List Group
+allGroups : List Group
 allGroups =
     [ { name = "Cyber1 TD1", slug = "11" }
     , { name = "Cyber1 TD2", slug = "12" }
@@ -18,5 +19,6 @@ allGroups =
     ]
 
 
-minWeekWidth: Int
-minWeekWidth = 598
+minWeekWidth : Int
+minWeekWidth =
+    598
