@@ -5,7 +5,7 @@ import './css/calendar.css';
 import {
     Elm
 } from './Main.elm';
-// import registerServiceWorker from './registerServiceWorker';
+// import registerServiceWorker from './service/registerServiceWorker';
 
 const app = Elm.Main.init({
     node: document.getElementById('root')
