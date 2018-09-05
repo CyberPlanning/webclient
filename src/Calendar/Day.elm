@@ -45,8 +45,8 @@ viewDayHeader day =
 
 
 viewTimeGutter : Date -> Html Msg
-viewTimeGutter date =
-    Helpers.hours date
+viewTimeGutter _ =
+    Helpers.hours
         |> List.map viewTimeSlotGroup
         |> div [ class "calendar--time-gutter" ]
 
@@ -56,7 +56,7 @@ viewTimeGutterHeader =
     div [ class "calendar--time-gutter" ] []
 
 
-viewTimeSlotGroup : Date -> Html Msg
+viewTimeSlotGroup : String -> Html Msg
 viewTimeSlotGroup date =
     div [ class "calendar--time-slot-group" ]
         [ viewHourSlot date
@@ -64,21 +64,21 @@ viewTimeSlotGroup date =
         ]
 
 
-viewHourSlot : Date -> Html Msg
+viewHourSlot : String -> Html Msg
 viewHourSlot date =
     div [ class "calendar--hour-slot" ]
-        [ span [ class "calendar--time-slot-text" ] [ text <| Helpers.hourString date ] ]
+        [ span [ class "calendar--time-slot-text" ] [ text date ] ]
 
 
 viewDaySlot : List Event -> Maybe String -> Date -> Dict String Date -> Html Msg
 viewDaySlot events selectedId day feries =
-    Helpers.hours day
+    Helpers.hours
         |> List.map viewDaySlotGroup
         |> (\b a -> (++) a b) (viewDayEvents events selectedId day feries)
         |> div [ class "calendar--day-slot" ]
 
 
-viewDaySlotGroup : Date -> Html Msg
+viewDaySlotGroup : String -> Html Msg
 viewDaySlotGroup date =
     div [ class "calendar--time-slot-group" ]
         [ viewTimeSlot date
@@ -86,7 +86,7 @@ viewDaySlotGroup date =
         ]
 
 
-viewTimeSlot : Date -> Html Msg
+viewTimeSlot : String -> Html Msg
 viewTimeSlot date =
     div
         [ class "calendar--time-slot" ]

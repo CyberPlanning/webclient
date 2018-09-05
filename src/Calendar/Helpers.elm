@@ -26,24 +26,22 @@ dateString =
 --         date
 
 
-hours : Date -> List Date
-hours date =
-    let
-        -- bumpMidnightBoundary date
-        day =
-            date
-
-        -- TODO
-        -- |> Date.add Date.Hour 7
-        morning =
-            Date.floor Date.Day day
-
-        -- TODO
-        -- |> Date.add Date.Hour -4
-        lastHour =
-            Date.ceiling Date.Day day
-    in
-    Date.range Date.Day 1 morning lastHour
+hours : List String
+hours =
+    [ "7:00"
+    , "8:00"
+    , "9:00"
+    , "10:00"
+    , "11:00"
+    , "12:00"
+    , "13:00"
+    , "14:00"
+    , "15:00"
+    , "16:00"
+    , "17:00"
+    , "18:00"
+    , "19:00"
+    ]
 
 
 weekRangesFromMonth : Int -> Date.Month -> List (List Date)
@@ -67,6 +65,7 @@ dayRangeOfWeek date =
     let
         weekDate =
             date
+                -- move to middle week because week-end are not showned
                 |> Date.add Date.Days 2
                 |> Date.floor Date.Monday
     in
@@ -94,6 +93,7 @@ noBright color =
         hsl =
             Color.toHsl color
 
+        -- hsl.lightness * 0.7
         newLightness =
             if hsl.lightness > 0.4 then
                 0.4
@@ -104,7 +104,4 @@ noBright color =
         newSaturation =
             hsl.saturation * 0.85
     in
-    -- TODO
-    -- Color.hsl hsl.hue hsl.saturation newLightness
-    -- Color.hsl (degrees 0) 0.7 0.7
-    color
+    Color.hsl hsl.hue hsl.saturation newLightness

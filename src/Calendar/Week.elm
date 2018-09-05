@@ -33,7 +33,7 @@ viewWeekDay : List Event -> Maybe String -> Dict String Date -> Date -> Html Msg
 viewWeekDay events selectedId feries day =
     let
         viewDaySlots =
-            Helpers.hours day
+            Helpers.hours
                 |> List.map viewDaySlotGroup
 
         dayEvents =
