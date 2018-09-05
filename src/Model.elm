@@ -147,6 +147,7 @@ extractTimeIsoString dateString =
                 |> String.dropRight 6
                 |> String.toInt
                 |> Maybe.withDefault 0
+                -- TODO better work with time zone
                 |> (+) 2
 
         minutes =
