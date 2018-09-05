@@ -1,22 +1,22 @@
-module Update exposing (..)
-
-import Task
-import Time
-import Process
-import Dom
-import Date
-import Date.Extra as Dateextra
-
-import Storage
-import Model exposing (Model, toDatetime, toCalEvents)
-import Query exposing (sendRequest)
-import Msg exposing (Msg(..))
-import Config exposing (allGroups)
+module Update exposing (calendarAction, createPlanningRequest, distanceX, distanceY, find, swipeOK, update)
 
 import Calendar.Calendar as Calendar
 import Calendar.Msg as CalMsg exposing (TimeSpan(..))
-
+import Config exposing (allGroups)
+import Date
+import Date.Extra as Dateextra
+import Dom
+import Model exposing (Model, toCalEvents, toDatetime)
+import Msg exposing (Msg(..))
+import Process
+import Query exposing (sendRequest)
+import Secret
+import Storage
 import Swipe
+import Task
+import Time
+
+
 
 ---- UPDATE ----
 
@@ -24,19 +24,21 @@ import Swipe
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        Noop -> ( model, Cmd.none )
+        Noop ->
+            ( model, Cmd.none )
 
         SetDate date ->
             let
                 timespan =
                     if model.size.width < Config.minWeekWidth then
                         Day
+
                     else
                         Week
             in
-                ( { model | date = Just date, calendarState = Calendar.init timespan date }
-                , createPlanningRequest date model.selectedGroup.slug
-                )
+            ( { model | date = Just date, calendarState = Calendar.init timespan date }
+            , createPlanningRequest date model.selectedGroup.slug
+            )
 
         GraphQlMsg response ->
             case response of
@@ -44,11 +46,10 @@ update msg model =
                     let
                         data =
                             query.planning.events
-                            |> toCalEvents
-                            |> Just
-                        
+                                |> toCalEvents
+                                |> Just
                     in
-                        ( { model | data = data, loading = False, error = Nothing }, Task.attempt (always Noop) (Dom.blur "groupSelect") )
+                    ( { model | data = data, loading = False, error = Nothing }, Task.attempt (always Noop) (Dom.blur "groupSelect") )
 
                 Err err ->
                     ( { model | error = Just (Debug.log "Network" err), loading = False }, Cmd.none )
@@ -57,17 +58,12 @@ update msg model =
             let
                 group =
                     find (\x -> x.slug == slug) allGroups
-                    |> Maybe.withDefault { slug = "12", name = "Cyber1 TD2" }
+                        |> Maybe.withDefault { slug = "12", name = "Cyber1 TD2" }
             in
-                ( { model | selectedGroup = group}, Storage.save slug )
+            ( { model | selectedGroup = group }, Storage.save slug )
 
         SetCalendarState calendarMsg ->
-            let
-                updatedCalendar =
-                    Calendar.update calendarMsg model.calendarState
-
-            in
-                ( { model | calendarState = updatedCalendar }, Cmd.none )
+            calendarAction model calendarMsg
 
         PageForward ->
             calendarAction model CalMsg.PageForward
@@ -80,19 +76,23 @@ update msg model =
 
         KeyDown code ->
             let
-                cmd = case code of
-                    39 ->
-                        Task.succeed PageForward
-                        |> Task.perform identity
+                cmd =
+                    case code of
+                        39 ->
+                            Task.succeed PageForward
+                                |> Task.perform identity
 
-                    37 ->
-                        Task.succeed PageBack
-                        |> Task.perform identity
+                        37 ->
+                            Task.succeed PageBack
+                                |> Task.perform identity
 
-                    _ ->
-                        Cmd.none
+                        _ ->
+                            Cmd.none
+
+                updatedModel =
+                    { model | secret1 = Secret.update code model.secret1, secret2 = Secret.update code model.secret2 }
             in
-                ( model, cmd )
+            ( updatedModel, cmd )
 
         SwipeEvent msg ->
             let
@@ -100,76 +100,79 @@ update msg model =
                     Swipe.update msg model.swipe
 
                 action =
-                    if (updatedSwipe.state == Swipe.SwipeEnd) && (distanceX updatedSwipe.c0 updatedSwipe.c1 > 70.0) then
-                        case updatedSwipe.direction of 
+                    if (updatedSwipe.state == Swipe.SwipeEnd) && swipeOK updatedSwipe.c0 updatedSwipe.c1 then
+                        case updatedSwipe.direction of
                             Just Swipe.Left ->
                                 Task.succeed PageForward
-                                |> Task.perform identity
+                                    |> Task.perform identity
 
                             Just Swipe.Right ->
                                 Task.succeed PageBack
-                                |> Task.perform identity
+                                    |> Task.perform identity
 
                             _ ->
                                 Cmd.none
+
                     else
                         Cmd.none
-
             in
-                ( {model | swipe = updatedSwipe}, action )
+            ( { model | swipe = updatedSwipe }, action )
 
         ClickToday ->
             let
-                date = model.date |> Maybe.withDefault (Date.fromTime 0)
+                date =
+                    model.date |> Maybe.withDefault (Date.fromTime 0)
             in
-                calendarAction model (CalMsg.ChangeViewing date)
+            calendarAction model (CalMsg.ChangeViewing date)
 
         LoadGroup slug ->
             let
                 group =
                     find (\x -> x.slug == slug) allGroups
-                    |> Maybe.withDefault { slug = "12", name = "Cyber1 TD2" }
+                        |> Maybe.withDefault { slug = "12", name = "Cyber1 TD2" }
             in
-                ( { model | selectedGroup = group }, Task.perform SetDate Date.now )
+            ( { model | selectedGroup = group }, Task.perform SetDate Date.now )
 
         SavedGroup ok ->
             let
                 state =
                     if (model.loading == False) && (model.loop == False) then
-                        ( { model | loading = True, loop = True }, Cmd.batch
+                        ( { model | loading = True, loop = True, error = Nothing }
+                        , Cmd.batch
                             [ createPlanningRequest model.calendarState.viewing model.selectedGroup.slug
                             , Process.sleep (1 * Time.second)
                                 |> Task.perform StopReloadIcon
                             ]
                         )
+
                     else
                         ( model, Cmd.none )
-
             in
-                state
+            state
 
         StopReloadIcon _ ->
             ( { model | loop = False }, Cmd.none )
 
 
-createPlanningRequest: Date.Date -> String -> Cmd Msg
+createPlanningRequest : Date.Date -> String -> Cmd Msg
 createPlanningRequest date slug =
     let
-        monthBegin =  date
-
-        dateFrom = 
+        monthBegin =
             date
-            |> Dateextra.floor Dateextra.Month
-            |> Dateextra.floor Dateextra.Monday
-            |> toDatetime
 
-        dateTo = 
+        dateFrom =
             date
-            |> Dateextra.ceiling Dateextra.Month
-            |> Dateextra.ceiling Dateextra.Sunday
-            |> toDatetime
+                |> Dateextra.floor Dateextra.Month
+                |> Dateextra.floor Dateextra.Monday
+                |> toDatetime
+
+        dateTo =
+            date
+                |> Dateextra.ceiling Dateextra.Month
+                |> Dateextra.ceiling Dateextra.Sunday
+                |> toDatetime
     in
-        sendRequest dateFrom dateTo [ slug ]
+    sendRequest dateFrom dateTo [ slug ]
 
 
 find : (a -> Bool) -> List a -> Maybe a
@@ -178,36 +181,52 @@ find predicate list =
         [] ->
             Nothing
 
-        first::rest ->
+        first :: rest ->
             if predicate first then
                 Just first
+
             else
                 find predicate rest
 
 
 distanceX : Swipe.Coordinates -> Swipe.Coordinates -> Float
-distanceX c0 c1 = 
+distanceX c0 c1 =
     abs (c0.clientX - c1.clientX)
 
 
-calendarAction: Model -> CalMsg.Msg -> ( Model, Cmd Msg )
+distanceY : Swipe.Coordinates -> Swipe.Coordinates -> Float
+distanceY c0 c1 =
+    abs (c0.clientY - c1.clientY)
+
+
+swipeOK : Swipe.Coordinates -> Swipe.Coordinates -> Bool
+swipeOK p0 p1 =
+    distanceX p0 p1
+        > 70.0
+        && distanceY p0 p1
+        < 50.0
+
+
+calendarAction : Model -> CalMsg.Msg -> ( Model, Cmd Msg )
 calendarAction model calMsg =
     let
         updatedCalendar =
             Calendar.update calMsg model.calendarState
-            
-        (cmd, loading) =
-            if (Date.month updatedCalendar.viewing) /= (Date.month model.calendarState.viewing) then
+
+        ( cmd, loading ) =
+            if Date.month updatedCalendar.viewing /= Date.month model.calendarState.viewing then
                 ( createPlanningRequest updatedCalendar.viewing model.selectedGroup.slug
                 , True
                 )
+
             else
-                (Cmd.none, False)
+                ( Cmd.none, False )
 
         updatedCalWithJourFerie =
-            if (Date.year updatedCalendar.viewing) /= (Date.year model.calendarState.viewing) then
+            if Date.year updatedCalendar.viewing /= Date.year model.calendarState.viewing then
                 Calendar.init updatedCalendar.timeSpan updatedCalendar.viewing
+
             else
                 updatedCalendar
     in
-        ( { model | calendarState = updatedCalWithJourFerie, loading = loading }, cmd )
+    ( { model | calendarState = updatedCalWithJourFerie, loading = loading }, cmd )

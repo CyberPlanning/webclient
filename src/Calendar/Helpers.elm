@@ -85,13 +85,17 @@ colorToHex color =
 noBright : Color -> Color
 noBright color =
     let
-        hsl = 
+        hsl =
             Color.toHsl color
 
         newLightness =
-            if hsl.lightness > 0.5 then
-                0.5
+            if hsl.lightness > 0.4 then
+                0.4
             else
                 hsl.lightness
+
+        newSaturation =
+            hsl.saturation * 0.85
+
     in
-        Color.hsl hsl.hue hsl.saturation newLightness
+        Color.hsl hsl.hue newSaturation newLightness

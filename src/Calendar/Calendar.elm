@@ -2,7 +2,6 @@ module Calendar.Calendar exposing (..)
 
 import Html exposing (..)
 import Html.Attributes exposing (class)
-import Html.Events exposing (on, keyCode)
 import Date exposing (Date)
 import Dict exposing (Dict)
 import Date.Extra
@@ -10,7 +9,6 @@ import Calendar.Day as Day
 import Calendar.Week as Week
 import Calendar.Msg exposing (Msg(..), TimeSpan(..))
 import Calendar.Event exposing (Event)
-import Json.Decode as Json
 import Calendar.JourFerie exposing (getAllJourFerie)
 
 
