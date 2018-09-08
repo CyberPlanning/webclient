@@ -124,6 +124,49 @@ body>div {
   align-items: center;
 }
 
+.fun2 .calendar--event {
+  background-color: #e30404 !important;
+  overflow: visible;
+  animation: 4s singing infinite alternate linear;
+}
+
+.fun2 .calendar--week-content .calendar--day:nth-child(odd) .calendar--event {
+  animation-delay: 1s;
+}
+
+.fun2 .calendar--week-content .calendar--day:nth-child(even) .calendar--event {
+  animation-delay: 0;
+}
+
+.fun2 .calendar--event::after {
+  content: '';
+  background-image: url("http://en.shapki-ushanki.ru/img/ushanka.png");
+  width: 100%;
+  max-width: 150px;
+  height: 100px;
+  display: block;
+  background-size: cover;
+  position: absolute;
+  top: -80px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.fun2 .calendar--event::before {
+  content: '';
+  background-image: url("http://gifimage.net/wp-content/uploads/2017/08/mouth-gif-21.gif");
+  width: 50%;
+  max-width: 50px;
+  height: 50px;
+  display: block;
+  background-size: cover;
+  position: absolute;
+  bottom: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  mix-blend-mode: multiply;
+}
+
 .fun .calendar--week-content .calendar--day:nth-child(odd) .calendar--event:nth-child(odd) {
   animation: linear infinite 4s 0.6s fun alternate !important;
 }
@@ -165,5 +208,19 @@ body>div {
 
   100% {
     transform: rotate(-720deg) scale(0.8);
+  }
+}
+
+@keyframes singing {
+  0% {
+    transform: translatey(0) scale(1);
+  }
+
+  80% {
+    transform: translatey(-15px) scale(1.05) rotate(1deg);
+  }
+
+  100% {
+    transform: translatey(-20px) scale(1.1) rotate(-1deg);
   }
 }

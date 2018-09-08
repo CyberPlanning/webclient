@@ -29,7 +29,12 @@ view model =
         attrs =
             Swipe.onSwipe SwipeEvent
                 -- TODO css for secret2
-                ++ [ classList [ ( "main--container", True ), ( "fun", Secret.activated model.secret1 ) ] ]
+                ++ [ classList
+                        [ ( "main--container", True )
+                        , ( "fun", Secret.activated model.secret1 )
+                        , ( "fun2", Secret.activated model.secret2 )
+                        ]
+                   ]
 
         funThings =
             if Secret.activated model.secret1 then
