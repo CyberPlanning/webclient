@@ -52,11 +52,30 @@ tooltipStyle color =
 
 viewHour : CalEvent.Event -> Html Msg
 viewHour event =
-    let
-        toString =
-            Date.format "H:mm"
-    in
-    toString event.start
+    toString event.startTime
         ++ " - "
-        ++ toString event.end
+        ++ toString event.endTime
         |> text
+
+toString : Int -> String
+toString time =
+    let
+        minutes =
+            toFloat time / 60
+        
+        minute =
+            round minutes
+            |> modBy 60 
+
+        hour = 
+            minutes / 60
+            |> round
+
+        minuteZero =
+            if minute < 10 then
+                "0" ++ (String.fromInt minute)
+            else
+                String.fromInt minute
+
+    in
+        (String.fromInt hour) ++ ":" ++ minuteZero
