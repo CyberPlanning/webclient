@@ -74,7 +74,7 @@ update msgSource model =
             calendarAction model CalMsg.PageBack
 
         WindowSize view ->
-            ( { model | size = { width = round view.viewport.width, height = round view.viewport.height } }, Storage.doload () )
+            ( { model | size = { width = floor view.viewport.width, height = floor view.viewport.height } }, Storage.doload () )
 
         KeyDown code ->
             let

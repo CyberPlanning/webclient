@@ -61,15 +61,16 @@ toString : Int -> String
 toString time =
     let
         minutes =
-            toFloat time / 60
+            toFloat time / 60.0
+            |> floor
         
         minute =
-            round minutes
-            |> modBy 60 
+            minutes
+            |> modBy 60
 
         hour = 
-            minutes / 60
-            |> round
+            toFloat minutes / 60.0
+            |> floor
 
         minuteZero =
             if minute < 10 then
