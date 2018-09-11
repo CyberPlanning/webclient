@@ -130,6 +130,13 @@ body>div {
   animation: 4s singing infinite alternate linear;
 }
 
+.fun2 .calendar--week {
+  background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Communist_Party_of_Vietnam_flag_logo.svg/277px-Communist_Party_of_Vietnam_flag_logo.svg.png');
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: 90vh;
+}
+
 .fun2 .calendar--week-content .calendar--day:nth-child(odd) .calendar--event {
   animation-delay: 1s;
 }
