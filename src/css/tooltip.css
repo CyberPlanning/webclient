@@ -22,7 +22,6 @@
 }
 
 .tooltip--event-sub {
-    /* background-color: rgba(0,0,0,0.5); */
     background-color: #373c3d;
     border-top: 1px solid #404547;
     color: white;
@@ -31,7 +30,3 @@
 .tooltip--event-sub:first-child() {
     border: 0;
 }
-
-/* .tooltip--event-sub:nth-child(even) {
-    background-color: rgba(0,0,0,0.4);
-} */
