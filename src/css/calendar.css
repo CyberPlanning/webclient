@@ -34,7 +34,7 @@
 
 .calendar--week-content {
   display: flex;
-  overflow: auto;
+  overflow-x: hidden;
   flex: 1;
 }
 
