@@ -4,13 +4,15 @@
 }
 
 .calendar--time-gutter {
-  min-width: 70px;
+  display: flex;
+  flex-direction: column;
 }
 
 .calendar--time-slot-group {
   min-height: 40px;
   display: flex;
   flex-flow: column nowrap;
+  flex: 1;
   border-bottom: 1px solid #363e41;
   border-left: 1px solid #363e41;
 }
@@ -28,21 +30,19 @@
 
 .calendar--week-content {
   display: flex;
-  /* overflow-y: auto; */
-  flex: 1;
   overflow: hidden;
 }
 
 .calendar--week-header,
 .calendar--day .calendar--date-header {
-  background-color: #34495e;
+  background-color: #3c6382;
   padding: 2px 0;
-  border-bottom: 1px solid #7f8c8d;
+  border-bottom: 2px solid #122e42;
 }
 
 .calendar--dates-header {
   display: flex;
-  background-color: #34495e;
+  background-color: #3c6382;
   flex-flow: row nowrap;
   align-content: stretch;
 }
@@ -73,7 +73,8 @@
   text-decoration: none;
   color: #ecf0f1;
   font-size: 15px;
-  width: 100px;
+  min-height: 30px;
+  line-height: 30px;
 }
 
 .calendar--day {
@@ -93,14 +94,14 @@
 }
 
 .calendar--hour-slot {
-  padding: 0 5px;
+  padding: 0 10px;
   flex: 1 0 0;
   background-color: #262d2f;
 }
 
 .calendar--event {
   font-size: 14px;
-  padding: 2px 5px;
+  padding: 5px 5px 2;
   background-color: #5fb4ca;
   color: white;
   cursor: pointer;

@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css?family=Montserrat');
+
 * {
   box-sizing: border-box;
 }
@@ -35,6 +37,7 @@ body>div {
   height: 100%;
   display: flex;
   flex-direction: column;
+  flex: 1;
 }
 
 .main--calendar {
@@ -45,7 +48,7 @@ body>div {
 
 .main--toolbar {
   display: flex;
-  background-color: #2c3e50;
+  background-color: #124368;
   padding: 0;
   justify-content: space-between;
   height: 40px;
@@ -113,6 +116,7 @@ body>div {
 
 .main--selector-select {
   appearance: none;
+  padding: 0 5px;
 }
 
 .main--message {
@@ -229,5 +233,16 @@ body>div {
 
   100% {
     transform: translatey(-20px) scale(1.1) rotate(-1deg);
+  }
+}
+
+@media only screen and (max-width: 430px) {
+  .main--month-title h2 {
+    font-size: 16px;
+    line-height: 30px;
+  }
+
+  .main--navigatiors-reload {
+    padding-left: 0;
   }
 }
