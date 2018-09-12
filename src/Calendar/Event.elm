@@ -21,7 +21,6 @@ type alias Event =
     , teachers : List String
     , groups : List String
     , color : String
-    , contacts : Int
     }
 
 

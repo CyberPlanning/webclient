@@ -90,7 +90,6 @@ toCalEvent event =
     , teachers = event.teachers
     , groups = event.groups
     , color = computeColor event.title
-    , contacts = 2
     }
 
 
