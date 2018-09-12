@@ -161,8 +161,8 @@ styleDayEvent start end color title =
     , style "width" "96%"
     , style "position" "absolute"
     , style "background-color" color
-    , attribute "title" title
-    , attribute "color" color
+    , attribute "data-title" title
+    , attribute "data-color" color
     ]
 
 
