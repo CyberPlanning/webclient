@@ -205,11 +205,13 @@ eventSegment event selectedId eventRange =
 
 makeTitle : String -> Html Msg
 makeTitle title =
-    if (String.dropRight 1 title) == "Projet cyber - Gr" then
-        "RIEN (projet) - " ++ String.right 3 title
-        |> text
-    else
-        text title
+    text title
+
+    -- if (String.dropRight 1 title) == "Projet cyber - Gr" then
+    --     "RIEN (projet) - " ++ String.right 3 title
+    --     |> text
+    -- else
+    --     text title
 
 
 cellWidth : Float
