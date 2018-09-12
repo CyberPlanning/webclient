@@ -4,9 +4,10 @@ import Calendar.Helpers as Helpers
 import Calendar.Msg exposing (Msg(..), TimeSpan(..))
 import Date exposing (Date)
 import Html exposing (..)
-import Html.Attributes exposing (class, classList, style)
+import Html.Attributes exposing (class, classList, style, attribute)
 import Html.Events exposing (..)
 import String
+import String.Extra
 
 
 type alias Event =
@@ -100,8 +101,9 @@ eventStyling event eventRange customClasses =
         eventColor =
             event.color
 
-        eventContacts =
-            event.contacts
+        eventTitle =
+            escapeTitle event.title
+            
 
         classes =
             case eventRange of
@@ -121,7 +123,7 @@ eventStyling event eventRange customClasses =
                     ""
 
         styles =
-            styleDayEvent eventStart eventEnd eventColor eventContacts
+            styleDayEvent eventStart eventEnd eventColor eventTitle
 
     in
     [ classList (( classes, True ) :: customClasses) ] ++ styles
@@ -139,8 +141,8 @@ percentDay date min max =
 
 {-| Date can be just time
 -}
-styleDayEvent : Int -> Int -> String -> Int -> List (Html.Attribute msg)
-styleDayEvent start end color contacts =
+styleDayEvent : Int -> Int -> String -> String -> List (Html.Attribute msg)
+styleDayEvent start end color title =
     let
         startPercent =
             100 * percentDay start (7 / 24) (20 / 24)
@@ -160,8 +162,8 @@ styleDayEvent start end color contacts =
     , style "width" "96%"
     , style "position" "absolute"
     , style "background-color" color
-
-    -- , ( "color" , if Helpers.isBright color then "black" else "white")
+    , attribute "title" title
+    , attribute "color" color
     ]
 
 
@@ -259,3 +261,9 @@ isBetween start end current =
             Date.toRataDie current
     in
     startInt <= currentInt && endInt >= currentInt
+
+
+escapeTitle : String -> String
+escapeTitle =
+    String.Extra.removeAccents
+    >> String.Extra.underscored
