@@ -14,7 +14,7 @@ body,
 }
 
 body {
-  font-family: 'Source Sans Pro', 'Trebuchet MS', 'Lucida Grande', 'Bitstream Vera Sans', 'Helvetica Neue', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 20px;
   margin: 0;
   text-align: center;
@@ -43,7 +43,7 @@ body>div {
 .main--calendar {
   overflow: hidden;
   display: flex;
-  /* flex: 1; */
+  flex: 1;
 }
 
 .main--toolbar {

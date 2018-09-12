@@ -8,6 +8,10 @@
   flex-direction: column;
 }
 
+.calendar--dates-header > .calendar--time-gutter {
+  width: 51px;
+}
+
 .calendar--time-slot-group {
   min-height: 40px;
   display: flex;
@@ -30,7 +34,8 @@
 
 .calendar--week-content {
   display: flex;
-  overflow: hidden;
+  overflow: auto;
+  flex: 1;
 }
 
 .calendar--week-header,
@@ -42,7 +47,6 @@
 
 .calendar--dates-header {
   display: flex;
-  background-color: #3c6382;
   flex-flow: row nowrap;
   align-content: stretch;
 }
@@ -73,8 +77,7 @@
   text-decoration: none;
   color: #ecf0f1;
   font-size: 15px;
-  min-height: 30px;
-  line-height: 30px;
+  line-height: 26px;
 }
 
 .calendar--day {
@@ -86,6 +89,8 @@
 .calendar--day-slot {
   flex: 1;
   position: relative;
+  display: flex;
+  flex-direction: column;
 }
 
 .calendar--day-content {
@@ -101,7 +106,7 @@
 
 .calendar--event {
   font-size: 14px;
-  padding: 5px 5px 2;
+  padding: 5px;
   background-color: #5fb4ca;
   color: white;
   cursor: pointer;
