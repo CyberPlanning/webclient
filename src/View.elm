@@ -14,6 +14,8 @@ import Msg exposing (Msg(..))
 import Secret
 import Swipe exposing (onSwipe)
 import Tooltip
+import Time exposing (Month(..))
+
 
 
 
@@ -72,7 +74,46 @@ viewToolbar selected viewing all loop =
 viewTitle : Date.Date -> Html Msg
 viewTitle viewing =
     div [ class "main--month-title" ]
-        [ h2 [] [ text <| Date.format "MMMM yyyy" viewing ] ]
+        [ h2 [] [ text <| formatDateTitle viewing ] ]
+
+
+-- "MMMM yyyy"
+formatDateTitle : Date.Date -> String
+formatDateTitle date =
+    let
+        month = Date.month date
+
+        monthName = case month of
+            Jan ->
+                "Janvier"
+            Feb ->
+                "Février"
+            Mar ->
+                "Mars"
+            Apr ->
+                "Avril"
+            May ->
+                "Mai"
+            Jun ->
+                "Juin"
+            Jul ->
+                "Juillet"
+            Aug ->
+                "Août"
+            Sep ->
+                "Septembre"
+            Oct ->
+                "Octobre"
+            Nov ->
+                "Novembre"
+            Dec ->
+                "Décembre"
+
+        year =
+            Date.year date
+            |> String.fromInt
+    in
+        monthName ++ " " ++ year
 
 
 viewPagination : Bool -> Bool -> Html Msg
@@ -98,7 +139,12 @@ viewPagination all loop =
 viewSelector : Group -> Html Msg
 viewSelector selected =
     div [ class "main--selector" ]
-        [ select [ class "main--selector-select", id "groupSelect", on "change" <| Json.map SetGroup targetValue, value selected.slug ]
+        [ select [ class "main--selector-select"
+                 , id "groupSelect"
+                 , on "change" <| Json.map SetGroup targetValue
+                 , value selected.slug
+                 , multiple False
+                 ]
             (List.map optionGroup allGroups)
         ]
 

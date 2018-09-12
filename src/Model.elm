@@ -52,15 +52,9 @@ type alias Group =
 
 
 toDatetime : Date.Date -> String
-toDatetime date =
-    date
-        -- |> Date.add Date.Hour -1
-        -- |> dropRight 1
-        |> Date.toIsoString
+toDatetime =
+    Date.toIsoString
 
-
-
--- Date.format "y-MM-ddTHH:mm:ss.000"
 
 
 initialModel : Model
@@ -96,6 +90,7 @@ toCalEvent event =
     , teachers = event.teachers
     , groups = event.groups
     , color = computeColor event.title
+    , contacts = 2
     }
 
 

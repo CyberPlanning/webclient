@@ -20,6 +20,7 @@ type alias Event =
     , teachers : List String
     , groups : List String
     , color : String
+    , contacts : Int
     }
 
 
@@ -86,10 +87,9 @@ rangeDescription start end interval date =
 eventStyling :
     Event
     -> EventRange
-    -> TimeSpan
     -> List ( String, Bool )
     -> List (Html.Attribute msg)
-eventStyling event eventRange timeSpan customClasses =
+eventStyling event eventRange customClasses =
     let
         eventStart =
             event.startTime
@@ -99,6 +99,9 @@ eventStyling event eventRange timeSpan customClasses =
 
         eventColor =
             event.color
+
+        eventContacts =
+            event.contacts
 
         classes =
             case eventRange of
@@ -118,12 +121,8 @@ eventStyling event eventRange timeSpan customClasses =
                     ""
 
         styles =
-            case timeSpan of
-                Week ->
-                    []
+            styleDayEvent eventStart eventEnd eventColor eventContacts
 
-                Day ->
-                    styleDayEvent eventStart eventEnd eventColor
     in
     [ classList (( classes, True ) :: customClasses) ] ++ styles
 
@@ -140,8 +139,8 @@ percentDay date min max =
 
 {-| Date can be just time
 -}
-styleDayEvent : Int -> Int -> String -> List (Html.Attribute msg)
-styleDayEvent start end color =
+styleDayEvent : Int -> Int -> String -> Int -> List (Html.Attribute msg)
+styleDayEvent start end color contacts =
     let
         startPercent =
             100 * percentDay start (7 / 24) (20 / 24)
@@ -173,11 +172,11 @@ maybeViewDayEvent event selectedId eventRange =
             Nothing
 
         _ ->
-            Just <| eventSegment event selectedId eventRange Day
+            Just <| eventSegment event selectedId eventRange
 
 
-eventSegment : Event -> Maybe String -> EventRange -> TimeSpan -> Html Msg
-eventSegment event selectedId eventRange timeSpan =
+eventSegment : Event -> Maybe String -> EventRange -> Html Msg
+eventSegment event selectedId eventRange =
     let
         eventId =
             event.toId
@@ -196,13 +195,21 @@ eventSegment event selectedId eventRange timeSpan =
          , onMouseLeave <| EventMouseLeave eventId
          , onClick <| EventMouseEnter eventId
          ]
-            ++ eventStyling event eventRange timeSpan classes
+            ++ eventStyling event eventRange classes
         )
-        [ div [ class "calendar--event-title" ] [ text event.title ]
+        [ div [ class "calendar--event-title" ] [ makeTitle event.title ]
         , div [ class "calendar--event-sub" ] [ text <| String.join "," event.classrooms ]
         , div [ class "calendar--event-sub" ] [ text <| String.join "," event.teachers ]
         , div [ class "calendar--event-sub" ] [ text <| String.join "," event.groups ]
         ]
+
+makeTitle : String -> Html Msg
+makeTitle title =
+    if (String.dropRight 1 title) == "Projet cyber - Gr" then
+        "RIEN (projet) - " ++ String.right 3 title
+        |> text
+    else
+        text title
 
 
 cellWidth : Float

@@ -1,19 +1,38 @@
-module Calendar.Helpers exposing (colorToHex, dateString, dayRangeOfWeek, hourString, hours, noBright, weekRangesFromMonth)
+module Calendar.Helpers exposing (colorToHex, dateString, dayRangeOfWeek, hours, noBright, weekRangesFromMonth)
 
 import Color exposing (Color)
 import Date exposing (Date)
+import Time exposing (Weekday(..))
 import Hex
 import List.Extra
 
 
-hourString : Date -> String
-hourString =
-    Date.format "H:mm"
-
-
 dateString : Date -> String
-dateString =
-    Date.format "EEEE dd"
+dateString date =
+    let
+        weekday = Date.weekday date
+
+        weekname = case weekday of
+            Mon -> 
+                "Lundi"
+            Tue -> 
+                "Mardi"
+            Wed -> 
+                "Mercredi"
+            Thu -> 
+                "Jeudi"
+            Fri -> 
+                "Vendredi"
+            Sat -> 
+                "Samedi"
+            Sun -> 
+                "Dimanche"
+
+        day =
+            Date.day date
+            |> String.fromInt
+    in
+        weekname ++ " " ++ day
 
 
 
