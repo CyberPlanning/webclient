@@ -15,14 +15,14 @@ import Secret
 import Swipe exposing (onSwipe)
 import Tooltip
 import Time exposing (Month(..))
-
+import Browser exposing (Document)
 
 
 
 ---- VIEW ----
 
 
-view : Model -> Html Msg
+view : Model -> Document Msg
 view model =
     let
         events =
@@ -35,18 +35,21 @@ view model =
 
         funThings =
             Secret.view model.secret
+        
+        container =
+            div attrs
+                [ viewToolbar model.selectedGroup model.calendarState.viewing (model.calendarState.timeSpan == Week) model.loop
+                , div [ class "main--calendar" ]
+                    [ Html.map SetCalendarState (Calendar.view events model.calendarState)
+                    ]
+                , viewMessage model
+                , Tooltip.viewTooltip model.calendarState.hover events
+                , funThings
+                ]
     in
-    div attrs
-        ([ viewToolbar model.selectedGroup model.calendarState.viewing (model.calendarState.timeSpan == Week) model.loop
-         , div [ class "main--calendar" ]
-            [ Html.map SetCalendarState (Calendar.view events model.calendarState)
-            ]
-         , viewMessage model
-         , Tooltip.viewTooltip model.calendarState.hover events
-         , funThings
-         ]
-        )
-
+        { title = "Planning - " ++ model.selectedGroup.name
+        , body = [ container ]
+        }
 
 viewToolbar : Group -> Date.Date -> Bool -> Bool -> Html Msg
 viewToolbar selected viewing all loop =

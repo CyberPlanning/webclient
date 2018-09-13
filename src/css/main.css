@@ -5,8 +5,7 @@
 }
 
 html,
-body,
-#root {
+body {
   padding: 0;
   margin: 0;
   height: 100vh;
@@ -20,13 +19,6 @@ body {
   text-align: center;
   background-color: #2d3436;
   color: #ecf0f1;
-}
-
-body>div {
-  padding: 0;
-  margin: 0;
-  height: 100vh;
-  overflow: hidden
 }
 
 .hidden {

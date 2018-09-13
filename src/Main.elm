@@ -23,7 +23,7 @@ init _ =
 
 main : Program () Model Msg
 main =
-    Browser.element
+    Browser.document
         { view = view
         , init = init
         , update = update
