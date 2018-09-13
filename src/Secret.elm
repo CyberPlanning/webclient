@@ -1,4 +1,4 @@
-module Secret exposing (State, activated, createState1, createState2, update, view)
+module Secret exposing (State, activated, createState1, createState2, createState3, update, view)
 
 import Array exposing (Array)
 import Html exposing (Html, iframe)
@@ -27,6 +27,13 @@ createState2 =
     , yt = "vN-ARytZKgQ"
     }
 
+createState3 : State
+createState3 = 
+    { code = Array.fromList [ 83, 65, 77, 66, 65 ]
+    , index = 0
+    , yt = "HAiHEQblKeQ"
+    }
+
 
 update : Int -> State -> State
 update code state =
@@ -51,7 +58,7 @@ view code =
     iframe
         [ width 0
         , height 0
-        , src ("https://www.youtube.com/embed/" ++ code ++ "?rel=0&amp;controls=0&amp;showinfo=0&amp;autoplay=1&amp;start=6")
+        , src ("https://www.youtube.com/embed/" ++ code ++ "?rel=0&controls=0&showinfo=0&autoplay=1&start=26")
         , attribute "frameborder" "0"
         , attribute "allow" "autoplay; encrypted-media"
         , attribute "allowfullscreen" "1"

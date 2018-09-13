@@ -45,6 +45,9 @@ view model =
             else if Secret.activated model.secret2 then
                 [ Secret.view model.secret2.yt ]
 
+            else if Secret.activated model.secret3 then
+                [ Secret.view model.secret3.yt ]
+
             else
                 []
     in

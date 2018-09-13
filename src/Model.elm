@@ -42,6 +42,7 @@ type alias Model =
     , loop : Bool
     , secret1 : Secret.State
     , secret2 : Secret.State
+    , secret3 : Secret.State
     }
 
 
@@ -70,6 +71,7 @@ initialModel =
     , loop = False
     , secret1 = Secret.createState1
     , secret2 = Secret.createState2
+    , secret3 = Secret.createState3
     }
 
 
