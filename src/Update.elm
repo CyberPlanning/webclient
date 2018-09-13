@@ -159,9 +159,6 @@ update msgSource model =
 createPlanningRequest : Date.Date -> String -> Cmd Msg
 createPlanningRequest date slug =
     let
-        monthBegin =
-            date
-
         dateFrom =
             date
                 |> Date.floor Date.Month
@@ -170,6 +167,8 @@ createPlanningRequest date slug =
 
         dateTo =
             date
+                -- Fix issue : Event not loaded in October to November transition
+                |> Date.add Date.Days 1
                 |> Date.ceiling Date.Month
                 |> Date.ceiling Date.Sunday
                 |> toDatetime
