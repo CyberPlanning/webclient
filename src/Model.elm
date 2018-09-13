@@ -40,9 +40,7 @@ type alias Model =
     , calendarState : Calendar.State
     , swipe : Swipe.State
     , loop : Bool
-    , secret1 : Secret.State
-    , secret2 : Secret.State
-    , secret3 : Secret.State
+    , secret : Secret.StateList
     }
 
 
@@ -69,9 +67,7 @@ initialModel =
     , size = { width = 1200, height = 800 }
     , swipe = Swipe.init
     , loop = False
-    , secret1 = Secret.createState1
-    , secret2 = Secret.createState2
-    , secret3 = Secret.createState3
+    , secret = Secret.createStates
     }
 
 

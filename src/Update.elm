@@ -92,7 +92,7 @@ update msgSource model =
                             Cmd.none
 
                 updatedModel =
-                    { model | secret1 = Secret.update code model.secret1, secret2 = Secret.update code model.secret2, secret3 = Secret.update code model.secret3 }
+                    { model | secret = Secret.update code model.secret }
             in
             ( updatedModel, cmd )
 

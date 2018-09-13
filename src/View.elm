@@ -30,26 +30,11 @@ view model =
 
         attrs =
             Swipe.onSwipe SwipeEvent
-                -- TODO css for secret2
-                ++ [ classList
-                        [ ( "main--container", True )
-                        , ( "fun", Secret.activated model.secret1 )
-                        , ( "fun2", Secret.activated model.secret2 )
-                        ]
-                   ]
+                ++ [ class "main--container" ]
+                ++ Secret.classStyle model.secret
 
         funThings =
-            if Secret.activated model.secret1 then
-                [ Secret.view model.secret1.yt ]
-
-            else if Secret.activated model.secret2 then
-                [ Secret.view model.secret2.yt ]
-
-            else if Secret.activated model.secret3 then
-                [ Secret.view model.secret3.yt ]
-
-            else
-                []
+            Secret.view model.secret
     in
     div attrs
         ([ viewToolbar model.selectedGroup model.calendarState.viewing (model.calendarState.timeSpan == Week) model.loop
@@ -58,8 +43,8 @@ view model =
             ]
          , viewMessage model
          , Tooltip.viewTooltip model.calendarState.hover events
+         , funThings
          ]
-            ++ funThings
         )
 
 
