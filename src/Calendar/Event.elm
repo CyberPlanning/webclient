@@ -3,13 +3,13 @@ module Calendar.Event exposing (Event, EventRange(..), cellWidth, eventSegment, 
 import Calendar.Helpers as Helpers
 import Calendar.Msg exposing (Msg(..), TimeSpan(..))
 import Date exposing (Date)
-import Time exposing (Posix)
-import TimeZone exposing (europe__paris)
 import Html exposing (..)
-import Html.Attributes exposing (class, classList, style, attribute)
+import Html.Attributes exposing (attribute, class, classList, style)
 import Html.Events exposing (..)
 import String
 import String.Extra
+import Time exposing (Posix)
+import TimeZone exposing (europe__paris)
 
 
 type alias Event =
@@ -104,7 +104,6 @@ eventStyling event eventRange customClasses =
 
         eventTitle =
             escapeTitle event.title
-            
 
         classes =
             case eventRange of
@@ -125,7 +124,6 @@ eventStyling event eventRange customClasses =
 
         styles =
             styleDayEvent eventStart eventEnd eventColor eventTitle
-
     in
     [ classList (( classes, True ) :: customClasses) ] ++ styles
 
@@ -142,7 +140,6 @@ fractionalDay time =
         seconds =
             Time.toSecond europe__paris time
     in
-    
     toFloat ((hours * 3600) + (minutes * 60) + seconds) / (24 * 3600)
 
 
@@ -217,15 +214,18 @@ eventSegment event selectedId eventRange =
         , div [ class "calendar--event-sub" ] [ text <| String.join "," event.groups ]
         ]
 
+
 makeTitle : String -> Html Msg
 makeTitle title =
     text title
 
-    -- if (String.dropRight 1 title) == "Projet cyber - Gr" then
-    --     "RIEN (projet) - " ++ String.right 3 title
-    --     |> text
-    -- else
-    --     text title
+
+
+-- if (String.dropRight 1 title) == "Projet cyber - Gr" then
+--     "RIEN (projet) - " ++ String.right 3 title
+--     |> text
+-- else
+--     text title
 
 
 cellWidth : Float
@@ -278,4 +278,4 @@ isBetween start end current =
 escapeTitle : String -> String
 escapeTitle =
     String.Extra.removeAccents
-    >> String.Extra.underscored
+        >> String.Extra.underscored

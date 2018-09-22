@@ -1,8 +1,9 @@
 module FakeQuery exposing (createFakeQuery)
 
+import Debug
 import Json.Decode as Json
 import Types exposing (Event, Planning, Query, decodeQuery)
-import Debug
+
 
 createFakeQuery : Query
 createFakeQuery =

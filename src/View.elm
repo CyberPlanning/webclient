@@ -1,5 +1,6 @@
 module View exposing (errorMessage, optionGroup, reloadButton, view, viewMessage, viewPagination, viewSelector, viewTitle, viewToolbar)
 
+import Browser exposing (Document)
 import Calendar.Calendar as Calendar
 import Calendar.Msg exposing (TimeSpan(..))
 import Config exposing (allGroups)
@@ -13,9 +14,8 @@ import Model exposing (Group, Model, toDatetime)
 import Msg exposing (Msg(..))
 import Secret
 import Swipe exposing (onSwipe)
-import Tooltip
 import Time exposing (Month(..))
-import Browser exposing (Document)
+import Tooltip
 
 
 
@@ -35,7 +35,7 @@ view model =
 
         funThings =
             Secret.view model.secret
-        
+
         container =
             div attrs
                 [ viewToolbar model.selectedGroup model.calendarState.viewing (model.calendarState.timeSpan == Week) model.loop
@@ -47,9 +47,10 @@ view model =
                 , funThings
                 ]
     in
-        { title = "Planning - " ++ model.selectedGroup.name
-        , body = [ container ]
-        }
+    { title = "Planning - " ++ model.selectedGroup.name
+    , body = [ container ]
+    }
+
 
 viewToolbar : Group -> Date.Date -> Bool -> Bool -> Html Msg
 viewToolbar selected viewing all loop =
@@ -68,43 +69,59 @@ viewTitle viewing =
         [ h2 [] [ text <| formatDateTitle viewing ] ]
 
 
+
 -- "MMMM yyyy"
+
+
 formatDateTitle : Date.Date -> String
 formatDateTitle date =
     let
-        month = Date.month date
+        month =
+            Date.month date
 
-        monthName = case month of
-            Jan ->
-                "Janvier"
-            Feb ->
-                "Février"
-            Mar ->
-                "Mars"
-            Apr ->
-                "Avril"
-            May ->
-                "Mai"
-            Jun ->
-                "Juin"
-            Jul ->
-                "Juillet"
-            Aug ->
-                "Août"
-            Sep ->
-                "Septembre"
-            Oct ->
-                "Octobre"
-            Nov ->
-                "Novembre"
-            Dec ->
-                "Décembre"
+        monthName =
+            case month of
+                Jan ->
+                    "Janvier"
+
+                Feb ->
+                    "Février"
+
+                Mar ->
+                    "Mars"
+
+                Apr ->
+                    "Avril"
+
+                May ->
+                    "Mai"
+
+                Jun ->
+                    "Juin"
+
+                Jul ->
+                    "Juillet"
+
+                Aug ->
+                    "Août"
+
+                Sep ->
+                    "Septembre"
+
+                Oct ->
+                    "Octobre"
+
+                Nov ->
+                    "Novembre"
+
+                Dec ->
+                    "Décembre"
 
         year =
             Date.year date
-            |> String.fromInt
+                |> String.fromInt
     in
-        monthName ++ " " ++ year
+    monthName ++ " " ++ year
 
 
 viewPagination : Bool -> Bool -> Html Msg
@@ -130,12 +147,13 @@ viewPagination all loop =
 viewSelector : Group -> Html Msg
 viewSelector selected =
     div [ class "main--selector" ]
-        [ select [ class "main--selector-select"
-                 , id "groupSelect"
-                 , on "change" <| Json.map SetGroup targetValue
-                 , value selected.slug
-                 , multiple False
-                 ]
+        [ select
+            [ class "main--selector-select"
+            , id "groupSelect"
+            , on "change" <| Json.map SetGroup targetValue
+            , value selected.slug
+            , multiple False
+            ]
             (List.map optionGroup allGroups)
         ]
 

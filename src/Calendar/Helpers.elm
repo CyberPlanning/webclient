@@ -2,37 +2,45 @@ module Calendar.Helpers exposing (colorToHex, dateString, dayRangeOfWeek, hours,
 
 import Color exposing (Color)
 import Date exposing (Date)
-import Time exposing (Weekday(..))
 import Hex
 import List.Extra
+import Time exposing (Weekday(..))
 
 
 dateString : Date -> String
 dateString date =
     let
-        weekday = Date.weekday date
+        weekday =
+            Date.weekday date
 
-        weekname = case weekday of
-            Mon -> 
-                "Lundi"
-            Tue -> 
-                "Mardi"
-            Wed -> 
-                "Mercredi"
-            Thu -> 
-                "Jeudi"
-            Fri -> 
-                "Vendredi"
-            Sat -> 
-                "Samedi"
-            Sun -> 
-                "Dimanche"
+        weekname =
+            case weekday of
+                Mon ->
+                    "Lundi"
+
+                Tue ->
+                    "Mardi"
+
+                Wed ->
+                    "Mercredi"
+
+                Thu ->
+                    "Jeudi"
+
+                Fri ->
+                    "Vendredi"
+
+                Sat ->
+                    "Samedi"
+
+                Sun ->
+                    "Dimanche"
 
         day =
             Date.day date
-            |> String.fromInt
+                |> String.fromInt
     in
-        weekname ++ " " ++ day
+    weekname ++ " " ++ day
 
 
 
