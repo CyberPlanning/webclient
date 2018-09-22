@@ -3,6 +3,8 @@ module Calendar.Event exposing (Event, EventRange(..), cellWidth, eventSegment, 
 import Calendar.Helpers as Helpers
 import Calendar.Msg exposing (Msg(..), TimeSpan(..))
 import Date exposing (Date)
+import Time exposing (Posix)
+import TimeZone exposing (europe__paris)
 import Html exposing (..)
 import Html.Attributes exposing (class, classList, style, attribute)
 import Html.Events exposing (..)
@@ -14,9 +16,9 @@ type alias Event =
     { toId : String
     , title : String
     , start : Date
-    , startTime : Int
+    , startTime : Posix
     , end : Date
-    , endTime : Int
+    , endTime : Posix
     , classrooms : List String
     , teachers : List String
     , groups : List String
@@ -128,19 +130,30 @@ eventStyling event eventRange customClasses =
     [ classList (( classes, True ) :: customClasses) ] ++ styles
 
 
-fractionalDay : Int -> Float
-fractionalDay seconds =
-    toFloat seconds / (24 * 60 * 60)
+fractionalDay : Posix -> Float
+fractionalDay time =
+    let
+        hours =
+            Time.toHour europe__paris time
+
+        minutes =
+            Time.toMinute europe__paris time
+
+        seconds =
+            Time.toSecond europe__paris time
+    in
+    
+    toFloat ((hours * 3600) + (minutes * 60) + seconds) / (24 * 3600)
 
 
-percentDay : Int -> Float -> Float -> Float
+percentDay : Posix -> Float -> Float -> Float
 percentDay date min max =
     (fractionalDay date - min) / (max - min)
 
 
 {-| Date can be just time
 -}
-styleDayEvent : Int -> Int -> String -> String -> List (Html.Attribute msg)
+styleDayEvent : Posix -> Posix -> String -> String -> List (Html.Attribute msg)
 styleDayEvent start end color title =
     let
         startPercent =

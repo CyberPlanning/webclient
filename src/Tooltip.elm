@@ -5,6 +5,8 @@ import Date exposing (Date)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Msg exposing (Msg(..))
+import Time exposing (Posix)
+import TimeZone exposing (europe__paris)
 
 
 viewTooltip : Maybe String -> List CalEvent.Event -> Html Msg
@@ -57,26 +59,17 @@ viewHour event =
         ++ toString event.endTime
         |> text
 
-toString : Int -> String
+
+toString : Posix -> String
 toString time =
     let
         minutes =
-            toFloat time / 60.0
-            |> floor
-        
-        minute =
-            minutes
-            |> modBy 60
+            Time.toMinute europe__paris time
+                |> String.fromInt
+                |> String.padLeft 2 '0'
 
-        hour = 
-            toFloat minutes / 60.0
-            |> floor
-
-        minuteZero =
-            if minute < 10 then
-                "0" ++ (String.fromInt minute)
-            else
-                String.fromInt minute
-
+        hours =
+            Time.toHour europe__paris time
+                |> String.fromInt
     in
-        (String.fromInt hour) ++ ":" ++ minuteZero
+    hours ++ ":" ++ minutes

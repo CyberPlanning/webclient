@@ -16,6 +16,7 @@
             "elm-community/string-extra": "3.0.0",
             "justinmimbs/date": "2.0.1",
             "rtfeldman/elm-hex": "1.0.0",
+            "rtfeldman/elm-iso8601-date-strings": "1.1.2",
             "truqu/elm-md5": "1.0.1"
         },
         "indirect": {

@@ -8,11 +8,12 @@ import Color
 import Date
 import Hex
 import Http exposing (Error)
+import Iso8601
 import MD5
 import Secret
 import String exposing (dropRight)
 import Swipe
-import Time
+import Time exposing (Posix)
 import Types exposing (Event, Query)
 
 
@@ -53,7 +54,6 @@ type alias Group =
 toDatetime : Date.Date -> String
 toDatetime =
     Date.toIsoString
-
 
 
 initialModel : Model
@@ -127,32 +127,36 @@ computeColor text =
         |> colorToHex
 
 
-extractTimeIsoString : String -> Int
+extractTimeIsoString : String -> Posix
 extractTimeIsoString dateString =
-    let
-        timeString =
-            dateString
-                |> String.dropLeft 11
+    dateString
+        ++ ".000Z"
+        |> Iso8601.toTime
+        |> Result.withDefault (Time.millisToPosix 0)
 
-        hours =
-            timeString
-                |> String.dropRight 6
-                |> String.toInt
-                |> Maybe.withDefault 0
-                -- TODO better work with time zone
-                |> (+) 2
 
-        minutes =
-            timeString
-                |> String.dropRight 3
-                |> String.dropLeft 3
-                |> String.toInt
-                |> Maybe.withDefault 0
 
-        seconds =
-            timeString
-                |> String.dropLeft 6
-                |> String.toInt
-                |> Maybe.withDefault 0
-    in
-    hours * 3600 + minutes * 60 + seconds
+-- let
+--     timeString =
+--         dateString
+--             |> String.dropLeft 11
+--     hours =
+--         timeString
+--             |> String.dropRight 6
+--             |> String.toInt
+--             |> Maybe.withDefault 0
+--             -- TODO better work with time zone
+--             |> (+) 2
+--     minutes =
+--         timeString
+--             |> String.dropRight 3
+--             |> String.dropLeft 3
+--             |> String.toInt
+--             |> Maybe.withDefault 0
+--     seconds =
+--         timeString
+--             |> String.dropLeft 6
+--             |> String.toInt
+--             |> Maybe.withDefault 0
+-- in
+-- hours * 3600 + minutes * 60 + seconds
