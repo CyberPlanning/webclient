@@ -2,6 +2,7 @@ import '../bower_components/normalize-css/normalize.css'
 import './css/main.css';
 import './css/tooltip.css';
 import './css/calendar.css';
+import './css/secret.css';
 import {
     Elm
 } from './Main.elm';

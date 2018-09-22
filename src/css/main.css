@@ -36,6 +36,7 @@ body {
   overflow: hidden;
   display: flex;
   flex: 1;
+  position: relative;
 }
 
 .main--toolbar {
@@ -78,7 +79,7 @@ body {
 }
 
 .main--navigatiors-reload {
-  font-size: 1.3em;
+  font-size: 1.2em;
   line-height: 100%;
 }
 
@@ -120,76 +121,6 @@ body {
   align-items: center;
 }
 
-.fun2 .calendar--event {
-  background-color: #e30404 !important;
-  overflow: visible;
-  animation: 4s singing infinite alternate linear;
-}
-
-.fun2 .calendar--week {
-  background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Communist_Party_of_Vietnam_flag_logo.svg/277px-Communist_Party_of_Vietnam_flag_logo.svg.png');
-  background-repeat: no-repeat;
-  background-position: center center;
-  background-size: 90vh;
-}
-
-.fun2 .calendar--week-content .calendar--day:nth-child(odd) .calendar--event {
-  animation-delay: 1s;
-}
-
-.fun2 .calendar--week-content .calendar--day:nth-child(even) .calendar--event {
-  animation-delay: 0;
-}
-
-.fun2 .calendar--event::after {
-  content: '';
-  background-image: url("http://en.shapki-ushanki.ru/img/ushanka.png");
-  width: 100%;
-  max-width: 150px;
-  height: 100px;
-  display: block;
-  background-size: cover;
-  position: absolute;
-  top: -80px;
-  left: 50%;
-  transform: translateX(-50%);
-}
-
-.fun2 .calendar--event::before {
-  content: '';
-  background-image: url("http://gifimage.net/wp-content/uploads/2017/08/mouth-gif-21.gif");
-  width: 50%;
-  max-width: 50px;
-  height: 50px;
-  display: block;
-  background-size: cover;
-  position: absolute;
-  bottom: 10%;
-  left: 50%;
-  transform: translateX(-50%);
-  mix-blend-mode: multiply;
-}
-
-.fun .calendar--week-content .calendar--day:nth-child(odd) .calendar--event:nth-child(odd) {
-  animation: linear infinite 4s 0.6s fun alternate !important;
-}
-
-.fun .calendar--week-content .calendar--day:nth-child(odd) .calendar--event:nth-child(even) {
-  animation: linear infinite 4s 0.2s fun alternate !important;
-}
-
-.fun .calendar--week-content .calendar--day:nth-child(even) .calendar--event:nth-child(odd) {
-  animation: linear infinite 4s fun alternate-reverse !important;
-}
-
-.fun .calendar--week-content .calendar--day:nth-child(even) .calendar--event:nth-child(even) {
-  animation: linear infinite 4s 0.5s fun alternate-reverse !important;
-}
-
-.fun .main--navigatiors-reload span {
-  animation: linear infinite 4s 0.3s fun alternate-reverse !important;
-}
-
 @keyframes loop {
   from {
     transform: rotate(0);
@@ -197,44 +128,5 @@ body {
 
   to {
     transform: rotate(360deg);
-  }
-}
-
-@keyframes fun {
-  0% {
-    transform: rotate(0) scale(0.8);
-  }
-
-  50% {
-    transform: rotate(20deg) scale(1.2);
-  }
-
-  100% {
-    transform: rotate(-720deg) scale(0.8);
-  }
-}
-
-@keyframes singing {
-  0% {
-    transform: translatey(0) scale(1);
-  }
-
-  80% {
-    transform: translatey(-15px) scale(1.05) rotate(1deg);
-  }
-
-  100% {
-    transform: translatey(-20px) scale(1.1) rotate(-1deg);
-  }
-}
-
-@media only screen and (max-width: 430px) {
-  .main--month-title h2 {
-    font-size: 16px;
-    line-height: 30px;
-  }
-
-  .main--navigatiors-reload {
-    padding-left: 0;
   }
 }
