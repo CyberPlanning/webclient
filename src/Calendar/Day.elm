@@ -29,7 +29,7 @@ viewDate day =
         [ button [ class "calendar--navigations-week", onClick WeekBack ] [ text "<<" ]
         , div [ class "calendar--date-header-content" ]
             [ button [ class "calendar--navigations-day", onClick PageBack ] [ text "<" ]
-            , a [ class "calendar--date", href "#" ] [ text <| Helpers.dateString day ]
+            , span [ class "calendar--date" ] [ text <| Helpers.dateString day ]
             , button [ class "calendar--navigations-day", onClick PageForward ] [ text ">" ]
             ]
         , button [ class "calendar--navigations-week", onClick WeekForward ] [ text ">>" ]

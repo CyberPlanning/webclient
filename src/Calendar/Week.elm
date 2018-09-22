@@ -74,4 +74,4 @@ viewDates days =
 viewDate : Date -> Html Msg
 viewDate day =
     div [ class "calendar--date-header" ]
-        [ a [ class "calendar--date", href "#" ] [ text <| Helpers.dateString day ] ]
+        [ span [ class "calendar--date" ] [ text <| Helpers.dateString day ] ]
