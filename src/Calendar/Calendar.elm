@@ -5,30 +5,32 @@ import Calendar.Event exposing (Event)
 import Calendar.JourFerie exposing (getAllJourFerie)
 import Calendar.Msg exposing (Msg(..), TimeSpan(..))
 import Calendar.Week as Week
-import Date exposing (Date)
 import Dict exposing (Dict)
 import Html exposing (..)
 import Html.Attributes exposing (class)
 import Html.Events exposing (keyCode, on)
 import Json.Decode as Json
+import Time exposing (Posix)
+import Time.Extra as TimeExtra
+import TimeZone exposing (europe__paris)
 
 
 type alias State =
     { timeSpan : TimeSpan
-    , viewing : Date
+    , viewing : Posix
     , hover : Maybe String
     , selected : Maybe String
-    , joursFeries : Dict String Date
+    , joursFeries : Dict String Posix
     }
 
 
-init : TimeSpan -> Date -> State
+init : TimeSpan -> Posix -> State
 init timeSpan viewing =
     { timeSpan = timeSpan
     , viewing = viewing
     , hover = Nothing
     , selected = Nothing
-    , joursFeries = getAllJourFerie (Date.year viewing)
+    , joursFeries = getAllJourFerie (Time.toYear europe__paris viewing)
     }
 
 
@@ -72,10 +74,10 @@ page step state =
     in
     case timeSpan of
         Week ->
-            { state | viewing = Date.add Date.Weeks step viewing, hover = Nothing }
+            { state | viewing = TimeExtra.add TimeExtra.Week step europe__paris viewing, hover = Nothing }
 
         Day ->
-            { state | viewing = Date.add Date.Days step viewing, hover = Nothing }
+            { state | viewing = TimeExtra.add TimeExtra.Day step europe__paris viewing, hover = Nothing }
 
 
 view : List Event -> State -> Html Msg

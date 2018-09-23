@@ -4,7 +4,6 @@ import Browser exposing (Document)
 import Calendar.Calendar as Calendar
 import Calendar.Msg exposing (TimeSpan(..))
 import Config exposing (allGroups)
-import Date
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (on, onClick, targetValue)
@@ -14,7 +13,8 @@ import Model exposing (Group, Model, toDatetime)
 import Msg exposing (Msg(..))
 import Secret
 import Swipe exposing (onSwipe)
-import Time exposing (Month(..))
+import Time exposing (Month(..), Posix)
+import TimeZone exposing (europe__paris)
 import Tooltip
 
 
@@ -52,7 +52,7 @@ view model =
     }
 
 
-viewToolbar : Group -> Date.Date -> Bool -> Bool -> Html Msg
+viewToolbar : Group -> Posix -> Bool -> Bool -> Html Msg
 viewToolbar selected viewing all loop =
     div [ class "main--toolbar" ]
         [ viewPagination all loop
@@ -63,7 +63,7 @@ viewToolbar selected viewing all loop =
         ]
 
 
-viewTitle : Date.Date -> Html Msg
+viewTitle : Posix -> Html Msg
 viewTitle viewing =
     div [ class "main--month-title" ]
         [ h2 [] [ text <| formatDateTitle viewing ] ]
@@ -73,11 +73,11 @@ viewTitle viewing =
 -- "MMMM yyyy"
 
 
-formatDateTitle : Date.Date -> String
+formatDateTitle : Posix -> String
 formatDateTitle date =
     let
         month =
-            Date.month date
+            Time.toMonth europe__paris date
 
         monthName =
             case month of
@@ -118,7 +118,7 @@ formatDateTitle date =
                     "Décembre"
 
         year =
-            Date.year date
+            Time.toYear europe__paris date
                 |> String.fromInt
     in
     monthName ++ " " ++ year

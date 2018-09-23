@@ -1,27 +1,33 @@
 module Calendar.JourFerie exposing (getAllJourFerie, jourFerie, jourFerieName)
 
-import Date exposing (Date, Interval(..), Unit(..))
 import Dict
-import Time exposing (Month(..))
+import Time exposing (Month(..), Posix)
+import Time.Extra as TimeExtra exposing (Parts)
+import TimeZone exposing (europe__paris)
 
 
-jourFerie : Dict.Dict String Date -> Date -> Maybe String
+paris : Time.Zone
+paris =
+    europe__paris
+
+
+jourFerie : Dict.Dict String Posix -> Posix -> Maybe String
 jourFerie joursFeries day =
     let
         dd =
-            Date.floor Day day
+            TimeExtra.floor TimeExtra.Day paris day
     in
     Dict.filter (\k v -> v == dd) joursFeries
         |> Dict.keys
         |> List.head
 
 
-jourFerieName : Dict.Dict String Date -> String -> Maybe Date
+jourFerieName : Dict.Dict String Posix -> String -> Maybe Posix
 jourFerieName joursFeries name =
     Dict.get name joursFeries
 
 
-getAllJourFerie : Int -> Dict.Dict String Date
+getAllJourFerie : Int -> Dict.Dict String Posix
 getAllJourFerie year =
     let
         -- Paques
@@ -71,40 +77,40 @@ getAllJourFerie year =
             modBy 31 n0
 
         paques =
-            Date.fromCalendarDate year (Date.numberToMonth m) (j + 1)
+            TimeExtra.partsToPosix paris (Parts year (numberToMonth m) (j + 1) 0 0 0 0)
 
         lundiPaques =
-            Date.add Days 1 paques
+            TimeExtra.add TimeExtra.Day 1 paris paques
 
         ascension =
-            Date.add Days 39 paques
+            TimeExtra.add TimeExtra.Day 39 paris paques
 
         pentecote =
-            Date.add Days 50 paques
+            TimeExtra.add TimeExtra.Day 50 paris paques
 
         jourDeLAn =
-            Date.fromCalendarDate year Jan 1
+            TimeExtra.partsToPosix paris (Parts year Jan 1 0 0 0 0)
 
         feteDuTravail =
-            Date.fromCalendarDate year May 1
+            TimeExtra.partsToPosix paris (Parts year May 1 0 0 0 0)
 
         victoireAllies =
-            Date.fromCalendarDate year May 8
+            TimeExtra.partsToPosix paris (Parts year May 8 0 0 0 0)
 
         feteNationale =
-            Date.fromCalendarDate year Jul 14
+            TimeExtra.partsToPosix paris (Parts year Jul 14 0 0 0 0)
 
         assomption =
-            Date.fromCalendarDate year Aug 15
+            TimeExtra.partsToPosix paris (Parts year Aug 15 0 0 0 0)
 
         toussaint =
-            Date.fromCalendarDate year Nov 1
+            TimeExtra.partsToPosix paris (Parts year Nov 1 0 0 0 0)
 
         armistice =
-            Date.fromCalendarDate year Nov 11
+            TimeExtra.partsToPosix paris (Parts year Nov 11 0 0 0 0)
 
         noel =
-            Date.fromCalendarDate year Dec 25
+            TimeExtra.partsToPosix paris (Parts year Dec 25 0 0 0 0)
     in
     [ ( "Pâques", paques )
     , ( "Lundi de Pâques", lundiPaques )
@@ -120,3 +126,43 @@ getAllJourFerie year =
     , ( "Noël", noel )
     ]
         |> Dict.fromList
+
+
+numberToMonth : Int -> Month
+numberToMonth number =
+    case max 1 number of
+        1 ->
+            Jan
+
+        2 ->
+            Feb
+
+        3 ->
+            Mar
+
+        4 ->
+            Apr
+
+        5 ->
+            May
+
+        6 ->
+            Jun
+
+        7 ->
+            Jul
+
+        8 ->
+            Aug
+
+        9 ->
+            Sep
+
+        10 ->
+            Oct
+
+        11 ->
+            Nov
+
+        _ ->
+            Dec

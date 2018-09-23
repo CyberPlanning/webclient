@@ -4,7 +4,6 @@ import Browser.Dom
 import Calendar.Calendar as Calendar
 import Calendar.Msg as CalMsg exposing (TimeSpan(..))
 import Config exposing (allGroups)
-import Date
 import Model exposing (Model, toCalEvents, toDatetime)
 import Msg exposing (Msg(..))
 import Process
@@ -13,6 +12,9 @@ import Secret
 import Storage
 import Swipe
 import Task
+import Time exposing (Posix)
+import Time.Extra as TimeExtra
+import TimeZone exposing (europe__paris)
 
 
 
@@ -123,7 +125,7 @@ update msgSource model =
         ClickToday ->
             let
                 date =
-                    model.date |> Maybe.withDefault (Date.fromOrdinalDate 0 0)
+                    model.date |> Maybe.withDefault (Time.millisToPosix 0)
             in
             calendarAction model (CalMsg.ChangeViewing date)
 
@@ -133,7 +135,7 @@ update msgSource model =
                     find (\x -> x.slug == slug) allGroups
                         |> Maybe.withDefault { slug = "12", name = "Cyber1 TD2" }
             in
-            ( { model | selectedGroup = group }, Task.perform SetDate Date.today )
+            ( { model | selectedGroup = group }, Task.perform SetDate Time.now )
 
         SavedGroup ok ->
             let
@@ -156,21 +158,21 @@ update msgSource model =
             ( { model | loop = False }, Cmd.none )
 
 
-createPlanningRequest : Date.Date -> String -> Cmd Msg
+createPlanningRequest : Posix -> String -> Cmd Msg
 createPlanningRequest date slug =
     let
         dateFrom =
             date
-                |> Date.floor Date.Month
-                |> Date.floor Date.Monday
+                |> TimeExtra.floor TimeExtra.Month europe__paris
+                |> TimeExtra.floor TimeExtra.Monday europe__paris
                 |> toDatetime
 
         dateTo =
             date
                 -- Fix issue : Event not loaded in October to November transition
-                |> Date.add Date.Days 1
-                |> Date.ceiling Date.Month
-                |> Date.ceiling Date.Sunday
+                |> TimeExtra.add TimeExtra.Day 1 europe__paris
+                |> TimeExtra.ceiling TimeExtra.Month europe__paris
+                |> TimeExtra.ceiling TimeExtra.Sunday europe__paris
                 |> toDatetime
     in
     sendRequest dateFrom dateTo [ slug ]
@@ -202,7 +204,7 @@ calendarAction model calMsg =
             Calendar.update calMsg model.calendarState
 
         ( cmd, loading ) =
-            if Date.month updatedCalendar.viewing /= Date.month model.calendarState.viewing then
+            if Time.toMonth europe__paris updatedCalendar.viewing /= Time.toMonth europe__paris model.calendarState.viewing then
                 ( createPlanningRequest updatedCalendar.viewing model.selectedGroup.slug
                 , True
                 )
@@ -211,7 +213,7 @@ calendarAction model calMsg =
                 ( Cmd.none, False )
 
         updatedCalWithJourFerie =
-            if Date.year updatedCalendar.viewing /= Date.year model.calendarState.viewing then
+            if Time.toYear europe__paris updatedCalendar.viewing /= Time.toYear europe__paris model.calendarState.viewing then
                 Calendar.init updatedCalendar.timeSpan updatedCalendar.viewing
 
             else

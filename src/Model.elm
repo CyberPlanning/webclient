@@ -1,11 +1,10 @@
-module Model exposing (Group, Model, PlanningResponse, WindowSize, computeColor, initialModel, parseDateEvent, toCalEvent, toCalEvents, toDatetime)
+module Model exposing (Group, Model, PlanningResponse, WindowSize, computeColor, initialModel, toCalEvent, toCalEvents, toDatetime)
 
 import Calendar.Calendar as Calendar
 import Calendar.Event as CalEvent
 import Calendar.Helpers exposing (colorToHex, noBright)
 import Calendar.Msg
 import Color
-import Date
 import Hex
 import Http exposing (Error)
 import Iso8601
@@ -34,7 +33,7 @@ type alias WindowSize =
 type alias Model =
     { data : Maybe (List CalEvent.Event) --Maybe (Result String Query)
     , error : Maybe Error
-    , date : Maybe Date.Date
+    , date : Maybe Posix
     , selectedGroup : Group
     , loading : Bool
     , size : WindowSize
@@ -51,9 +50,9 @@ type alias Group =
     }
 
 
-toDatetime : Date.Date -> String
+toDatetime : Posix -> String
 toDatetime =
-    Date.toIsoString
+    Iso8601.fromTime >> String.dropRight 14
 
 
 initialModel : Model
@@ -63,7 +62,7 @@ initialModel =
     , date = Nothing
     , selectedGroup = { name = "Cyber1 TD2", slug = "12" }
     , loading = True
-    , calendarState = Calendar.init Calendar.Msg.Week (Date.fromCalendarDate 2018 Time.Jan 1)
+    , calendarState = Calendar.init Calendar.Msg.Week (Time.millisToPosix 0)
     , size = { width = 1200, height = 800 }
     , swipe = Swipe.init
     , loop = False
@@ -80,23 +79,13 @@ toCalEvent : Event -> CalEvent.Event
 toCalEvent event =
     { toId = event.eventId
     , title = event.title
-    , start = parseDateEvent event.startDate
     , startTime = extractTimeIsoString event.startDate
-    , end = parseDateEvent event.endDate
     , endTime = extractTimeIsoString event.endDate
     , classrooms = event.classrooms
     , teachers = event.teachers
     , groups = event.groups
     , color = computeColor event.title
     }
-
-
-parseDateEvent : String -> Date.Date
-parseDateEvent date =
-    date
-        |> String.dropRight 9
-        |> Date.fromIsoString
-        |> Result.withDefault (Date.fromOrdinalDate 0 0)
 
 
 computeColor : String -> String

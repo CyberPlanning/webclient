@@ -1,17 +1,23 @@
 module Calendar.Helpers exposing (colorToHex, dateString, dayRangeOfWeek, hours, noBright, weekRangesFromMonth)
 
 import Color exposing (Color)
-import Date exposing (Date)
 import Hex
 import List.Extra
-import Time exposing (Weekday(..))
+import Time exposing (Posix, Weekday(..))
+import Time.Extra as TimeExtra exposing (Parts)
+import TimeZone exposing (europe__paris)
 
 
-dateString : Date -> String
+paris : Time.Zone
+paris =
+    europe__paris
+
+
+dateString : Posix -> String
 dateString date =
     let
         weekday =
-            Date.weekday date
+            Time.toWeekday paris date
 
         weekname =
             case weekday of
@@ -37,7 +43,7 @@ dateString date =
                     "Dimanche"
 
         day =
-            Date.day date
+            Time.toDay paris date
                 |> String.fromInt
     in
     weekname ++ " " ++ day
@@ -71,35 +77,37 @@ hours =
     ]
 
 
-weekRangesFromMonth : Int -> Date.Month -> List (List Date)
+weekRangesFromMonth : Int -> Time.Month -> List (List Posix)
 weekRangesFromMonth year month =
     let
         firstOfMonth =
-            Date.fromCalendarDate year month 1
+            TimeExtra.partsToPosix paris (Parts year month 1 0 0 0 0)
 
         firstOfNextMonth =
-            Date.add Date.Months 1 firstOfMonth
+            TimeExtra.add TimeExtra.Month 1 paris firstOfMonth
     in
-    Date.range Date.Day
+    TimeExtra.range TimeExtra.Day
         1
-        (Date.floor Date.Sunday firstOfMonth)
-        (Date.ceiling Date.Sunday firstOfNextMonth)
+        paris
+        (TimeExtra.floor TimeExtra.Sunday paris firstOfMonth)
+        (TimeExtra.ceiling TimeExtra.Sunday paris firstOfNextMonth)
         |> List.Extra.groupsOf 7
 
 
-dayRangeOfWeek : Date -> List Date
+dayRangeOfWeek : Posix -> List Posix
 dayRangeOfWeek date =
     let
         weekDate =
             date
                 -- move to middle week because week-end are not showned
-                |> Date.add Date.Days 2
-                |> Date.floor Date.Monday
+                |> TimeExtra.add TimeExtra.Day 2 paris
+                |> TimeExtra.floor TimeExtra.Monday paris
     in
-    Date.range Date.Day
+    TimeExtra.range TimeExtra.Day
         1
-        (Date.floor Date.Monday weekDate)
-        (Date.ceiling Date.Saturday weekDate)
+        paris
+        (TimeExtra.floor TimeExtra.Monday paris weekDate)
+        (TimeExtra.ceiling TimeExtra.Saturday paris weekDate)
 
 
 colorToHex : Color -> String

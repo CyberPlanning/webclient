@@ -4,18 +4,18 @@ import Calendar.Day exposing (viewAllDayCell, viewDayEvents, viewDaySlotGroup, v
 import Calendar.Event exposing (Event)
 import Calendar.Helpers as Helpers
 import Calendar.Msg exposing (Msg(..))
-import Date exposing (Date)
 import Dict exposing (Dict)
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import Time exposing (Posix)
 
 
 viewWeekContent :
     List Event
     -> Maybe String
-    -> Date
-    -> List Date
-    -> Dict String Date
+    -> Posix
+    -> List Posix
+    -> Dict String Posix
     -> Html Msg
 viewWeekContent events selectedId viewing days feries =
     let
@@ -29,7 +29,7 @@ viewWeekContent events selectedId viewing days feries =
         (timeGutter :: weekDays)
 
 
-viewWeekDay : List Event -> Maybe String -> Dict String Date -> Date -> Html Msg
+viewWeekDay : List Event -> Maybe String -> Dict String Posix -> Posix -> Html Msg
 viewWeekDay events selectedId feries day =
     let
         viewDaySlots =
@@ -45,7 +45,7 @@ viewWeekDay events selectedId feries day =
         ]
 
 
-view : List Event -> Maybe String -> Date -> Dict String Date -> Html Msg
+view : List Event -> Maybe String -> Posix -> Dict String Posix -> Html Msg
 view events selectedId viewing feries =
     let
         weekRange =
@@ -57,13 +57,13 @@ view events selectedId viewing feries =
         ]
 
 
-viewWeekHeader : List Date -> Html Msg
+viewWeekHeader : List Posix -> Html Msg
 viewWeekHeader days =
     div [ class "calendar--week-header" ]
         [ viewDates days ]
 
 
-viewDates : List Date -> Html Msg
+viewDates : List Posix -> Html Msg
 viewDates days =
     div [ class "calendar--dates-header" ]
         [ viewTimeGutterHeader
@@ -71,7 +71,7 @@ viewDates days =
         ]
 
 
-viewDate : Date -> Html Msg
+viewDate : Posix -> Html Msg
 viewDate day =
     div [ class "calendar--date-header" ]
         [ span [ class "calendar--date" ] [ text <| Helpers.dateString day ] ]

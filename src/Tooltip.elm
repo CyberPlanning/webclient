@@ -1,7 +1,6 @@
 module Tooltip exposing (viewTooltip)
 
 import Calendar.Event as CalEvent
-import Date exposing (Date)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Msg exposing (Msg(..))

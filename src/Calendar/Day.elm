@@ -4,14 +4,15 @@ import Calendar.Event exposing (Event, maybeViewDayEvent, rangeDescription)
 import Calendar.Helpers as Helpers
 import Calendar.JourFerie exposing (jourFerie)
 import Calendar.Msg exposing (Msg(..))
-import Date exposing (Date)
 import Dict exposing (Dict)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
+import Time exposing (Posix)
+import Time.Extra as TimeExtra
 
 
-view : List Event -> Maybe String -> Date -> Dict String Date -> Html Msg
+view : List Event -> Maybe String -> Posix -> Dict String Posix -> Html Msg
 view events selectedId day feries =
     div [ class "calendar--day" ]
         [ viewDayHeader day
@@ -23,7 +24,7 @@ view events selectedId day feries =
         ]
 
 
-viewDate : Date -> Html Msg
+viewDate : Posix -> Html Msg
 viewDate day =
     div [ class "calendar--date-header" ]
         [ button [ class "calendar--navigations-week", onClick WeekBack ] [ text "<<" ]
@@ -36,7 +37,7 @@ viewDate day =
         ]
 
 
-viewDayHeader : Date -> Html Msg
+viewDayHeader : Posix -> Html Msg
 viewDayHeader day =
     div [ class "calendar--day-header" ]
         [ viewTimeGutterHeader
@@ -44,7 +45,7 @@ viewDayHeader day =
         ]
 
 
-viewTimeGutter : Date -> Html Msg
+viewTimeGutter : Posix -> Html Msg
 viewTimeGutter _ =
     Helpers.hours
         |> List.map viewTimeSlotGroup
@@ -70,7 +71,7 @@ viewHourSlot date =
         [ span [ class "calendar--time-slot-text" ] [ text date ] ]
 
 
-viewDaySlot : List Event -> Maybe String -> Date -> Dict String Date -> Html Msg
+viewDaySlot : List Event -> Maybe String -> Posix -> Dict String Posix -> Html Msg
 viewDaySlot events selectedId day feries =
     Helpers.hours
         |> List.map viewDaySlotGroup
@@ -93,7 +94,7 @@ viewTimeSlot date =
         []
 
 
-viewDayEvents : List Event -> Maybe String -> Date -> Dict String Date -> List (Html Msg)
+viewDayEvents : List Event -> Maybe String -> Posix -> Dict String Posix -> List (Html Msg)
 viewDayEvents events selectedId day feries =
     let
         extra =
@@ -113,16 +114,16 @@ viewDayEvents events selectedId day feries =
     extra ++ eventsHtml
 
 
-viewDayEvent : Date -> Maybe String -> Event -> Maybe (Html Msg)
+viewDayEvent : Posix -> Maybe String -> Event -> Maybe (Html Msg)
 viewDayEvent day selectedId event =
     let
         eventRange =
-            rangeDescription event.start event.end Date.Day day
+            rangeDescription event.startTime event.endTime TimeExtra.Day day
     in
     maybeViewDayEvent event selectedId eventRange
 
 
-viewAllDayCell : List Date -> Html Msg
+viewAllDayCell : List Posix -> Html Msg
 viewAllDayCell days =
     let
         viewAllDayText =

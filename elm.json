@@ -14,16 +14,17 @@
             "elm/time": "1.0.0",
             "elm-community/list-extra": "8.0.0",
             "elm-community/string-extra": "3.0.0",
-            "justinmimbs/date": "2.0.1",
+            "justinmimbs/time-extra": "1.0.1",
             "rtfeldman/elm-hex": "1.0.0",
             "rtfeldman/elm-iso8601-date-strings": "1.1.2",
-            "truqu/elm-md5": "1.0.1"
+            "truqu/elm-md5": "1.1.0"
         },
         "indirect": {
+            "justinmimbs/date": "3.1.1",
             "elm/parser": "1.1.0",
             "elm/regex": "1.0.0",
             "elm/url": "1.0.0",
-            "elm/virtual-dom": "1.0.0",
+            "elm/virtual-dom": "1.0.2",
             "zwilias/elm-utf-tools": "2.0.1"
         }
     },

@@ -1,6 +1,6 @@
 module Calendar.Msg exposing (Msg(..), TimeSpan(..))
 
-import Date exposing (Date)
+import Time exposing (Posix)
 
 
 type TimeSpan
@@ -14,7 +14,7 @@ type Msg
     | WeekForward
     | WeekBack
     | ChangeTimeSpan TimeSpan
-    | ChangeViewing Date
+    | ChangeViewing Posix
     | EventClick String
     | EventMouseEnter String
     | EventMouseLeave String

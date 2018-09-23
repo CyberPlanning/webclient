@@ -2,22 +2,21 @@ module Calendar.Event exposing (Event, EventRange(..), cellWidth, eventSegment, 
 
 import Calendar.Helpers as Helpers
 import Calendar.Msg exposing (Msg(..), TimeSpan(..))
-import Date exposing (Date)
 import Html exposing (..)
 import Html.Attributes exposing (attribute, class, classList, style)
 import Html.Events exposing (..)
+import Iso8601
 import String
 import String.Extra
-import Time exposing (Posix)
+import Time exposing (Posix, Weekday(..))
+import Time.Extra as TimeExtra
 import TimeZone exposing (europe__paris)
 
 
 type alias Event =
     { toId : String
     , title : String
-    , start : Date
     , startTime : Posix
-    , end : Date
     , endTime : Posix
     , classrooms : List String
     , teachers : List String
@@ -28,59 +27,30 @@ type alias Event =
 
 type EventRange
     = StartsAndEnds
-    | ContinuesAfter
-    | ContinuesPrior
-    | ContinuesAfterAndPrior
     | ExistsOutside
 
 
-rangeDescription : Date -> Date -> Date.Interval -> Date -> EventRange
+rangeDescription : Posix -> Posix -> TimeExtra.Interval -> Posix -> EventRange
 rangeDescription start end interval date =
     let
-        -- TODO
-        -- Helpers.bumpMidnightBoundary date
+        -- Fix : floor and ceiling return same Time if it is midnight
         day =
-            date
+            TimeExtra.add TimeExtra.Millisecond 1 europe__paris date
 
         begInterval =
-            Date.floor interval day
+            TimeExtra.floor interval europe__paris day
 
-        -- TODO
-        -- |> Date.add Date.Millisecond -1
         endInterval =
-            Date.ceiling interval day
+            TimeExtra.ceiling interval europe__paris day
 
-        -- TODO
         startsThisInterval =
             isBetween begInterval endInterval start
 
-        -- TODO
         endsThisInterval =
             isBetween begInterval endInterval end
-
-        -- TODO
-        -- Date.diff Date.Millisecond begInterval start
-        --     |> (>) 0
-        startsBeforeInterval =
-            False
-
-        -- TODO
-        -- Date.diff Date.Millisecond end endInterval
-        --     |> (>) 0
-        endsAfterInterval =
-            False
     in
     if startsThisInterval && endsThisInterval then
         StartsAndEnds
-
-    else if startsBeforeInterval && endsAfterInterval then
-        ContinuesAfterAndPrior
-
-    else if startsThisInterval && endsAfterInterval then
-        ContinuesAfter
-
-    else if endsThisInterval && startsBeforeInterval then
-        ContinuesPrior
 
     else
         ExistsOutside
@@ -109,15 +79,6 @@ eventStyling event eventRange customClasses =
             case eventRange of
                 StartsAndEnds ->
                     "calendar--event calendar--event-starts-and-ends"
-
-                ContinuesAfter ->
-                    "calendar--event calendar--event-continues-after"
-
-                ContinuesPrior ->
-                    "calendar--event calendar--event-continues-prior"
-
-                ContinuesAfterAndPrior ->
-                    "calendar--event"
 
                 ExistsOutside ->
                     ""
@@ -233,14 +194,16 @@ cellWidth =
     100.0 / 7
 
 
-offsetLength : Date -> Float
+offsetLength : Posix -> Float
 offsetLength date =
-    modBy 7 (Date.weekdayNumber date)
+    Time.toWeekday europe__paris date
+        |> weekdayToNumber
+        |> modBy 7
         |> toFloat
         |> (*) cellWidth
 
 
-offsetPercentage : Date -> String
+offsetPercentage : Posix -> String
 offsetPercentage date =
     (offsetLength date
         |> String.fromFloat
@@ -260,17 +223,17 @@ rowSegment widthPercentage children =
     div (styleRowSegment widthPercentage) children
 
 
-isBetween : Date -> Date -> Date -> Bool
+isBetween : Posix -> Posix -> Posix -> Bool
 isBetween start end current =
     let
         startInt =
-            Date.toRataDie start
+            Time.posixToMillis start
 
         endInt =
-            Date.toRataDie end
+            Time.posixToMillis end
 
         currentInt =
-            Date.toRataDie current
+            Time.posixToMillis current
     in
     startInt <= currentInt && endInt >= currentInt
 
@@ -279,3 +242,28 @@ escapeTitle : String -> String
 escapeTitle =
     String.Extra.removeAccents
         >> String.Extra.underscored
+
+
+weekdayToNumber : Weekday -> Int
+weekdayToNumber wd =
+    case wd of
+        Mon ->
+            1
+
+        Tue ->
+            2
+
+        Wed ->
+            3
+
+        Thu ->
+            4
+
+        Fri ->
+            5
+
+        Sat ->
+            6
+
+        Sun ->
+            7
