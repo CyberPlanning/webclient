@@ -1,14 +1,12 @@
-module Model exposing (Group, Model, PlanningResponse, WindowSize, computeColor, initialModel, toCalEvent, toCalEvents, toDatetime)
+module Model exposing (Group, Model, PlanningResponse, WindowSize, initialModel, toCalEvent, toCalEvents, toDatetime)
 
 import Calendar.Calendar as Calendar
 import Calendar.Event as CalEvent
-import Calendar.Helpers exposing (colorToHex, noBright)
+import Calendar.Helpers exposing (colorToHex, computeColor, noBright)
 import Calendar.Msg
 import Color
-import Hex
 import Http exposing (Error)
 import Iso8601
-import MD5
 import Secret
 import String exposing (dropRight)
 import Swipe
@@ -86,34 +84,6 @@ toCalEvent event =
     , groups = event.groups
     , color = computeColor event.title
     }
-
-
-computeColor : String -> String
-computeColor text =
-    let
-        hex =
-            String.dropRight 1 text
-                |> MD5.hex
-                |> String.right 6
-
-        red =
-            String.slice 0 2 hex
-                |> Hex.fromString
-                |> Result.withDefault 0
-
-        green =
-            String.slice 2 4 hex
-                |> Hex.fromString
-                |> Result.withDefault 0
-
-        blue =
-            String.slice 4 6 hex
-                |> Hex.fromString
-                |> Result.withDefault 0
-    in
-    Color.rgb red green blue
-        |> noBright
-        |> colorToHex
 
 
 extractTimeIsoString : String -> Posix

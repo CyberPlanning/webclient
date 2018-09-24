@@ -1,8 +1,9 @@
-module Calendar.Helpers exposing (colorToHex, dateString, dayRangeOfWeek, hours, noBright, weekRangesFromMonth)
+module Calendar.Helpers exposing (colorToHex, computeColor, dateString, dayRangeOfWeek, hours, noBright, weekRangesFromMonth)
 
 import Color exposing (Color)
 import Hex
 import List.Extra
+import MD5
 import Time exposing (Posix, Weekday(..))
 import Time.Extra as TimeExtra exposing (Parts)
 import TimeZone exposing (europe__paris)
@@ -108,6 +109,34 @@ dayRangeOfWeek date =
         paris
         (TimeExtra.floor TimeExtra.Monday paris weekDate)
         (TimeExtra.ceiling TimeExtra.Saturday paris weekDate)
+
+
+computeColor : String -> String
+computeColor text =
+    let
+        hex =
+            String.dropRight 1 text
+                |> MD5.hex
+                |> String.right 6
+
+        red =
+            String.slice 0 2 hex
+                |> Hex.fromString
+                |> Result.withDefault 0
+
+        green =
+            String.slice 2 4 hex
+                |> Hex.fromString
+                |> Result.withDefault 0
+
+        blue =
+            String.slice 4 6 hex
+                |> Hex.fromString
+                |> Result.withDefault 0
+    in
+    Color.rgb red green blue
+        |> noBright
+        |> colorToHex
 
 
 colorToHex : Color -> String

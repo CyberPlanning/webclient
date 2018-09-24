@@ -12,6 +12,7 @@ import Json.Decode as Json
 import Model exposing (Group, Model, toDatetime)
 import Msg exposing (Msg(..))
 import Secret
+import Secret.Help
 import Swipe exposing (onSwipe)
 import Time exposing (Month(..), Posix)
 import TimeZone exposing (europe__paris)
@@ -26,7 +27,11 @@ view : Model -> Document Msg
 view model =
     let
         events =
-            model.data |> Maybe.withDefault []
+            if Secret.isHelpActivated model.secret then
+                Secret.Help.helpEvents model.calendarState.viewing
+
+            else
+                model.data |> Maybe.withDefault []
 
         attrs =
             Swipe.onSwipe SwipeEvent
