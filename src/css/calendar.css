@@ -114,6 +114,10 @@
   border-bottom: 1px solid #2d3436
 }
 
+.fun-help .calendar--event {
+  transition: 1s;
+}
+
 .calendar--event-title {
   font-weight: bold;
   height: 2em;

@@ -109,8 +109,17 @@ updateYTState code state =
 
 classStyle : StateList -> List (Html.Attribute msg)
 classStyle state =
+    let
+        helpStyle =
+            if isHelpActivated state then
+                [ class "fun-help" ]
+
+            else
+                []
+    in
     List.filter activated state.secrets
         |> List.map (.class >> class)
+        |> (++) helpStyle
 
 
 view : StateList -> Html msg
