@@ -13,6 +13,7 @@ import Model exposing (Group, Model, toDatetime)
 import Msg exposing (Msg(..))
 import Secret
 import Secret.Help
+import SideMenu
 import Swipe exposing (onSwipe)
 import Time exposing (Month(..), Posix)
 import TimeZone exposing (europe__paris)
@@ -49,6 +50,7 @@ view model =
                     ]
                 , viewMessage model
                 , Tooltip.viewTooltip model.calendarState.hover events
+                , SideMenu.view model.menuOpened model.selectedGroup model.calendarState.timeSpan
                 , funThings
                 ]
     in
