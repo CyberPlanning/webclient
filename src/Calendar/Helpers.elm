@@ -2,7 +2,6 @@ module Calendar.Helpers exposing (colorToHex, computeColor, dateString, dayRange
 
 import Color exposing (Color)
 import Hex
-import List.Extra
 import MD5
 import Time exposing (Posix, Weekday(..))
 import Time.Extra as TimeExtra exposing (Parts)
