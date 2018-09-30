@@ -3,9 +3,8 @@ module Calendar.Calendar exposing (State, init, page, update, view)
 import Calendar.Day as Day
 import Calendar.Event exposing (Event)
 import Calendar.JourFerie exposing (getAllJourFerie)
-import Calendar.Msg exposing (Msg(..), TimeSpan(..))
+import Calendar.Msg exposing (InternalState, Msg(..), TimeSpan(..))
 import Calendar.Week as Week
-import Dict exposing (Dict)
 import Html exposing (..)
 import Html.Attributes exposing (class)
 import Html.Events exposing (keyCode, on)
@@ -16,12 +15,7 @@ import TimeZone exposing (europe__paris)
 
 
 type alias State =
-    { timeSpan : TimeSpan
-    , viewing : Posix
-    , hover : Maybe String
-    , selected : Maybe String
-    , joursFeries : Dict String Posix
-    }
+    InternalState
 
 
 init : TimeSpan -> Posix -> State
@@ -87,18 +81,18 @@ page step state =
 
 
 view : List Event -> State -> Html Msg
-view events { viewing, timeSpan, selected, joursFeries } =
+view events state =
     let
         calendarView =
-            case timeSpan of
+            case state.timeSpan of
                 Week ->
-                    Week.view events selected viewing joursFeries
+                    Week.view state events
 
                 AllWeek ->
-                    Week.viewAll events selected viewing joursFeries
+                    Week.viewAll state events
 
                 Day ->
-                    Day.view events selected viewing joursFeries
+                    Day.view state events
     in
     div
         [ class "calendar--calendar" ]
