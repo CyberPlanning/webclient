@@ -1,5 +1,6 @@
-module Calendar.Msg exposing (Msg(..), TimeSpan(..))
+module Calendar.Msg exposing (InternalState, Msg(..), TimeSpan(..))
 
+import Dict exposing (Dict)
 import Time exposing (Posix)
 
 
@@ -19,3 +20,12 @@ type Msg
     | EventClick String
     | EventMouseEnter String
     | EventMouseLeave String
+
+
+type alias InternalState =
+    { timeSpan : TimeSpan
+    , viewing : Posix
+    , hover : Maybe String
+    , selected : Maybe String
+    , joursFeries : Dict String Posix
+    }

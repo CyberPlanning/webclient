@@ -3,7 +3,7 @@ module Calendar.Day exposing (view, viewAllDayCell, viewDate, viewDayEvent, view
 import Calendar.Event exposing (Event, maybeViewDayEvent, rangeDescription)
 import Calendar.Helpers as Helpers
 import Calendar.JourFerie exposing (jourFerie)
-import Calendar.Msg exposing (Msg(..))
+import Calendar.Msg exposing (InternalState, Msg(..))
 import Dict exposing (Dict)
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -12,14 +12,14 @@ import Time exposing (Posix)
 import Time.Extra as TimeExtra
 
 
-view : List Event -> Maybe String -> Posix -> Dict String Posix -> Html Msg
-view events selectedId day feries =
+view : InternalState -> List Event -> Html Msg
+view { selected, viewing, joursFeries } events =
     div [ class "calendar--day" ]
-        [ viewDayHeader day
+        [ viewDayHeader viewing
         , div [ class "calendar--day-content" ]
-            [ viewTimeGutter day
+            [ viewTimeGutter viewing
             , div [ class "calendar--day" ]
-                [ viewDaySlot events selectedId day feries ]
+                [ viewDaySlot events selected viewing joursFeries ]
             ]
         ]
 
