@@ -109,8 +109,6 @@ percentDay date min max =
     (fractionalDay date - min) / (max - min)
 
 
-{-| Date can be just time
--}
 styleDayEvent : Posix -> Posix -> String -> String -> List (Html.Attribute msg)
 styleDayEvent start end color title =
     let
@@ -179,14 +177,6 @@ eventSegment event selectedId eventRange =
 makeTitle : String -> Html Msg
 makeTitle title =
     text title
-
-
-
--- if (String.dropRight 1 title) == "Projet cyber - Gr" then
---     "RIEN (projet) - " ++ String.right 3 title
---     |> text
--- else
---     text title
 
 
 cellWidth : Float

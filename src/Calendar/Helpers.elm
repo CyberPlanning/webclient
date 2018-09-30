@@ -1,4 +1,4 @@
-module Calendar.Helpers exposing (colorToHex, computeColor, dateString, dayRangeOfWeek, hours, noBright, weekRangesFromMonth)
+module Calendar.Helpers exposing (colorToHex, computeColor, dateString, dayRangeOfWeek, hours, noBright)
 
 import Color exposing (Color)
 import Hex
@@ -50,16 +50,6 @@ dateString date =
     weekname ++ " " ++ day
 
 
-
--- TODO
--- bumpMidnightBoundary : Date -> Date
--- bumpMidnightBoundary date =
---     if Date.fractionalDay date == 0 then
---         Date.add Date.Millisecond 1 date
---     else
---         date
-
-
 hours : List String
 hours =
     [ "7:00"
@@ -76,23 +66,6 @@ hours =
     , "18:00"
     , "19:00"
     ]
-
-
-weekRangesFromMonth : Int -> Time.Month -> List (List Posix)
-weekRangesFromMonth year month =
-    let
-        firstOfMonth =
-            TimeExtra.partsToPosix paris (Parts year month 1 0 0 0 0)
-
-        firstOfNextMonth =
-            TimeExtra.add TimeExtra.Month 1 paris firstOfMonth
-    in
-    TimeExtra.range TimeExtra.Day
-        1
-        paris
-        (TimeExtra.floor TimeExtra.Sunday paris firstOfMonth)
-        (TimeExtra.ceiling TimeExtra.Sunday paris firstOfNextMonth)
-        |> List.Extra.groupsOf 7
 
 
 dayRangeOfWeek : Posix -> List Posix
