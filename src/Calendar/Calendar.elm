@@ -71,13 +71,19 @@ page step state =
     let
         { timeSpan, viewing } =
             state
-    in
-    case timeSpan of
-        Week ->
-            { state | viewing = TimeExtra.add TimeExtra.Week step europe__paris viewing, hover = Nothing }
 
-        Day ->
-            { state | viewing = TimeExtra.add TimeExtra.Day step europe__paris viewing, hover = Nothing }
+        interval =
+            case timeSpan of
+                Week ->
+                    TimeExtra.Week
+
+                AllWeek ->
+                    TimeExtra.Week
+
+                Day ->
+                    TimeExtra.Day
+    in
+    { state | viewing = TimeExtra.add interval step europe__paris viewing, hover = Nothing }
 
 
 view : List Event -> State -> Html Msg
@@ -87,6 +93,9 @@ view events { viewing, timeSpan, selected, joursFeries } =
             case timeSpan of
                 Week ->
                     Week.view events selected viewing joursFeries
+
+                AllWeek ->
+                    Week.viewAll events selected viewing joursFeries
 
                 Day ->
                     Day.view events selected viewing joursFeries

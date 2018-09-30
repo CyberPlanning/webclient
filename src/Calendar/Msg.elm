@@ -5,6 +5,7 @@ import Time exposing (Posix)
 
 type TimeSpan
     = Week
+    | AllWeek
     | Day
 
 

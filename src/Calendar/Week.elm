@@ -1,4 +1,4 @@
-module Calendar.Week exposing (view, viewDate, viewDates, viewWeekContent, viewWeekDay, viewWeekHeader)
+module Calendar.Week exposing (view, viewAll, viewDate, viewDates, viewWeekContent, viewWeekDay, viewWeekHeader)
 
 import Calendar.Day exposing (viewAllDayCell, viewDayEvents, viewDaySlotGroup, viewTimeGutter, viewTimeGutterHeader)
 import Calendar.Event exposing (Event)
@@ -8,6 +8,26 @@ import Dict exposing (Dict)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Time exposing (Posix)
+
+
+view : List Event -> Maybe String -> Posix -> Dict String Posix -> Html Msg
+view events selectedId viewing feries =
+    Helpers.dayRangeOfWeek viewing
+        |> viewDays events selectedId viewing feries
+
+
+viewAll : List Event -> Maybe String -> Posix -> Dict String Posix -> Html Msg
+viewAll events selectedId viewing feries =
+    Helpers.dayRangeOfAllWeek viewing
+        |> viewDays events selectedId viewing feries
+
+
+viewDays : List Event -> Maybe String -> Posix -> Dict String Posix -> List Posix -> Html Msg
+viewDays events selectedId viewing feries weekRange =
+    div [ class "calendar--week" ]
+        [ viewWeekHeader weekRange
+        , viewWeekContent events selectedId viewing weekRange feries
+        ]
 
 
 viewWeekContent :
@@ -42,18 +62,6 @@ viewWeekDay events selectedId feries day =
     div [ class "calendar--day" ]
         [ div [ class "calendar--day-slot" ]
             (viewDaySlots ++ dayEvents)
-        ]
-
-
-view : List Event -> Maybe String -> Posix -> Dict String Posix -> Html Msg
-view events selectedId viewing feries =
-    let
-        weekRange =
-            Helpers.dayRangeOfWeek viewing
-    in
-    div [ class "calendar--week" ]
-        [ viewWeekHeader weekRange
-        , viewWeekContent events selectedId viewing weekRange feries
         ]
 
 
