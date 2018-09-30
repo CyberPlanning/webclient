@@ -22,4 +22,5 @@ type Msg
     | ClickToday
     | LoadGroup String
     | SavedGroup String
+    | ToggleMenu
     | StopReloadIcon ()

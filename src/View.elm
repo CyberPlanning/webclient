@@ -76,8 +76,9 @@ viewTitle viewing =
         [ h2 [] [ text <| formatDateTitle viewing ] ]
 
 
-
--- "MMMM yyyy"
+viewMenuButton : Html Msg
+viewMenuButton =
+    button [ class "main--navigatiors-button", onClick ToggleMenu ] [ text "menu" ]
 
 
 formatDateTitle : Posix -> String
@@ -144,7 +145,8 @@ viewPagination all loop =
                 []
     in
     div [ class "main--paginators" ]
-        (btns
+        (viewMenuButton
+            :: btns
             ++ [ button [ class "main--navigatiors-button", onClick ClickToday ] [ text "today" ]
                , reloadButton loop
                ]

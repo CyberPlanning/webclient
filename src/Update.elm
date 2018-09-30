@@ -157,6 +157,9 @@ update msgSource model =
         StopReloadIcon _ ->
             ( { model | loop = False }, Cmd.none )
 
+        ToggleMenu ->
+            ( { model | menuOpened = not model.menuOpened }, Cmd.none )
+
 
 createPlanningRequest : Posix -> String -> Cmd Msg
 createPlanningRequest date slug =
