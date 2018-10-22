@@ -80,21 +80,19 @@ update msgSource model =
 
         KeyDown code ->
             let
-                cmd =
+                (calendarModel, cmd) =
                     case code of
                         39 ->
-                            Task.succeed PageForward
-                                |> Task.perform identity
+                            calendarAction model CalMsg.PageForward
 
                         37 ->
-                            Task.succeed PageBack
-                                |> Task.perform identity
+                            calendarAction model CalMsg.PageBack
 
                         _ ->
-                            Cmd.none
+                            (model, Cmd.none)
 
                 updatedModel =
-                    { model | secret = Secret.update code model.secret }
+                    { calendarModel | secret = Secret.update code model.secret }
             in
             ( updatedModel, cmd )
 
@@ -119,11 +117,10 @@ update msgSource model =
             ( { model | swipe = updatedSwipe }, action )
 
         ClickToday ->
-            let
-                date =
-                    model.date |> Maybe.withDefault (Time.millisToPosix 0)
-            in
-            calendarAction model (CalMsg.ChangeViewing date)
+            model.date
+            |> Maybe.withDefault (Time.millisToPosix 0)
+            |> CalMsg.ChangeViewing
+            |> calendarAction model
 
         LoadGroup slug ->
             let
