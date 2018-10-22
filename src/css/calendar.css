@@ -38,21 +38,8 @@
   flex: 1;
 }
 
-.calendar--week-header,
-.calendar--day .calendar--date-header {
-  background-color: #3c6382;
-  padding: 2px 0;
-  border-bottom: 2px solid #122e42;
-}
-
-.calendar--dates-header {
-  display: flex;
-  flex-flow: row nowrap;
-  align-content: stretch;
-}
-
 .calendar--dates {
-  flex-flow: row nowrap;
+  flex-flow: column nowrap;
   display: flex;
   align-content: stretch;
   justify-content: space-around;
@@ -60,10 +47,17 @@
 }
 
 .calendar--date-header {
-  padding: 0;
-  text-align: center;
+  justify-content: center;
   display: flex;
   align-items: center;
+
+  background-color: #3c6382;
+  padding: 2px 0;
+  border-bottom: 2px solid #122e42;
+}
+
+.calendar--date-header-weeknum {
+  background-color: #345b7a;
 }
 
 .calendar--date-header-content {
