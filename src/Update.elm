@@ -1,4 +1,4 @@
-module Update exposing (calendarAction, createPlanningRequest, distanceX, find, update)
+module Update exposing (calendarAction, createPlanningRequest, find, update)
 
 import Browser.Dom
 import Calendar.Calendar as Calendar
@@ -104,21 +104,17 @@ update msgSource model =
                     Swipe.update msg model.swipe
 
                 action =
-                    if (updatedSwipe.state == Swipe.SwipeEnd) && (distanceX updatedSwipe.c0 updatedSwipe.c1 > 70.0) then
-                        case updatedSwipe.direction of
-                            Just Swipe.Left ->
-                                Task.succeed PageForward
-                                    |> Task.perform identity
+                    case Swipe.hasSwiped updatedSwipe 70 of
+                        Just Swipe.Left ->
+                            Task.succeed PageForward
+                                |> Task.perform identity
 
-                            Just Swipe.Right ->
-                                Task.succeed PageBack
-                                    |> Task.perform identity
+                        Just Swipe.Right ->
+                            Task.succeed PageBack
+                                |> Task.perform identity
 
-                            _ ->
-                                Cmd.none
-
-                    else
-                        Cmd.none
+                        _ ->
+                            Cmd.none
             in
             ( { model | swipe = updatedSwipe }, action )
 
@@ -193,11 +189,6 @@ find predicate list =
 
             else
                 find predicate rest
-
-
-distanceX : Swipe.Coordinates -> Swipe.Coordinates -> Float
-distanceX c0 c1 =
-    abs (c0.clientX - c1.clientX)
 
 
 calendarAction : Model -> CalMsg.Msg -> ( Model, Cmd Msg )

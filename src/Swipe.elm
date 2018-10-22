@@ -7,6 +7,7 @@ module Swipe exposing
     , init
     , onSwipe
     , update
+    , hasSwiped
     )
 
 import Html
@@ -97,6 +98,14 @@ update msg state =
             }
 
 
+hasSwiped : State -> Float -> Maybe Direction
+hasSwiped state distance =
+    if (state.state == SwipeEnd) && (distanceX state.c0 state.c1 > distance) then
+        state.direction
+    else
+        Nothing
+
+
 direction : Coordinates -> Maybe Direction
 direction { clientX, clientY } =
     if clientX > 0 then
@@ -109,15 +118,9 @@ direction { clientX, clientY } =
         Nothing
 
 
-
--- if abs clientX > abs clientY then
--- else
---     if clientY > 0 then
---         Just Down
---     else if clientY < 0 then
---         Just Up
---     else
---         Nothing
+distanceX : Coordinates -> Coordinates -> Float
+distanceX c0 c1 =
+    abs (c0.clientX - c1.clientX)
 
 
 subCoordinates : Coordinates -> Coordinates -> Coordinates
