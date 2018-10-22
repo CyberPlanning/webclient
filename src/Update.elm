@@ -34,7 +34,7 @@ update msgSource model =
                         Day
 
                     else
-                        Week
+                        AllWeek
             in
             ( { model | date = Just date, calendarState = Calendar.init timespan date }
             , createPlanningRequest date model.selectedGroup.slug
