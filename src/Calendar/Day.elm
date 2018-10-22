@@ -10,16 +10,18 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
 import Time exposing (Posix)
 import Time.Extra as TimeExtra
+import TimeZone exposing (europe__paris)
 
 
 view : InternalState -> List Event -> Html Msg
 view { selected, viewing, joursFeries } events =
     div [ class "calendar--day" ]
-        [ viewDayHeader viewing
-        , div [ class "calendar--day-content" ]
+        [ div [ class "calendar--day-content" ]
             [ viewTimeGutter viewing
             , div [ class "calendar--day" ]
-                [ viewDaySlot events selected viewing joursFeries ]
+                [ viewDayHeader viewing
+                , viewDaySlot events selected viewing joursFeries
+                ]
             ]
         ]
 
@@ -40,21 +42,39 @@ viewDate day =
 viewDayHeader : Posix -> Html Msg
 viewDayHeader day =
     div [ class "calendar--day-header" ]
-        [ viewTimeGutterHeader
-        , viewDate day
+        [ viewDate day
         ]
 
 
 viewTimeGutter : Posix -> Html Msg
-viewTimeGutter _ =
+viewTimeGutter viewing =
     Helpers.hours
         |> List.map viewTimeSlotGroup
+        |> (::) (viewTimeGutterHeader viewing)
         |> div [ class "calendar--time-gutter" ]
 
 
-viewTimeGutterHeader : Html Msg
-viewTimeGutterHeader =
-    div [ class "calendar--time-gutter" ] []
+viewTimeGutterHeader : Posix -> Html Msg
+viewTimeGutterHeader viewing =
+    let
+        date =
+            viewing
+                |> TimeExtra.ceiling TimeExtra.Sunday europe__paris
+
+        year =
+            Time.toYear europe__paris date
+
+        weekNum =
+            TimeExtra.diff TimeExtra.Week
+                europe__paris
+                (TimeExtra.partsToPosix europe__paris (TimeExtra.Parts year Time.Jan 1 0 0 0 0))
+                date
+                |> (+) 1
+                |> String.fromInt
+    in
+    div [ class "calendar--date-header", class "calendar--date-header-weeknum" ]
+        [ span [ class "calendar--date" ] [ text weekNum ]
+        ]
 
 
 viewTimeSlotGroup : String -> Html Msg

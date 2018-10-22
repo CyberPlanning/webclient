@@ -1,4 +1,4 @@
-module Calendar.Week exposing (view, viewAll, viewDate, viewDates, viewWeekContent, viewWeekDay, viewWeekHeader)
+module Calendar.Week exposing (view, viewAll, viewWeekContent, viewWeekDay)
 
 import Calendar.Day exposing (viewAllDayCell, viewDayEvents, viewDaySlotGroup, viewTimeGutter, viewTimeGutterHeader)
 import Calendar.Event exposing (Event)
@@ -25,8 +25,7 @@ viewAll state events =
 viewDays : InternalState -> List Event -> List Posix -> Html Msg
 viewDays { selected, viewing, joursFeries } events weekRange =
     div [ class "calendar--week" ]
-        [ viewWeekHeader weekRange
-        , viewWeekContent events selected viewing weekRange joursFeries
+        [ viewWeekContent events selected viewing weekRange joursFeries
         ]
 
 
@@ -59,27 +58,29 @@ viewWeekDay events selectedId feries day =
         dayEvents =
             viewDayEvents events selectedId day feries
     in
-    div [ class "calendar--day" ]
-        [ div [ class "calendar--day-slot" ]
-            (viewDaySlots ++ dayEvents)
-        ]
-
-
-viewWeekHeader : List Posix -> Html Msg
-viewWeekHeader days =
-    div [ class "calendar--week-header" ]
-        [ viewDates days ]
-
-
-viewDates : List Posix -> Html Msg
-viewDates days =
-    div [ class "calendar--dates-header" ]
-        [ viewTimeGutterHeader
-        , div [ class "calendar--dates" ] <| List.map viewDate days
-        ]
-
-
-viewDate : Posix -> Html Msg
-viewDate day =
-    div [ class "calendar--date-header" ]
+    div [ class "calendar--dates"]
+    [ div [ class "calendar--date-header" ]
         [ span [ class "calendar--date" ] [ text <| Helpers.dateString day ] ]
+    , div [ class "calendar--day-slot" ]
+        (viewDaySlots ++ dayEvents)
+    ]
+
+
+-- viewWeekHeader : List Posix -> Html Msg
+-- viewWeekHeader days =
+--     div [ class "calendar--week-header" ]
+--         [ viewDates days ]
+
+
+-- viewDates : List Posix -> Html Msg
+-- viewDates days =
+--     div [ class "calendar--dates-header" ]
+--         [ viewTimeGutterHeader
+--         , div [ class "calendar--dates" ] <| List.map viewDate days
+--         ]
+
+
+-- viewDate : Posix -> Html Msg
+-- viewDate day =
+--     div [ class "calendar--date-header" ]
+--         [ span [ class "calendar--date" ] [ text <| Helpers.dateString day ] ]
