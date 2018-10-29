@@ -27,15 +27,17 @@
 }
 
 .calendar--week {
-  display: flex;
-  flex-flow: column nowrap;
+  /* display: flex;
+  flex-flow: column nowrap; */
   flex: 1;
+  overflow-y: auto;
 }
 
 .calendar--week-content {
   display: flex;
   overflow-x: hidden;
-  flex: 1;
+  /* flex: 1; */
+  min-height: 100%;
 }
 
 .calendar--dates {
@@ -72,6 +74,7 @@
   color: #ecf0f1;
   font-size: 15px;
   line-height: 26px;
+  white-space: nowrap;
 }
 
 .calendar--day {
