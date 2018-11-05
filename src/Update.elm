@@ -44,12 +44,19 @@ update msgSource model =
             case response of
                 Ok query ->
                     let
-                        data =
+                        cyberEvents =
                             query.planning.events
                                 |> toCalEvents
-                                |> Just
+                        
+                        hack2g2Events =
+                            query.hack2g2.events
+                                |> toCalEvents
+
+                        allEvents =
+                            cyberEvents ++ hack2g2Events
+                            |> Just
                     in
-                    ( { model | data = data, loading = False, error = Nothing }, Task.attempt (always Noop) (Browser.Dom.blur "groupSelect") )
+                    ( { model | data = allEvents, loading = False, error = Nothing }, Task.attempt (always Noop) (Browser.Dom.blur "groupSelect") )
 
                 Err err ->
                     ( { model | error = Just err, loading = False }, Cmd.none )

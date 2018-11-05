@@ -10,7 +10,7 @@ import Types exposing (Query, decodeQuery)
 
 eventsApiQuery : String
 eventsApiQuery =
-    "query day_planning($collection:Collection!,$grs:[String],$to:DateTime!,$from:DateTime!){planning(collection:$collection,affiliationGroups:$grs,toDate:$to,fromDate:$from){events{title startDate endDate classrooms teachers groups eventId}}}"
+    "query day_planning($collection:Collection!,$grs:[String],$to:DateTime!,$from:DateTime!){planning(collection:$collection,affiliationGroups:$grs,toDate:$to,fromDate:$from){events{title startDate endDate classrooms teachers groups eventId}},hack2g2: planning(collection:HACK2G2,toDate:$to,fromDate:$from){events{title,startDate,endDate,classrooms,teachers,groups,eventId}}}"
 
 
 type alias Params =
