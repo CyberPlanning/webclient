@@ -113,10 +113,10 @@ styleDayEvent : Posix -> Posix -> String -> String -> List (Html.Attribute msg)
 styleDayEvent start end color title =
     let
         startPercent =
-            100 * percentDay start (7 / 24) (20 / 24)
+            100 * percentDay start (7 / 24) (21 / 24)
 
         endPercent =
-            100 * percentDay end (7 / 24) (20 / 24)
+            100 * percentDay end (7 / 24) (21 / 24)
 
         height =
             (String.fromFloat <| endPercent - startPercent) ++ "%"
