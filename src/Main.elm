@@ -1,4 +1,4 @@
-module Main exposing (init, main, subscriptions)
+module Main exposing (main)
 
 import Browser
 import Browser.Dom
@@ -14,7 +14,6 @@ import View exposing (view)
 
 
 ---- PROGRAM ----
-
 
 init : () -> ( Model, Cmd Msg )
 init _ =
