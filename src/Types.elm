@@ -12,9 +12,9 @@ type alias Event =
     { title : String
     , startDate : String
     , endDate : String
-    , classrooms : List String
-    , teachers : List String
-    , groups : List String
+    , classrooms : Maybe (List String)
+    , teachers : Maybe (List String)
+    , groups : Maybe (List String)
     , eventId : String
     }
 
@@ -31,15 +31,22 @@ decodePlanning =
         (field "events" (Decode.list decodeEvent))
 
 
+listnull : Decoder (Maybe (List String))
+listnull =
+    Decode.string
+    |> Decode.list
+    |> Decode.nullable
+
+
 decodeEvent : Decoder Event
 decodeEvent =
     Decode.map7 Event
         (field "title" string)
         (field "startDate" string)
         (field "endDate" string)
-        (field "classrooms" (Decode.list string))
-        (field "teachers" (Decode.list string))
-        (field "groups" (Decode.list string))
+        (field "classrooms" listnull)
+        (field "teachers" listnull)
+        (field "groups" listnull)
         (field "eventId" string)
 
 
