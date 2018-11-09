@@ -118,8 +118,8 @@
 
 .calendar--event-title {
   font-weight: bold;
-  height: 2em;
-  line-height: 1em;
+  max-height: 2.4em;
+  line-height: 1.2em;
   overflow: hidden;
 }
 
