@@ -51,9 +51,13 @@ update msgSource model =
                         hack2g2Events =
                             query.hack2g2.events
                                 |> toCalEvents
+                        
+                        customEvents =
+                            query.custom.events
+                                |> toCalEvents
 
                         allEvents =
-                            cyberEvents ++ hack2g2Events
+                            cyberEvents ++ hack2g2Events ++ customEvents
                             |> Just
                     in
                     ( { model | data = allEvents, loading = False, error = Nothing }, Task.attempt (always Noop) (Browser.Dom.blur "groupSelect") )

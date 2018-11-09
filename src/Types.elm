@@ -22,6 +22,7 @@ type alias Event =
 type alias Query =
     { planning : Planning
     , hack2g2 : Planning
+    , custom : Planning
     }
 
 
@@ -52,6 +53,7 @@ decodeEvent =
 
 decodeQuery : Decoder Query
 decodeQuery =
-    Decode.map2 Query
+    Decode.map3 Query
         (field "planning" decodePlanning)
         (field "hack2g2" decodePlanning)
+        (field "custom" decodePlanning)
