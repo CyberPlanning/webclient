@@ -32,7 +32,7 @@ viewTooltipContent maybeEvent =
                 ([ div [ class "tooltip--event-title" ] [ text event.title ]
                  , div [ classList [ ( "tooltip--event-sub", True ), ( "tooltip--event-hours", True ) ] ] [ viewHour event ]
                  ]
-                    ++ showIfNotEmpty [ String.join "," event.classrooms, String.join "," event.teachers, String.join "," event.groups ]
+                    ++ showIfNotEmpty [ String.join "," event.locations, String.join "," event.stakeholders, String.join "," event.groups ]
                 )
             ]
 

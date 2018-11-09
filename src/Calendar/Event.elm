@@ -18,8 +18,8 @@ type alias Event =
     , title : String
     , startTime : Posix
     , endTime : Posix
-    , classrooms : List String
-    , teachers : List String
+    , locations : List String
+    , stakeholders : List String
     , groups : List String
     , color : String
     }
@@ -168,8 +168,8 @@ eventSegment event selectedId eventRange =
             ++ eventStyling event eventRange classes
         )
         [ div [ class "calendar--event-title" ] [ makeTitle event.title ]
-        , div [ class "calendar--event-sub" ] [ text <| String.join "," event.classrooms ]
-        , div [ class "calendar--event-sub" ] [ text <| String.join "," event.teachers ]
+        , div [ class "calendar--event-sub" ] [ text <| String.join "," event.locations ]
+        , div [ class "calendar--event-sub" ] [ text <| String.join "," event.stakeholders ]
         , div [ class "calendar--event-sub" ] [ text <| String.join "," event.groups ]
         ]
 

@@ -81,8 +81,8 @@ toCalEvent event =
     , title = event.title
     , startTime = extractTimeIsoString event.startDate
     , endTime = extractTimeIsoString event.endDate
-    , classrooms = Maybe.withDefault [] event.classrooms
-    , teachers = Maybe.withDefault [] event.teachers
+    , locations = Maybe.withDefault [] event.classrooms
+    , stakeholders = Maybe.withDefault [] event.teachers
     , groups = Maybe.withDefault [] event.groups
     , color = computeColor event.title
     }

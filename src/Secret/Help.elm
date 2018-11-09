@@ -79,8 +79,8 @@ helpToEvent viewing help =
     , title = help.title
     , startTime = start
     , endTime = end
-    , classrooms = [ help.desc ]
-    , teachers = [ help.desc2 ]
+    , locations = [ help.desc ]
+    , stakeholders = [ help.desc2 ]
     , groups = []
     , color = computeColor help.title
     }
