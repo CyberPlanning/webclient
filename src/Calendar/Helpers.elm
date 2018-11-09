@@ -74,11 +74,12 @@ dayRangeOfWeek date =
             date
                 -- move to middle week because week-end are not showned
                 |> TimeExtra.add TimeExtra.Day 2 paris
+                |> TimeExtra.floor TimeExtra.Monday paris
     in
     TimeExtra.range TimeExtra.Day
         1
         paris
-        (TimeExtra.floor TimeExtra.Monday paris weekDate)
+        weekDate
         (TimeExtra.ceiling TimeExtra.Saturday paris weekDate)
 
 
