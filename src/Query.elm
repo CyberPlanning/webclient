@@ -10,7 +10,7 @@ import Types exposing (Query, decodeQuery)
 
 eventsApiQuery : String
 eventsApiQuery =
-    "query day_planning($collection:String!,$grs:[String],$to:DateTime!,$from:DateTime!){planning(collection:$collection,affiliationGroups:$grs,toDate:$to,fromDate:$from){events{title startDate endDate classrooms teachers groups eventId}}}"
+    "query day_planning($collection:Collection!,$grs:[String],$to:DateTime!,$from:DateTime!){planning(collection:$collection,affiliationGroups:$grs,toDate:$to,fromDate:$from){events{title startDate endDate classrooms teachers groups eventId}}}"
 
 
 type alias Params =
@@ -67,7 +67,7 @@ sendRequest from to groups =
     { from = from
     , to = to
     , grs = groups
-    , collection = "planning_cyber"
+    , collection = "CYBER"
     }
         |> requestBody eventsApiQuery
         |> post Config.apiUrl []
