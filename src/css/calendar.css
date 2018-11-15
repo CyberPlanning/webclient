@@ -6,6 +6,7 @@
 .calendar--time-gutter {
   display: flex;
   flex-direction: column;
+  background-color: var(--background-color);
 }
 
 .calendar--dates-header > .calendar--time-gutter {
@@ -17,13 +18,12 @@
   display: flex;
   flex-flow: column nowrap;
   flex: 1;
-  border-bottom: 1px solid #363e41;
-  border-left: 1px solid #363e41;
+  border-bottom: 1px solid var(--border-color);
+  border-left: 1px solid var(--border-color);
 }
 
 .calendar--time-slot-text {
   font-size: 12px;
-  color: #ecf0f1;
 }
 
 .calendar--week {
@@ -53,13 +53,19 @@
   display: flex;
   align-items: center;
 
-  background-color: #3c6382;
+  background-color: var(--accent-color);
   padding: 2px 0;
-  border-bottom: 2px solid #122e42;
+  border-bottom: 2px solid var(--header-border-color);
 }
 
 .calendar--date-header-weeknum {
-  background-color: #345b7a;
+  background-color: var(--accent-color-dark);
+}
+
+.calendar--date-header-zone {
+  font-size: 9px;
+  padding: 1px 0;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .calendar--date-header-content {
@@ -71,7 +77,6 @@
 
 .calendar--date {
   text-decoration: none;
-  color: #ecf0f1;
   font-size: 15px;
   line-height: 26px;
   white-space: nowrap;
@@ -99,27 +104,22 @@
 .calendar--hour-slot {
   padding: 0 10px;
   flex: 1 0 0;
-  background-color: #262d2f;
 }
 
 .calendar--event {
-  font-size: 14px;
-  padding: 5px;
-  background-color: #5fb4ca;
+  font-size: 0.9rem;
+  padding: 0.2em;
+  background-color: var(--accent-color);
   color: white;
   cursor: pointer;
   overflow: hidden;
-  border-bottom: 1px solid #2d3436
-}
-
-.fun-help .calendar--event {
-  transition: 1s;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .calendar--event-title {
-  font-weight: bold;
+  font-weight: 500;
+  font-size: 0.9rem;
   max-height: 2.4em;
-  line-height: 1.2em;
   overflow: hidden;
 }
 
@@ -133,7 +133,6 @@
   padding: 0 15px;
   background-color: transparent;
   height: 100%;
-  color: #ecf0f1;
   font-size: 15px;
   cursor: pointer;
 }

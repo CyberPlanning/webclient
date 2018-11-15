@@ -1,7 +1,11 @@
-@import url('https://fonts.googleapis.com/css?family=Montserrat');
+@import url('https://fonts.googleapis.com/css?family=Roboto:400,500');
 
 * {
   box-sizing: border-box;
+}
+
+:root {
+  font-size: 16px;
 }
 
 html,
@@ -13,12 +17,14 @@ body {
 }
 
 body {
-  font-family: 'Montserrat', sans-serif;
-  font-size: 20px;
   margin: 0;
   text-align: center;
-  background-color: #2d3436;
-  color: #ecf0f1;
+  background-color: var(--body-color);
+}
+
+body, button, a {
+  font-family: 'Roboto', Helvetica, Arial, sans-serif;
+  color: var(--text-color);
 }
 
 .hidden {
@@ -41,7 +47,7 @@ body {
 
 .main--toolbar {
   display: flex;
-  background-color: #124368;
+  background-color: var(--nav-color);
   padding: 0;
   justify-content: space-between;
   height: 40px;
@@ -51,41 +57,42 @@ body {
 .main--month-title {
   cursor: pointer;
   position: absolute;
-  width: 100%;
-  height: 100%;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex: 1;
+  justify-content: center;
+  align-items: center;
 }
 
 .main--month-title h2 {
+  font-size: 1.3rem;
   margin: 0;
-  padding: 5px 0;
-  font-size: 22px;
   white-space: nowrap;
 }
 
 .main--navigatiors-button,
 .main--selector-select {
-  height: 100%;
   border: 0;
   background-color: transparent;
-  color: #ecf0f1;
-  font-size: 15px;
+  font-size: 1rem;
   cursor: pointer;
   vertical-align: top;
 }
 
 .main--navigatiors-button:hover,
 .main--selector-select:hover {
-  background-color: #34495e;
+  background-color: var(--accent-color);
 }
 
-.main--navigatiors-reload {
-  font-size: 1.2em;
-  line-height: 100%;
-}
+/* .main--navigatiors-reload {
+  font-size: 1.00em;
+} */
 
-.main--navigatiors-reload span {
+.main--navigatiors-reload i {
   display: block;
-  padding-left: 4px;
   transform-origin: center center;
   animation-name: none;
   animation-duration: 1000ms;
@@ -93,13 +100,36 @@ body {
   animation-iteration-count: 1;
 }
 
-.main--navigatiors-reload.loop span {
+.main--navigatiors-reload.loop i {
   animation-name: loop;
 }
 
+.main--navigatiors-action {
+  display: inline-flex;
+  vertical-align: top;
+  padding: 5px 0 5px 5px;
+  height: 100%;
+}
+
 .main--navigatiors-button {
+  padding: 0 0.25rem;
+  border-radius: 50%;
+}
+
+.main--navigatiors-today {
+  border: 0;
   padding: 0 8px;
   text-transform: uppercase;
+  font-weight: 500;
+  font-size: 0.9rem;
+  background-color: var(--accent-color);
+  border-radius: 5px;
+  cursor: pointer;
+  vertical-align: top;
+}
+
+.main--navigatiors-today:active {
+  background-color: var(--accent-color-dark);
 }
 
 .main--paginators,

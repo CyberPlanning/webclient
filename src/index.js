@@ -1,8 +1,10 @@
 import '../bower_components/normalize-css/normalize.css'
+import './css/colors.css';
 import './css/main.css';
 import './css/tooltip.css';
 import './css/calendar.css';
 import './css/secret.css';
+import './css/cybericons.css';
 import {
     Elm
 } from './Main.elm';

@@ -76,11 +76,6 @@ viewTitle viewing =
         [ h2 [] [ text <| formatDateTitle viewing ] ]
 
 
-viewMenuButton : Html Msg
-viewMenuButton =
-    button [ class "main--navigatiors-button", onClick ToggleMenu ] [ text "menu" ]
-
-
 formatDateTitle : Posix -> String
 formatDateTitle date =
     let
@@ -135,10 +130,16 @@ formatDateTitle date =
 viewPagination : Bool -> Bool -> Html Msg
 viewPagination all loop =
     let
-        btns =
+        navigations =
             if all then
-                [ button [ class "main--navigatiors-button", onClick PageBack ] [ text "back" ]
-                , button [ class "main--navigatiors-button", onClick PageForward ] [ text "next" ]
+                [ navButton
+                    [ class "main--navigatiors-button", onClick PageBack ]
+                    [ i [ class "icon-left" ] []
+                    ]
+                , navButton
+                    [ class "main--navigatiors-button", onClick PageForward ]
+                    [ i [ class "icon-right" ] []
+                    ]
                 ]
 
             else
@@ -146,8 +147,8 @@ viewPagination all loop =
     in
     div [ class "main--paginators" ]
         (viewMenuButton
-            :: btns
-            ++ [ button [ class "main--navigatiors-button", onClick ClickToday ] [ text "today" ]
+            :: navigations
+            ++ [ navButton [ class "main--navigatiors-today", onClick ClickToday ] [ text "aujourd'hui" ]
                , reloadButton loop
                ]
         )
@@ -175,17 +176,31 @@ optionGroup group =
 
 reloadButton : Bool -> Html Msg
 reloadButton loop =
-    button
+    navButton
         [ classList
             [ ( "main--navigatiors-button", True )
             , ( "main--navigatiors-reload", True )
             , ( "loop", loop )
             ]
-        , style "font-size" "1.2em"
         , onClick (SavedGroup "ok")
         ]
-        [ span [] [ text "⟳" ]
+        [ i [ class "icon-reload" ] [ ]
         ]
+
+
+viewMenuButton : Html Msg
+viewMenuButton =
+    navButton
+        [ class "main--navigatiors-button", onClick ToggleMenu ]
+        [ i [ class "icon-menu"] []
+        ]
+
+
+navButton : List (Attribute msg) -> List (Html msg) -> Html msg
+navButton attr content =
+    div
+        [ class "main--navigatiors-action" ]
+        [ button attr content ]
 
 
 viewMessage : Model -> Html Msg

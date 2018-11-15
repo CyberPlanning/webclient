@@ -49,7 +49,7 @@ viewDayHeader day =
 viewTimeGutter : Posix -> Html Msg
 viewTimeGutter viewing =
     Helpers.hours
-        |> List.map viewTimeSlotGroup
+        |> List.indexedMap (viewTimeSlotGroup viewing)
         |> (::) (viewTimeGutterHeader viewing)
         |> div [ class "calendar--time-gutter" ]
 
@@ -76,11 +76,30 @@ viewTimeGutterHeader viewing =
         [ span [ class "calendar--date" ] [ text weekNum ]
         ]
 
+viewTimeGutterZone : Posix -> Html Msg
+viewTimeGutterZone viewing =
+    let
+        offset =
+            viewing
+            |> TimeExtra.toOffset europe__paris
+            |> toFloat
 
-viewTimeSlotGroup : String -> Html Msg
-viewTimeSlotGroup date =
+        zone = offset / 60
+            |> floor
+            |> String.fromInt
+            |> (++) "GMT+"
+
+    in
+    div [ class "calendar--date-header-zone" ]
+        [ span [ ] [ text zone ]
+        ]
+
+
+viewTimeSlotGroup : Posix -> Int -> String -> Html Msg
+viewTimeSlotGroup viewing idx date =
     div [ class "calendar--time-slot-group" ]
-        [ viewHourSlot date
+        [ if idx == 0 then viewTimeGutterZone viewing else text ""
+        , viewHourSlot date
         , div [ class "calendar--time-slot" ] []
         ]
 
