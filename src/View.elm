@@ -44,7 +44,7 @@ view model =
 
         container =
             div attrs
-                [ viewToolbar model.selectedGroup model.calendarState.viewing (model.calendarState.timeSpan == Week) model.loop
+                [ viewToolbar model.selectedGroup model.calendarState.viewing (model.calendarState.timeSpan /= Day) model.loop
                 , div [ class "main--calendar" ]
                     [ Html.map SetCalendarState (Calendar.view events model.calendarState)
                     ]
