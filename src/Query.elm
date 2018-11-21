@@ -6,18 +6,42 @@ import Json.Decode as Decode
 import Json.Encode as Encode
 import Msg exposing (Msg(..))
 import Types exposing (Query, decodeQuery)
+import Model exposing (Settings)
 
 
 eventsApiQuery : String
 eventsApiQuery =
-    "query day_planning($collection:Collection!,$grs:[String],$to:DateTime!,$from:DateTime!){planning(collection:$collection,affiliationGroups:$grs,toDate:$to,fromDate:$from){events{title startDate endDate classrooms teachers groups eventId}},hack2g2: planning(collection:HACK2G2,toDate:$to,fromDate:$from){events{title,startDate,endDate,classrooms,teachers,groups,eventId}},custom: planning(collection:CUSTOM,toDate:$to,fromDate:$from){events{title,startDate,endDate,classrooms,teachers,groups,eventId}}}"
+    """query day_planning($grs: [String], $to: DateTime!, $from: DateTime!, $hack2g2: Boolean!, $custom: Boolean!) {
+        planning(collection: CYBER, affiliationGroups: $grs, toDate: $to, fromDate: $from) {
+            ...events
+        }
+        hack2g2: planning(collection: HACK2G2, toDate: $to, fromDate: $from) @include(if: $hack2g2) {
+            ...events
+        }
+        custom: planning(collection: CUSTOM, toDate: $to, fromDate: $from) @include(if: $custom) {
+            ...events
+        }
+    }
+    fragment events on Planning {
+        events {
+            title
+            eventId
+            startDate
+            endDate
+            classrooms
+            teachers
+            groups
+        }
+    }
+    """
 
 
 type alias Params =
     { from : String
     , to : String
     , grs : List String
-    , collection : String
+    , hack2g2 : Bool
+    , custom : Bool
     }
 
 
@@ -45,14 +69,15 @@ requestAPI =
 
 
 requestBody : String -> Params -> Body
-requestBody queryString { from, to, grs, collection } =
+requestBody queryString { from, to, grs, hack2g2, custom } =
     let
         var =
             Encode.object
                 [ ( "from", Encode.string from )
                 , ( "to", Encode.string to )
                 , ( "grs", Encode.list Encode.string grs )
-                , ( "collection", Encode.string collection )
+                , ( "hack2g2", Encode.bool hack2g2 )
+                , ( "custom", Encode.bool custom )
                 ]
     in
     Encode.object
@@ -62,12 +87,13 @@ requestBody queryString { from, to, grs, collection } =
         |> Http.jsonBody
 
 
-sendRequest : String -> String -> List String -> Cmd Msg
-sendRequest from to groups =
+sendRequest : String -> String -> List String -> Settings -> Cmd Msg
+sendRequest from to groups { showCustom, showHack2g2 } =
     { from = from
     , to = to
     , grs = groups
-    , collection = "CYBER"
+    , hack2g2 = showHack2g2
+    , custom = showCustom
     }
         |> requestBody eventsApiQuery
         |> post Config.apiUrl []

@@ -1,4 +1,4 @@
-module Model exposing (Group, Model, PlanningResponse, WindowSize, initialModel, toCalEvent, toCalEvents, toDatetime)
+module Model exposing (Group, Model, Settings, CustomEvent(..), PlanningResponse, WindowSize, initialModel, toCalEvent, toCalEvents, toDatetime)
 
 import Calendar.Calendar as Calendar
 import Calendar.Event as CalEvent
@@ -38,15 +38,25 @@ type alias Model =
     , calendarState : Calendar.State
     , swipe : Swipe.State
     , loop : Bool
-    , menuOpened : Bool
     , secret : Secret.StateList
+    , settings : Settings
     }
 
+type alias Settings =
+    { showHack2g2 : Bool
+    , showCustom : Bool
+    , menuOpened : Bool
+    }
 
 type alias Group =
     { name : String
     , slug : String
     }
+
+type CustomEvent
+    = Hack2g2
+    | Custom
+
 
 
 toDatetime : Posix -> String
@@ -59,14 +69,18 @@ initialModel =
     { data = Nothing
     , error = Nothing
     , date = Nothing
-    , selectedGroup = { name = "Cyber1 TD2", slug = "12" }
     , loading = True
+    , selectedGroup = { name = "Cyber1 TD2", slug = "12" }
     , calendarState = Calendar.init Calendar.Msg.Week (Time.millisToPosix 0)
     , size = { width = 1200, height = 800 }
     , swipe = Swipe.init
     , loop = False
-    , menuOpened = False
     , secret = Secret.createStates
+    , settings =
+        { showCustom = False
+        , showHack2g2 = False
+        , menuOpened = False
+        }
     }
 
 

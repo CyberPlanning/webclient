@@ -6,7 +6,7 @@ import Http exposing (Error)
 import Swipe
 import Time exposing (Posix)
 import Types exposing (Query)
-
+import Model exposing(CustomEvent)
 
 type Msg
     = Noop
@@ -24,3 +24,5 @@ type Msg
     | SavedGroup String
     | ToggleMenu
     | StopReloadIcon ()
+    | ChangeMode Calendar.TimeSpan
+    | CheckEvents CustomEvent Bool

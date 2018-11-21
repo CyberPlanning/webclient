@@ -1,9 +1,8 @@
-module View exposing (errorMessage, optionGroup, reloadButton, view, viewMessage, viewPagination, viewSelector, viewTitle, viewToolbar)
+module View exposing (view)
 
 import Browser exposing (Document)
 import Calendar.Calendar as Calendar
 import Calendar.Msg exposing (TimeSpan(..))
-import Config exposing (allGroups)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (on, onClick, targetValue)
@@ -46,11 +45,11 @@ view model =
             div attrs
                 [ viewToolbar model.selectedGroup model.calendarState.viewing (model.calendarState.timeSpan /= Day) model.loop
                 , div [ class "main--calendar" ]
-                    [ Html.map SetCalendarState (Calendar.view events model.calendarState)
+                    [ SideMenu.view model.selectedGroup model.calendarState.timeSpan model.settings
+                    , Html.map SetCalendarState (Calendar.view events model.calendarState)
                     ]
                 , viewMessage model
                 , Tooltip.viewTooltip model.calendarState.hover events
-                , SideMenu.view model.menuOpened model.selectedGroup model.calendarState.timeSpan
                 , funThings
                 ]
     in
@@ -64,9 +63,7 @@ viewToolbar selected viewing all loop =
     div [ class "main--toolbar" ]
         [ viewPagination all loop
         , viewTitle viewing
-        , viewSelector selected
-
-        -- , viewTimeSpanSelection timeSpan
+        , viewSentance
         ]
 
 
@@ -127,6 +124,15 @@ formatDateTitle date =
     monthName ++ " " ++ year
 
 
+viewSentance: Html Msg
+viewSentance =
+    div [ style "color" "grey"
+        , style "font-size" "14px"
+        ]
+        [ text "I'm not going to be the person I'm expected to be anymore.." ]
+
+
+
 viewPagination : Bool -> Bool -> Html Msg
 viewPagination all loop =
     let
@@ -153,27 +159,6 @@ viewPagination all loop =
                ]
         )
 
-
-viewSelector : Group -> Html Msg
-viewSelector selected =
-    div [ class "main--selector" ]
-        [ select
-            [ class "main--selector-select"
-            , id "groupSelect"
-            , on "change" <| Json.map SetGroup targetValue
-            , value selected.slug
-            , multiple False
-            ]
-            (List.map optionGroup allGroups)
-        ]
-
-
-optionGroup : Group -> Html Msg
-optionGroup group =
-    option [ value group.slug ]
-        [ text group.name ]
-
-
 reloadButton : Bool -> Html Msg
 reloadButton loop =
     navButton
@@ -184,7 +169,7 @@ reloadButton loop =
             ]
         , onClick (SavedGroup "ok")
         ]
-        [ i [ class "icon-reload" ] [ ]
+        [ i [ class "icon-reload" ] []
         ]
 
 
@@ -192,7 +177,7 @@ viewMenuButton : Html Msg
 viewMenuButton =
     navButton
         [ class "main--navigatiors-button", onClick ToggleMenu ]
-        [ i [ class "icon-menu"] []
+        [ i [ class "icon-menu" ] []
         ]
 
 

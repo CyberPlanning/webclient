@@ -21,8 +21,8 @@ type alias Event =
 
 type alias Query =
     { planning : Planning
-    , hack2g2 : Planning
-    , custom : Planning
+    , hack2g2 : Maybe Planning
+    , custom : Maybe Planning
     }
 
 
@@ -55,5 +55,5 @@ decodeQuery : Decoder Query
 decodeQuery =
     Decode.map3 Query
         (field "planning" decodePlanning)
-        (field "hack2g2" decodePlanning)
-        (field "custom" decodePlanning)
+        (Decode.maybe (field "hack2g2" decodePlanning))
+        (Decode.maybe (field "custom" decodePlanning))

@@ -4,7 +4,7 @@ import Browser.Dom
 import Calendar.Calendar as Calendar
 import Calendar.Msg as CalMsg exposing (TimeSpan(..))
 import Config exposing (allGroups)
-import Model exposing (Model, toCalEvents, toDatetime)
+import Model exposing (CustomEvent(..), Model, Settings, toCalEvents, toDatetime)
 import Msg exposing (Msg(..))
 import Process
 import Query exposing (sendRequest)
@@ -37,7 +37,7 @@ update msgSource model =
                         AllWeek
             in
             ( { model | date = Just date, calendarState = Calendar.init timespan date }
-            , createPlanningRequest date model.selectedGroup.slug
+            , createPlanningRequest date model.selectedGroup.slug model.settings
             )
 
         GraphQlMsg response ->
@@ -47,18 +47,30 @@ update msgSource model =
                         cyberEvents =
                             query.planning.events
                                 |> toCalEvents
-                        
+
                         hack2g2Events =
-                            query.hack2g2.events
-                                |> toCalEvents
-                        
+                            case query.hack2g2 of
+                                Nothing ->
+                                    []
+
+                                Just p ->
+                                    p.events
+                                        |> toCalEvents
+
                         customEvents =
-                            query.custom.events
-                                |> toCalEvents
+                            case query.custom of
+                                Nothing ->
+                                    []
+
+                                Just p ->
+                                    p.events
+                                        |> toCalEvents
 
                         allEvents =
-                            cyberEvents ++ hack2g2Events ++ customEvents
-                            |> Just
+                            cyberEvents
+                                ++ hack2g2Events
+                                ++ customEvents
+                                |> Just
                     in
                     ( { model | data = allEvents, loading = False, error = Nothing }, Task.attempt (always Noop) (Browser.Dom.blur "groupSelect") )
 
@@ -91,7 +103,7 @@ update msgSource model =
 
         KeyDown code ->
             let
-                (calendarModel, cmd) =
+                ( calendarModel, cmd ) =
                     case code of
                         39 ->
                             calendarAction model CalMsg.PageForward
@@ -100,7 +112,7 @@ update msgSource model =
                             calendarAction model CalMsg.PageBack
 
                         _ ->
-                            (model, Cmd.none)
+                            ( model, Cmd.none )
 
                 updatedModel =
                     { calendarModel | secret = Secret.update code model.secret }
@@ -129,9 +141,9 @@ update msgSource model =
 
         ClickToday ->
             model.date
-            |> Maybe.withDefault (Time.millisToPosix 0)
-            |> CalMsg.ChangeViewing
-            |> calendarAction model
+                |> Maybe.withDefault (Time.millisToPosix 0)
+                |> CalMsg.ChangeViewing
+                |> calendarAction model
 
         LoadGroup slug ->
             let
@@ -146,11 +158,7 @@ update msgSource model =
                 state =
                     if (model.loading == False) && (model.loop == False) then
                         ( { model | loading = True, loop = True }
-                        , Cmd.batch
-                            [ createPlanningRequest model.calendarState.viewing model.selectedGroup.slug
-                            , Process.sleep (1 * 1000)
-                                |> Task.perform StopReloadIcon
-                            ]
+                        , queryReload (createPlanningRequest model.calendarState.viewing model.selectedGroup.slug model.settings)
                         )
 
                     else
@@ -162,11 +170,39 @@ update msgSource model =
             ( { model | loop = False }, Cmd.none )
 
         ToggleMenu ->
-            ( { model | menuOpened = not model.menuOpened }, Cmd.none )
+            let
+                s =
+                    model.settings
+
+                newSettings =
+                    { s | menuOpened = not s.menuOpened }
+            in
+            ( { model | settings = newSettings }, Cmd.none )
+
+        ChangeMode mode ->
+            calendarAction model (CalMsg.ChangeTimeSpan mode)
+
+        CheckEvents type_ checked ->
+            let
+                s =
+                    model.settings
+
+                newSettings =
+                    case type_ of
+                        Hack2g2 ->
+                            { s | showHack2g2 = checked }
+
+                        Custom ->
+                            { s | showCustom = checked }
+
+                cmd =
+                    createPlanningRequest model.calendarState.viewing model.selectedGroup.slug newSettings
+            in
+            ( { model | loading = True, loop = True, settings = newSettings }, queryReload cmd )
 
 
-createPlanningRequest : Posix -> String -> Cmd Msg
-createPlanningRequest date slug =
+createPlanningRequest : Posix -> String -> Settings -> Cmd Msg
+createPlanningRequest date slug settings =
     let
         dateFrom =
             date
@@ -182,7 +218,7 @@ createPlanningRequest date slug =
                 |> TimeExtra.ceiling TimeExtra.Sunday europe__paris
                 |> toDatetime
     in
-    sendRequest dateFrom dateTo [ slug ]
+    sendRequest dateFrom dateTo [ slug ] settings
 
 
 find : (a -> Bool) -> List a -> Maybe a
@@ -207,7 +243,7 @@ calendarAction model calMsg =
 
         ( cmd, loading ) =
             if Time.toMonth europe__paris updatedCalendar.viewing /= Time.toMonth europe__paris model.calendarState.viewing then
-                ( createPlanningRequest updatedCalendar.viewing model.selectedGroup.slug
+                ( createPlanningRequest updatedCalendar.viewing model.selectedGroup.slug model.settings
                 , True
                 )
 
@@ -222,3 +258,12 @@ calendarAction model calMsg =
                 updatedCalendar
     in
     ( { model | calendarState = updatedCalWithJourFerie, loading = loading }, cmd )
+
+
+queryReload : Cmd.Cmd Msg -> Cmd.Cmd Msg
+queryReload action =
+    Cmd.batch
+        [ action
+        , Process.sleep (1 * 1000)
+            |> Task.perform StopReloadIcon
+        ]
