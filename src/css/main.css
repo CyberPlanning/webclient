@@ -27,6 +27,18 @@ body, button, a {
   color: var(--text-color);
 }
 
+button {
+  border: 0;
+  border-radius: 0;
+  background-color: transparent;
+  cursor: pointer;
+  padding: 5px 15px;
+}
+
+button:hover {
+  background-color: var(--accent-color);
+}
+
 .hidden {
   display: none !important;
 }
@@ -72,8 +84,7 @@ body, button, a {
   white-space: nowrap;
 }
 
-.main--navigatiors-button,
-.main--selector-select {
+.main--navigatiors-button {
   border: 0;
   background-color: transparent;
   font-size: 1rem;
@@ -81,14 +92,16 @@ body, button, a {
   vertical-align: top;
 }
 
-.main--navigatiors-button:hover,
-.main--selector-select:hover {
+.main--navigatiors-button:hover {
   background-color: var(--accent-color);
 }
 
-/* .main--navigatiors-reload {
-  font-size: 1.00em;
-} */
+button:focus,
+select:focus,
+option:focus,
+input:focus {
+  outline-color: var(--accent-color);
+}
 
 .main--navigatiors-reload i {
   display: block;
@@ -116,14 +129,12 @@ body, button, a {
 }
 
 .main--navigatiors-today {
-  border: 0;
   padding: 0 8px;
   text-transform: uppercase;
   font-weight: 500;
   font-size: 0.9rem;
   background-color: var(--accent-color);
   border-radius: 5px;
-  cursor: pointer;
   vertical-align: top;
 }
 
@@ -131,14 +142,8 @@ body, button, a {
   background-color: var(--accent-color-dark);
 }
 
-.main--paginators,
-.main--selector {
+.main--paginators {
   z-index: 1;
-}
-
-.main--selector-select {
-  appearance: none;
-  padding: 0 5px;
 }
 
 .main--message {

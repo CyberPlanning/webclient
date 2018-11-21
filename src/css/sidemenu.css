@@ -1,0 +1,13 @@
+.sidemenu--main {
+    padding: 15px;
+}
+
+.sidemenu--selector {
+  border: 0;
+  padding: 2px;
+  background-color: var(--accent-color);
+  font-size: 1rem;
+  cursor: pointer;
+  vertical-align: top;
+}
+

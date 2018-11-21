@@ -3,8 +3,10 @@ import './css/colors.css';
 import './css/main.css';
 import './css/tooltip.css';
 import './css/calendar.css';
+import './css/sidemenu.css';
 import './css/secret.css';
 import './css/cybericons.css';
+import './css/material-checkbox.css';
 import {
     Elm
 } from './Main.elm';
