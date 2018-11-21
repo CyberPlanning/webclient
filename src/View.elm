@@ -63,7 +63,6 @@ viewToolbar selected viewing all loop =
     div [ class "main--toolbar" ]
         [ viewPagination all loop
         , viewTitle viewing
-        , viewSentance
         ]
 
 
@@ -122,15 +121,6 @@ formatDateTitle date =
                 |> String.fromInt
     in
     monthName ++ " " ++ year
-
-
-viewSentance: Html Msg
-viewSentance =
-    div [ style "color" "grey"
-        , style "font-size" "14px"
-        ]
-        [ text "I'm not going to be the person I'm expected to be anymore.." ]
-
 
 
 viewPagination : Bool -> Bool -> Html Msg
