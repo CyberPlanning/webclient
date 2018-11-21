@@ -46,6 +46,7 @@
   align-content: stretch;
   justify-content: space-around;
   flex: 1;
+  min-width: 0;
 }
 
 .calendar--date-header {
@@ -80,6 +81,8 @@
   font-size: 15px;
   line-height: 26px;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .calendar--day {

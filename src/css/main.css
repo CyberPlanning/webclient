@@ -55,7 +55,6 @@ body, button, a {
 }
 
 .main--month-title {
-  cursor: pointer;
   position: absolute;
   top: 0;
   left: 0;
