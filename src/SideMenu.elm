@@ -2,8 +2,8 @@ module SideMenu exposing (view)
 
 import Calendar.Msg exposing (TimeSpan(..))
 import Config exposing (allGroups)
-import Html exposing (Html, div, select, text, option, button, input, label)
-import Html.Attributes exposing (class, id, multiple, value, style, type_, for, checked)
+import Html exposing (Html, div, select, text, option, button, input, label, i, span, a)
+import Html.Attributes exposing (class, id, multiple, value, style, type_, for, checked, title)
 import Html.Events exposing (on, onClick, onCheck, targetValue)
 import Json.Decode as Json
 import Model exposing (Group, Settings)
@@ -12,14 +12,26 @@ import Msg exposing (Msg(..))
 
 view : Group -> TimeSpan -> Settings -> Html Msg
 view group timespan { menuOpened, showCustom, showHack2g2 } =
-    div [ class "sidemenu--main", style "display" (if menuOpened then "block" else "none" ) ]
-        [ viewSelector group
-        , hack2g2Checkbox showHack2g2
-        , customCheckbox showCustom
-        , modeButton Week "Week"
-        , modeButton AllWeek "All Week"
-        , modeButton Day "Day"
+    div [ class "sidemenu--container", style "display" (if menuOpened then "flex" else "none" ) ]
+        [ div
+            [ class "sidemenu--main" ]
+            [ viewSelector group
+            , hack2g2Checkbox showHack2g2
+            , customCheckbox showCustom
+            , modeButton Week "Week"
+            , modeButton AllWeek "All Week"
+            , modeButton Day "Day"
+            ]
+        , div
+            [ class "sidemenu--footer" ]
+            [ div
+                [ class "sidemenu--footer-content" ]
+                [ a [ title "Click me" ] [ i [ class "icon-unsecure" ] [] ]
+                , span [] [ text "Secured by CP" ]
+                ]
+            ]
         ]
+    
 
 
 viewSelector : Group -> Html Msg
