@@ -20,9 +20,8 @@ type Msg
     | SetCalendarState Calendar.Msg
     | SwipeEvent Swipe.Msg
     | ClickToday
-    | LoadGroup String
-    | SavedGroup String
     | ToggleMenu
     | StopReloadIcon ()
     | ChangeMode Calendar.TimeSpan
     | CheckEvents CustomEvent Bool
+    | Reload

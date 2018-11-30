@@ -11,17 +11,44 @@ import {
     Elm
 } from './Main.elm';
 // import registerServiceWorker from './service/registerServiceWorker';
+const storageKeyGroup = "group";
+const storageKeySettings = "settings";
+
+const urlParams = new URLSearchParams(window.location.search);
+const urlGroup = urlParams.get('g');
+
+const localGroup = urlGroup || localStorage.getItem(storageKeyGroup) || "";
+const localSettings = (function() {
+    const s = localStorage.getItem(storageKeySettings);
+    if (s == undefined) {
+        return {
+            showHack2g2: true,
+            showCustom: true,
+            menuOpened: true,
+        }
+    }
+    try {
+        return JSON.parse(s)
+    } catch (error) {
+        return {
+            showHack2g2: true,
+            showCustom: true,
+            menuOpened: true,
+        }
+    }
+})()
 
 const app = Elm.Main.init({
-    node: document.getElementById('root')
+    node: document.getElementById('root'),
+    flags: {
+        group: localGroup,
+        settings: localSettings,
+    }
 });
-const storageKey = "group";
-app.ports.save.subscribe(function (value) {
-    localStorage.setItem(storageKey, value);
-    app.ports.saved.send("ok");
-});
-app.ports.doload.subscribe(function () {
-    app.ports.load.send(localStorage.getItem(storageKey) || "");
+
+app.ports.save.subscribe(function ({group, settings}) {
+    localStorage.setItem(storageKeyGroup, group);
+    localStorage.setItem(storageKeySettings, JSON.stringify(settings));
 });
 
 // registerServiceWorker();

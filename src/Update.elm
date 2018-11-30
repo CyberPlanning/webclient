@@ -1,10 +1,10 @@
-module Update exposing (calendarAction, createPlanningRequest, find, update)
+module Update exposing (calendarAction, createPlanningRequest, update)
 
 import Browser.Dom
 import Calendar.Calendar as Calendar
 import Calendar.Msg as CalMsg exposing (TimeSpan(..))
 import Config exposing (allGroups)
-import Model exposing (CustomEvent(..), Model, Settings, toCalEvents, toDatetime)
+import Model exposing (CustomEvent(..), Model, Settings)
 import Msg exposing (Msg(..))
 import Process
 import Query exposing (sendRequest)
@@ -15,6 +15,7 @@ import Task
 import Time exposing (Posix)
 import Time.Extra as TimeExtra
 import TimeZone exposing (europe__paris)
+import Utils exposing (find, toCalEvents, toDatetime)
 
 
 
@@ -71,8 +72,11 @@ update msgSource model =
                                 ++ hack2g2Events
                                 ++ customEvents
                                 |> Just
+
+                        cmd =
+                            Task.attempt (always Noop) (Browser.Dom.blur "groupSelect")
                     in
-                    ( { model | data = allEvents, loading = False, error = Nothing }, Task.attempt (always Noop) (Browser.Dom.blur "groupSelect") )
+                    ( { model | data = allEvents, loading = False, error = Nothing }, cmd )
 
                 Err err ->
                     ( { model | error = Just err, loading = False }, Cmd.none )
@@ -82,8 +86,23 @@ update msgSource model =
                 group =
                     find (\x -> x.slug == slug) allGroups
                         |> Maybe.withDefault { slug = "12", name = "Cyber1 TD2" }
+
+                storage =
+                    { group = slug
+                    , settings = model.settings
+                    }
+
+                ( load, action ) =
+                    if (model.loading == False) && (model.loop == False) then
+                        ( True, queryReload (createPlanningRequest model.calendarState.viewing slug model.settings) )
+
+                    else
+                        ( False, Cmd.none )
             in
-            ( { model | selectedGroup = group }, Storage.save slug )
+            ( { model | selectedGroup = group, loading = True, loop = True }, Cmd.batch [ Storage.save storage, action ] )
+
+        Reload ->
+            ( { model | loading = True, loop = True }, queryReload (createPlanningRequest model.calendarState.viewing model.selectedGroup.slug model.settings) )
 
         SetCalendarState calendarMsg ->
             let
@@ -99,7 +118,7 @@ update msgSource model =
             calendarAction model CalMsg.PageBack
 
         WindowSize view ->
-            ( { model | size = { width = floor view.viewport.width, height = floor view.viewport.height } }, Storage.doload () )
+            ( { model | size = { width = floor view.viewport.width, height = floor view.viewport.height } }, Task.perform SetDate Time.now )
 
         KeyDown code ->
             let
@@ -145,27 +164,6 @@ update msgSource model =
                 |> CalMsg.ChangeViewing
                 |> calendarAction model
 
-        LoadGroup slug ->
-            let
-                group =
-                    find (\x -> x.slug == slug) allGroups
-                        |> Maybe.withDefault { slug = "12", name = "Cyber1 TD2" }
-            in
-            ( { model | selectedGroup = group }, Task.perform SetDate Time.now )
-
-        SavedGroup ok ->
-            let
-                state =
-                    if (model.loading == False) && (model.loop == False) then
-                        ( { model | loading = True, loop = True }
-                        , queryReload (createPlanningRequest model.calendarState.viewing model.selectedGroup.slug model.settings)
-                        )
-
-                    else
-                        ( model, Cmd.none )
-            in
-            state
-
         StopReloadIcon _ ->
             ( { model | loop = False }, Cmd.none )
 
@@ -176,8 +174,13 @@ update msgSource model =
 
                 newSettings =
                     { s | menuOpened = not s.menuOpened }
+
+                storage =
+                    { group = model.selectedGroup.slug
+                    , settings = newSettings
+                    }
             in
-            ( { model | settings = newSettings }, Cmd.none )
+            ( { model | settings = newSettings }, Storage.save storage )
 
         ChangeMode mode ->
             calendarAction model (CalMsg.ChangeTimeSpan mode)
@@ -195,8 +198,16 @@ update msgSource model =
                         Custom ->
                             { s | showCustom = checked }
 
+                storage =
+                    { group = model.selectedGroup.slug
+                    , settings = newSettings
+                    }
+
                 cmd =
-                    createPlanningRequest model.calendarState.viewing model.selectedGroup.slug newSettings
+                    Cmd.batch
+                        [ createPlanningRequest model.calendarState.viewing model.selectedGroup.slug newSettings
+                        , Storage.save storage
+                        ]
             in
             ( { model | loading = True, loop = True, settings = newSettings }, queryReload cmd )
 
@@ -219,20 +230,6 @@ createPlanningRequest date slug settings =
                 |> toDatetime
     in
     sendRequest dateFrom dateTo [ slug ] settings
-
-
-find : (a -> Bool) -> List a -> Maybe a
-find predicate list =
-    case list of
-        [] ->
-            Nothing
-
-        first :: rest ->
-            if predicate first then
-                Just first
-
-            else
-                find predicate rest
 
 
 calendarAction : Model -> CalMsg.Msg -> ( Model, Cmd Msg )

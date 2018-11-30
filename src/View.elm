@@ -8,7 +8,8 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (on, onClick, targetValue)
 import Http
 import Json.Decode as Json
-import Model exposing (Group, Model, toDatetime)
+import Model exposing (Group, Model)
+import Utils exposing (toDatetime)
 import Msg exposing (Msg(..))
 import Secret
 import Secret.Help
@@ -157,7 +158,7 @@ reloadButton loop =
             , ( "main--navigatiors-reload", True )
             , ( "loop", loop )
             ]
-        , onClick (SavedGroup "ok")
+        , onClick Reload
         ]
         [ i [ class "icon-reload" ] []
         ]
