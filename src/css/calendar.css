@@ -9,10 +9,6 @@
   background-color: var(--background-color);
 }
 
-.calendar--dates-header > .calendar--time-gutter {
-  width: 51px;
-}
-
 .calendar--time-slot-group {
   min-height: 30px;
   display: flex;

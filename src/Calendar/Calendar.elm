@@ -23,6 +23,7 @@ init timeSpan viewing =
     { timeSpan = timeSpan
     , viewing = viewing
     , hover = Nothing
+    , position = Nothing
     , selected = Nothing
     , joursFeries = getAllJourFerie (Time.toYear europe__paris viewing)
     }
@@ -53,8 +54,8 @@ update msg state =
         EventClick eventId ->
             { state | selected = Just eventId }
 
-        EventMouseEnter eventId ->
-            { state | hover = Just eventId }
+        EventMouseEnter eventId pos ->
+            { state | hover = Just eventId, position = Just pos }
 
         EventMouseLeave eventId ->
             { state | hover = Nothing }

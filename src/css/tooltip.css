@@ -4,7 +4,7 @@
     font-size: 15px;
     width: 70%;
     max-width: 250px;
-    bottom: 0;
+    /* bottom: 0; */
     border-radius: 5px;
     color: white;
     border: 1px solid black;
@@ -27,6 +27,6 @@
     color: white;
 }
 
-.tooltip--event-sub:first-child() {
+/* .tooltip--event-sub:first-child() {
     border: 0;
-}
+} */

@@ -74,7 +74,7 @@ update msgSource model =
                                 |> Just
 
                         cmd =
-                            Task.attempt (always Noop) (Browser.Dom.blur "groupSelect")
+                            Task.attempt (always Noop) (Browser.Dom.blur "select-group")
                     in
                     ( { model | data = allEvents, loading = False, error = Nothing }, cmd )
 

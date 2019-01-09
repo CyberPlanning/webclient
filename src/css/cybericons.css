@@ -1,11 +1,9 @@
 @font-face {
   font-family: 'cybericons';
   src: url('font/cybericons.eot?21557874');
-  src: url('font/cybericons.eot?21557874#iefix') format('embedded-opentype'),
-       url('font/cybericons.woff2?21557874') format('woff2'),
+  src: url('font/cybericons.woff2?21557874') format('woff2'),
        url('font/cybericons.woff?21557874') format('woff'),
-       url('font/cybericons.ttf?21557874') format('truetype'),
-       url('font/cybericons.svg?21557874#cybericons') format('svg');
+       url('font/cybericons.ttf?21557874') format('truetype');
   font-weight: normal;
   font-style: normal;
 }

@@ -50,7 +50,7 @@ view model =
                     , Html.map SetCalendarState (Calendar.view events model.calendarState)
                     ]
                 , viewMessage model
-                , Tooltip.viewTooltip model.calendarState.hover events
+                , Tooltip.viewTooltip model.calendarState.hover model.calendarState.position events
                 , funThings
                 ]
     in
@@ -130,11 +130,11 @@ viewPagination all loop =
         navigations =
             if all then
                 [ navButton
-                    [ class "main--navigatiors-button", onClick PageBack ]
+                    [ class "main--navigatiors-button", onClick PageBack, attribute "aria-label" "Previous Page" ]
                     [ i [ class "icon-left" ] []
                     ]
                 , navButton
-                    [ class "main--navigatiors-button", onClick PageForward ]
+                    [ class "main--navigatiors-button", onClick PageForward, attribute "aria-label" "Next Page" ]
                     [ i [ class "icon-right" ] []
                     ]
                 ]
@@ -145,7 +145,7 @@ viewPagination all loop =
     div [ class "main--paginators" ]
         (viewMenuButton
             :: navigations
-            ++ [ navButton [ class "main--navigatiors-today", onClick ClickToday ] [ text "aujourd'hui" ]
+            ++ [ navButton [ class "main--navigatiors-today", onClick ClickToday, attribute "aria-label" "Today" ] [ text "aujourd'hui" ]
                , reloadButton loop
                ]
         )
@@ -159,6 +159,7 @@ reloadButton loop =
             , ( "loop", loop )
             ]
         , onClick Reload
+        , attribute "aria-label" "Reload"
         ]
         [ i [ class "icon-reload" ] []
         ]
@@ -167,7 +168,7 @@ reloadButton loop =
 viewMenuButton : Html Msg
 viewMenuButton =
     navButton
-        [ class "main--navigatiors-button", onClick ToggleMenu ]
+        [ class "main--navigatiors-button", onClick ToggleMenu, attribute "aria-label" "Toggle Menu" ]
         [ i [ class "icon-menu" ] []
         ]
 

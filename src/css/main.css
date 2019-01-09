@@ -22,7 +22,7 @@ body {
   background-color: var(--body-color);
 }
 
-body, button, a {
+body, button, a, input, select {
   font-family: 'Roboto', Helvetica, Arial, sans-serif;
   color: var(--text-color);
 }
@@ -67,11 +67,6 @@ button:hover {
 }
 
 .main--month-title {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
   display: flex;
   flex: 1;
   justify-content: center;
@@ -162,5 +157,19 @@ input:focus {
 
   to {
     transform: rotate(360deg);
+  }
+}
+
+@media only screen and (max-width: 550px) {
+  .main--month-title {
+      position: relative;
+  }
+
+  .main--month-title h2 {
+      font-size: 1rem;
+  }
+  
+  .main--navigatiors-today {
+      font-size: 0.8rem;
   }
 }

@@ -1,6 +1,7 @@
 module Tooltip exposing (viewTooltip)
 
 import Calendar.Event as CalEvent
+import Calendar.Msg exposing (Position)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Msg exposing (Msg(..))
@@ -8,15 +9,15 @@ import Time exposing (Posix)
 import TimeZone exposing (europe__paris)
 
 
-viewTooltip : Maybe String -> List CalEvent.Event -> Html Msg
-viewTooltip selectedId events =
+viewTooltip : Maybe String -> Maybe Position -> List CalEvent.Event -> Html Msg
+viewTooltip selectedId maybePos events =
     let
         content =
             case selectedId of
                 Just id ->
                     List.filter (\e -> e.toId == id) events
                         |> List.head
-                        |> viewTooltipContent
+                        |> viewTooltipContent maybePos
 
                 _ ->
                     []
@@ -24,11 +25,11 @@ viewTooltip selectedId events =
     div [ class "tooltip" ] content
 
 
-viewTooltipContent : Maybe CalEvent.Event -> List (Html Msg)
-viewTooltipContent maybeEvent =
+viewTooltipContent : Maybe Position -> Maybe CalEvent.Event -> List (Html Msg)
+viewTooltipContent maybePos maybeEvent =
     case maybeEvent of
         Just event ->
-            [ div [ class "tooltip--event", tooltipStyle event.color ]
+            [ div ( [ class "tooltip--event" ] ++ tooltipStyle event.color maybePos)
                 ([ div [ class "tooltip--event-title" ] [ text event.title ]
                  , div [ classList [ ( "tooltip--event-sub", True ), ( "tooltip--event-hours", True ) ] ] [ viewHour event ]
                  ]
@@ -46,9 +47,27 @@ showIfNotEmpty data =
         |> List.map (\e -> div [ class "tooltip--event-sub" ] [ text e ])
 
 
-tooltipStyle : String -> Html.Attribute Msg
-tooltipStyle color =
-    style "background-color" color
+tooltipStyle : String -> Maybe Position -> List (Html.Attribute Msg)
+tooltipStyle color maybePos =
+    let
+        absoluteCoords =
+            case maybePos of
+                Just pos ->
+                    let
+                        posX =
+                            pos.x + 5
+                            |> String.fromInt
+                        posY =
+                            pos.y + 5
+                            |> String.fromInt
+                    in
+                    [ style "left" (posX ++ "px"), style "top" ( posY ++ "px") ]
+
+                _ ->
+                    [ style "bottom" "0" ]
+    in
+    [ style "background-color" color ]
+        ++ absoluteCoords
 
 
 viewHour : CalEvent.Event -> Html Msg

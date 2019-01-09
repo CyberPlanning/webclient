@@ -1,13 +1,13 @@
 module Calendar.Event exposing (Event, EventRange(..), cellWidth, eventSegment, eventStyling, maybeViewDayEvent, offsetLength, offsetPercentage, percentDay, rangeDescription, rowSegment, styleDayEvent, styleRowSegment)
 
 import Calendar.Helpers as Helpers
-import Calendar.Msg exposing (Msg(..), TimeSpan(..))
+import Calendar.Msg exposing (Msg(..), TimeSpan(..), onMouseEnter)
 import Html exposing (..)
 import Html.Attributes exposing (attribute, class, classList, style)
-import Html.Events exposing (..)
+import Html.Events exposing (onMouseLeave, onClick)
 import Iso8601
 import String
-import String.Extra
+-- import String.Extra
 import Time exposing (Posix, Weekday(..))
 import Time.Extra as TimeExtra
 import TimeZone exposing (europe__paris)
@@ -163,7 +163,7 @@ eventSegment event selectedId eventRange =
     div
         ([ onMouseEnter <| EventMouseEnter eventId
          , onMouseLeave <| EventMouseLeave eventId
-         , onClick <| EventMouseEnter eventId
+        --  , onClick <| EventMouseEnter eventId
          ]
             ++ eventStyling event eventRange classes
         )
@@ -230,8 +230,9 @@ isBetween start end current =
 
 escapeTitle : String -> String
 escapeTitle =
-    String.Extra.removeAccents
-        >> String.Extra.underscored
+    always ""
+    -- String.Extra.removeAccents
+        -- >> String.Extra.underscored
 
 
 weekdayToNumber : Weekday -> Int
