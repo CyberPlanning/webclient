@@ -58,7 +58,7 @@ view model =
                     , Html.map SetCalendarState (Calendar.view events model.calendarState)
                     ]
                 , viewMessage model
-                , Tooltip.viewTooltip currentEvent model.calendarState.position events model.size.width
+                , Tooltip.viewTooltip currentEvent model.calendarState.position events model.size
                 , funThings
                 ]
     in
