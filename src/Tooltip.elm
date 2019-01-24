@@ -9,15 +9,15 @@ import Time exposing (Posix)
 import TimeZone exposing (europe__paris)
 
 
-viewTooltip : Maybe String -> Maybe Position -> List CalEvent.Event -> Html Msg
-viewTooltip selectedId maybePos events =
+viewTooltip : Maybe String -> Maybe Position -> List CalEvent.Event -> Int -> Html Msg
+viewTooltip selectedId maybePos events screenWidth =
     let
         content =
             case selectedId of
                 Just id ->
                     List.filter (\e -> e.toId == id) events
                         |> List.head
-                        |> viewTooltipContent maybePos
+                        |> viewTooltipContent maybePos screenWidth
 
                 _ ->
                     []
@@ -25,11 +25,11 @@ viewTooltip selectedId maybePos events =
     div [ class "tooltip" ] content
 
 
-viewTooltipContent : Maybe Position -> Maybe CalEvent.Event -> List (Html Msg)
-viewTooltipContent maybePos maybeEvent =
+viewTooltipContent : Maybe Position -> Int -> Maybe CalEvent.Event -> List (Html Msg)
+viewTooltipContent maybePos screenWidth maybeEvent =
     case maybeEvent of
         Just event ->
-            [ div ( [ class "tooltip--event" ] ++ tooltipStyle event.color maybePos)
+            [ div ( [ class "tooltip--event" ] ++ tooltipStylePos event.color maybePos screenWidth)
                 ([ div [ class "tooltip--event-title" ] [ text event.title ]
                  , div [ classList [ ( "tooltip--event-sub", True ), ( "tooltip--event-hours", True ) ] ] [ viewHour event ]
                  ]
@@ -47,18 +47,20 @@ showIfNotEmpty data =
         |> List.map (\e -> div [ class "tooltip--event-sub" ] [ text e ])
 
 
-tooltipStyle : String -> Maybe Position -> List (Html.Attribute Msg)
-tooltipStyle color maybePos =
+tooltipStylePos : String -> Maybe Position -> Int -> List (Html.Attribute Msg)
+tooltipStylePos color maybePos screenWidth =
     let
         absoluteCoords =
             case maybePos of
                 Just pos ->
                     let
                         posX =
-                            pos.x + 5
+                            pos.x
+                            |> Basics.min (screenWidth - 252)
+                            |> Basics.max 0
                             |> String.fromInt
                         posY =
-                            pos.y + 5
+                            pos.y
                             |> String.fromInt
                     in
                     [ style "left" (posX ++ "px"), style "top" ( posY ++ "px") ]

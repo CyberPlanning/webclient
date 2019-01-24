@@ -2,12 +2,14 @@
 .tooltip--event {
     position: absolute;
     font-size: 15px;
-    width: 70%;
-    max-width: 250px;
+    width: 250px;
     /* bottom: 0; */
     border-radius: 5px;
     color: white;
     border: 1px solid black;
+
+    pointer-events: none;
+    user-select: none;
 }
 
 .tooltip--event-title {

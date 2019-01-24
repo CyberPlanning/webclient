@@ -113,6 +113,7 @@
   cursor: pointer;
   overflow: hidden;
   border-bottom: 1px solid var(--border-color);
+  user-select: none;
 }
 
 .calendar--event-title {
