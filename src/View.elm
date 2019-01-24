@@ -3,13 +3,13 @@ module View exposing (view)
 import Browser exposing (Document)
 import Calendar.Calendar as Calendar
 import Calendar.Msg exposing (TimeSpan(..))
+import Config
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (on, onClick, targetValue)
 import Http
 import Json.Decode as Json
 import Model exposing (Group, Model)
-import Utils exposing (toDatetime)
 import Msg exposing (Msg(..))
 import Secret
 import Secret.Help
@@ -18,6 +18,7 @@ import Swipe exposing (onSwipe)
 import Time exposing (Month(..), Posix)
 import TimeZone exposing (europe__paris)
 import Tooltip
+import Utils exposing (toDatetime)
 
 
 
@@ -39,6 +40,13 @@ view model =
                 ++ [ class "main--container" ]
                 ++ Secret.classStyle model.secret
 
+        currentEvent =
+            if model.size.width < Config.minWeekWidth then
+                model.calendarState.selected
+
+            else
+                model.calendarState.hover
+
         funThings =
             Secret.view model.secret
 
@@ -50,7 +58,7 @@ view model =
                     , Html.map SetCalendarState (Calendar.view events model.calendarState)
                     ]
                 , viewMessage model
-                , Tooltip.viewTooltip model.calendarState.hover model.calendarState.position events model.size.width
+                , Tooltip.viewTooltip currentEvent model.calendarState.position events model.size.width
                 , funThings
                 ]
     in
@@ -149,6 +157,7 @@ viewPagination all loop =
                , reloadButton loop
                ]
         )
+
 
 reloadButton : Bool -> Html Msg
 reloadButton loop =

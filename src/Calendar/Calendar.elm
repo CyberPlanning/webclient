@@ -51,14 +51,14 @@ update msg state =
         ChangeViewing viewing ->
             { state | viewing = viewing }
 
-        EventClick eventId ->
-            { state | selected = Just eventId }
+        EventClick eventId pos ->
+            { state | selected = Just eventId, position = Just pos }
 
         EventMouseEnter eventId pos ->
             { state | hover = Just eventId, position = Just pos }
 
         EventMouseLeave eventId ->
-            { state | hover = Nothing }
+            { state | hover = Nothing, selected = Nothing }
 
 
 page : Int -> State -> State
@@ -78,7 +78,7 @@ page step state =
                 Day ->
                     TimeExtra.Day
     in
-    { state | viewing = TimeExtra.add interval step europe__paris viewing, hover = Nothing }
+    { state | viewing = TimeExtra.add interval step europe__paris viewing, hover = Nothing, selected = Nothing }
 
 
 view : List Event -> State -> Html Msg

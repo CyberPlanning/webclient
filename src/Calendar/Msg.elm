@@ -1,4 +1,4 @@
-module Calendar.Msg exposing (InternalState, Msg(..), TimeSpan(..), Position, position, onMouseEnter)
+module Calendar.Msg exposing (InternalState, Msg(..), TimeSpan(..), Position, position, onMouseEnter, onClick)
 
 import Dict exposing (Dict)
 import Time exposing (Posix)
@@ -20,7 +20,7 @@ type Msg
     | WeekBack
     | ChangeTimeSpan TimeSpan
     | ChangeViewing Posix
-    | EventClick String
+    | EventClick String Position
     | EventMouseEnter String Position
     | EventMouseLeave String
 
@@ -53,3 +53,8 @@ position =
 onMouseEnter : (Position -> msg) -> Attribute msg
 onMouseEnter msg =
     on "mouseenter" (Json.map msg position)
+
+
+onClick : (Position -> msg) -> Attribute msg
+onClick msg =
+    on "click" (Json.map msg position)

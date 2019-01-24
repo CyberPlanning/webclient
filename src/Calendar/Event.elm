@@ -1,10 +1,10 @@
 module Calendar.Event exposing (Event, EventRange(..), cellWidth, eventSegment, eventStyling, maybeViewDayEvent, offsetLength, offsetPercentage, percentDay, rangeDescription, rowSegment, styleDayEvent, styleRowSegment)
 
 import Calendar.Helpers as Helpers
-import Calendar.Msg exposing (Msg(..), TimeSpan(..), onMouseEnter)
+import Calendar.Msg exposing (Msg(..), TimeSpan(..), onMouseEnter, onClick)
 import Html exposing (..)
 import Html.Attributes exposing (attribute, class, classList, style)
-import Html.Events exposing (onMouseLeave, onClick)
+import Html.Events exposing (onMouseLeave)
 import Iso8601
 import String
 -- import String.Extra
@@ -163,7 +163,7 @@ eventSegment event selectedId eventRange =
     div
         ([ onMouseEnter <| EventMouseEnter eventId
          , onMouseLeave <| EventMouseLeave eventId
-        --  , onClick <| EventMouseEnter eventId
+         , onClick <| EventClick eventId
          ]
             ++ eventStyling event eventRange classes
         )
