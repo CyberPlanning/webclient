@@ -4,10 +4,10 @@ import Calendar.Event as CalEvent
 import Calendar.Msg exposing (Position)
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import Model exposing (WindowSize)
 import Msg exposing (Msg(..))
 import Time exposing (Posix)
 import TimeZone exposing (europe__paris)
-import Model exposing(WindowSize)
 
 
 viewTooltip : Maybe String -> Maybe Position -> List CalEvent.Event -> WindowSize -> Html Msg
@@ -30,11 +30,21 @@ viewTooltipContent : Maybe Position -> WindowSize -> Maybe CalEvent.Event -> Lis
 viewTooltipContent maybePos screenSize maybeEvent =
     case maybeEvent of
         Just event ->
-            [ div ( [ class "tooltip--event" ] ++ tooltipStylePos event.color maybePos screenSize)
-                ([ div [ class "tooltip--event-title" ] [ text event.title ]
-                 , div [ classList [ ( "tooltip--event-sub", True ), ( "tooltip--event-hours", True ) ] ] [ viewHour event ]
+            let
+                badge =
+                    if String.isEmpty event.source then
+                        []
+                    else
+                        [ viewBadge event.source event.style ]
+
+                title =
+                    [ text event.title ] ++ badge
+            in
+            [ div ([ class "tooltip--event" ] ++ tooltipStylePos event.style maybePos screenSize)
+                ([ div [ class "tooltip--event-title" ] title
+                 , div [ class "tooltip--event-sub", class "tooltip--event-hours" ] [ viewHour event ]
                  ]
-                    ++ showIfNotEmpty [ String.join "," event.locations, String.join "," event.stakeholders, String.join "," event.groups ]
+                    ++ showIfNotEmpty event.description
                 )
             ]
 
@@ -48,30 +58,32 @@ showIfNotEmpty data =
         |> List.map (\e -> div [ class "tooltip--event-sub" ] [ text e ])
 
 
-tooltipStylePos : String -> Maybe Position -> WindowSize -> List (Html.Attribute Msg)
-tooltipStylePos color maybePos {width, height} =
+tooltipStylePos : CalEvent.Style -> Maybe Position -> WindowSize -> List (Html.Attribute Msg)
+tooltipStylePos { textColor, eventColor } maybePos { width, height } =
     let
         absoluteCoords =
             case maybePos of
                 Just pos ->
                     let
                         posX =
-                            pos.x - 125
-                            |> Basics.min (width - 252)
-                            |> Basics.max 0
-                            |> String.fromInt
+                            pos.x
+                                - 125
+                                |> Basics.min (width - 252)
+                                |> Basics.max 0
+                                |> String.fromInt
+
                         posY =
                             pos.y
-                            |> Basics.min (height - 152)
-                            |> Basics.max 0
-                            |> String.fromInt
+                                |> Basics.min (height - 152)
+                                |> Basics.max 0
+                                |> String.fromInt
                     in
-                    [ style "left" (posX ++ "px"), style "top" ( posY ++ "px") ]
+                    [ style "left" (posX ++ "px"), style "top" (posY ++ "px") ]
 
                 _ ->
                     [ style "bottom" "0" ]
     in
-    [ style "background-color" color ]
+    [ style "background-color" eventColor, style "color" textColor ]
         ++ absoluteCoords
 
 
@@ -81,6 +93,12 @@ viewHour event =
         ++ " - "
         ++ toString event.endTime
         |> text
+
+
+viewBadge : String -> CalEvent.Style -> Html Msg
+viewBadge name { eventColor, textColor } =
+    span [ class "tooltip--event-badge", style "background-color" textColor, style "color" eventColor ]
+        [ text name ]
 
 
 toString : Posix -> String

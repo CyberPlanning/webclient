@@ -1,4 +1,4 @@
-module Calendar.Event exposing (Event, EventRange(..), cellWidth, eventSegment, eventStyling, maybeViewDayEvent, offsetLength, offsetPercentage, percentDay, rangeDescription, rowSegment, styleDayEvent, styleRowSegment)
+module Calendar.Event exposing (Style, Event, EventRange(..), cellWidth, eventSegment, eventStyling, maybeViewDayEvent, offsetLength, offsetPercentage, percentDay, rangeDescription, rowSegment, styleDayEvent, styleRowSegment)
 
 import Calendar.Helpers as Helpers
 import Calendar.Msg exposing (Msg(..), TimeSpan(..), onMouseEnter, onClick)
@@ -13,17 +13,20 @@ import Time.Extra as TimeExtra
 import TimeZone exposing (europe__paris)
 
 
+type alias Style =
+    { eventColor : String
+    , textColor : String
+    }
+
 type alias Event =
     { toId : String
     , title : String
     , startTime : Posix
     , endTime : Posix
-    , locations : List String
-    , stakeholders : List String
-    , groups : List String
-    , color : String
+    , description : List String
+    , source : String
+    , style : Style
     }
-
 
 type EventRange
     = StartsAndEnds
@@ -69,8 +72,11 @@ eventStyling event eventRange customClasses =
         eventEnd =
             event.endTime
 
-        eventColor =
-            event.color
+        colorBg =
+            event.style.eventColor
+
+        colorFg =
+            event.style.textColor
 
         eventTitle =
             escapeTitle event.title
@@ -83,8 +89,16 @@ eventStyling event eventRange customClasses =
                 ExistsOutside ->
                     ""
 
+        extraStyle =
+            if String.isEmpty event.source then
+                []
+            else
+                [ style "border-color" colorFg ]
+
         styles =
-            styleDayEvent eventStart eventEnd eventColor eventTitle
+            styleDayEvent eventStart eventEnd
+            ++ styleColorDayEvent eventTitle colorFg colorBg
+            ++ extraStyle
     in
     [ classList (( classes, True ) :: customClasses) ] ++ styles
 
@@ -109,8 +123,8 @@ percentDay date min max =
     (fractionalDay date - min) / (max - min)
 
 
-styleDayEvent : Posix -> Posix -> String -> String -> List (Html.Attribute msg)
-styleDayEvent start end color title =
+styleDayEvent : Posix -> Posix -> List (Html.Attribute msg)
+styleDayEvent start end =
     let
         startPercent =
             100 * percentDay start (7 / 24) (21 / 24)
@@ -129,9 +143,14 @@ styleDayEvent start end color title =
     , style "left" "2%"
     , style "width" "96%"
     , style "position" "absolute"
-    , style "background-color" color
+    ]
+
+styleColorDayEvent : String -> String -> String -> List (Html.Attribute msg)
+styleColorDayEvent title fg bg =
+    [ style "background-color" bg
+    , style "color" fg
     , attribute "data-title" title
-    , attribute "data-color" color
+    , attribute "data-color" fg
     ]
 
 
@@ -159,6 +178,13 @@ eventSegment event selectedId eventRange =
             [ ( "calendar--event-content", True )
             , ( "calendar--event-content--is-selected", isSelected )
             ]
+
+        title =
+            [ text event.title ]
+
+        childs =
+            List.map viewSub event.description
+        
     in
     div
         ([ onMouseEnter <| EventMouseEnter eventId
@@ -167,16 +193,17 @@ eventSegment event selectedId eventRange =
          ]
             ++ eventStyling event eventRange classes
         )
-        [ div [ class "calendar--event-title" ] [ makeTitle event.title ]
-        , div [ class "calendar--event-sub" ] [ text <| String.join "," event.locations ]
-        , div [ class "calendar--event-sub" ] [ text <| String.join "," event.stakeholders ]
-        , div [ class "calendar--event-sub" ] [ text <| String.join "," event.groups ]
-        ]
+        (( div [ class "calendar--event-title" ] title ) :: childs)
 
 
 makeTitle : String -> Html Msg
 makeTitle title =
     text title
+
+
+viewSub : String -> Html Msg
+viewSub val =
+    div [ class "calendar--event-sub" ] [ text val ]
 
 
 cellWidth : Float

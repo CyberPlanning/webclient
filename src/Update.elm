@@ -15,7 +15,7 @@ import Task
 import Time exposing (Posix)
 import Time.Extra as TimeExtra
 import TimeZone exposing (europe__paris)
-import Utils exposing (find, toCalEvents, toDatetime)
+import Utils exposing (find, toCalEvents, toCalEventsWithSource, toDatetime)
 
 
 
@@ -57,7 +57,7 @@ update msgSource model =
 
                                 Just p ->
                                     p.events
-                                        |> toCalEvents
+                                        |> toCalEventsWithSource "Hack2g2" "#00ff1d"
 
                         customEvents =
                             case query.custom of
@@ -66,7 +66,7 @@ update msgSource model =
 
                                 Just p ->
                                     p.events
-                                        |> toCalEvents
+                                        |> toCalEventsWithSource "Custom" "#d82727"
 
                         allEvents =
                             cyberEvents

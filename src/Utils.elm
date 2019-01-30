@@ -1,16 +1,16 @@
-module Utils exposing (extractTimeIsoString, find, initialModel, toCalEvents, toDatetime)
+module Utils exposing (computeStyle, extractTimeIsoString, find, initialModel, toCalEvents, toCalEventsWithSource, toDatetime)
 
-import Iso8601
-import Model exposing (Settings, Model)
-import Config exposing (allGroups)
-import Secret
-import Swipe
-import Types exposing (Event)
-import Time exposing (Posix)
 import Calendar.Calendar as Calendar
 import Calendar.Event as CalEvent
 import Calendar.Helpers exposing (colorToHex, computeColor, noBright)
 import Calendar.Msg
+import Config exposing (allGroups)
+import Iso8601
+import Model exposing (Model, Settings)
+import Secret
+import Swipe
+import Time exposing (Posix)
+import Types exposing (Event)
 
 
 toDatetime : Posix -> String
@@ -45,16 +45,68 @@ toCalEvents events =
     List.map toCalEvent events
 
 
+toCalEventsWithSource : String -> String -> List Event -> List CalEvent.Event
+toCalEventsWithSource source color events =
+    List.map (toCalEventSource source color) events
+
+
 toCalEvent : Event -> CalEvent.Event
 toCalEvent event =
+    let
+        classes =
+            Maybe.withDefault [] event.classrooms
+
+        teachers =
+            Maybe.withDefault [] event.teachers
+
+        groups =
+            Maybe.withDefault [] event.groups
+
+        description =
+            List.map (String.join ", ") [ classes, teachers, groups ]
+    in
     { toId = event.eventId
     , title = event.title
     , startTime = extractTimeIsoString event.startDate
     , endTime = extractTimeIsoString event.endDate
-    , locations = Maybe.withDefault [] event.classrooms
-    , stakeholders = Maybe.withDefault [] event.teachers
-    , groups = Maybe.withDefault [] event.groups
-    , color = computeColor event.title
+    , description = description
+    , style = computeStyle event.title
+    , source = ""
+    }
+
+
+toCalEventSource : String -> String -> Event -> CalEvent.Event
+toCalEventSource source color event =
+    let
+        classes =
+            Maybe.withDefault [] event.classrooms
+
+        teachers =
+            Maybe.withDefault [] event.teachers
+
+        groups =
+            Maybe.withDefault [] event.groups
+
+        description =
+            List.map (String.join ", ") [ classes, teachers, groups ]
+    in
+    { toId = event.eventId
+    , title = event.title
+    , startTime = extractTimeIsoString event.startDate
+    , endTime = extractTimeIsoString event.endDate
+    , description = description
+    , source = source
+    , style =
+        { textColor = color
+        , eventColor = "black"
+        }
+    }
+
+
+computeStyle : String -> CalEvent.Style
+computeStyle val =
+    { textColor = "white"
+    , eventColor = computeColor val
     }
 
 
