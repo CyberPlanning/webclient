@@ -44,6 +44,7 @@ type alias Settings =
     { showHack2g2 : Bool
     , showCustom : Bool
     , menuOpened : Bool
+    , allWeek : Bool
     }
 
 

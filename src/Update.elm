@@ -35,7 +35,8 @@ update msgSource model =
                         Day
 
                     else
-                        AllWeek
+                        if model.settings.allWeek then AllWeek else Week
+
             in
             ( { model | date = Just date, calendarState = Calendar.init timespan date }
             , createPlanningRequest date model.selectedGroup.slug model.settings
@@ -183,14 +184,33 @@ update msgSource model =
             ( { model | settings = newSettings }, Storage.save storage )
 
         ChangeMode mode ->
-            calendarAction model (CalMsg.ChangeTimeSpan mode)
+            let
+                ( calendarModel, _ ) =
+                    calendarAction model (CalMsg.ChangeTimeSpan mode)
+
+                allWeek =
+                    if mode == AllWeek then True else False
+            
+                s = model.settings
+
+                updatedSettings =
+                    { s | allWeek = allWeek }
+
+                storage =
+                    { group = calendarModel.selectedGroup.slug
+                    , settings = updatedSettings
+                    }
+
+            in
+                ({ calendarModel | settings = updatedSettings }, Storage.save storage)
+            
 
         CheckEvents type_ checked ->
             let
                 s =
                     model.settings
 
-                newSettings =
+                updatedSettings =
                     case type_ of
                         Hack2g2 ->
                             { s | showHack2g2 = checked }
@@ -200,16 +220,16 @@ update msgSource model =
 
                 storage =
                     { group = model.selectedGroup.slug
-                    , settings = newSettings
+                    , settings = updatedSettings
                     }
 
                 cmd =
                     Cmd.batch
-                        [ createPlanningRequest model.calendarState.viewing model.selectedGroup.slug newSettings
+                        [ createPlanningRequest model.calendarState.viewing model.selectedGroup.slug updatedSettings
                         , Storage.save storage
                         ]
             in
-            ( { model | loading = True, loop = True, settings = newSettings }, queryReload cmd )
+            ( { model | loading = True, loop = True, settings = updatedSettings }, queryReload cmd )
 
 
 createPlanningRequest : Posix -> String -> Settings -> Cmd Msg
