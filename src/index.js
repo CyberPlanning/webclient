@@ -3,7 +3,7 @@ import './css/main.css';
 import './css/tooltip.css';
 import './css/calendar.css';
 import './css/sidemenu.css';
-// import './css/secret.css';
+import './css/secret.css';
 import './css/cybericons.css';
 import './css/material-checkbox.css';
 import {
@@ -16,24 +16,24 @@ const storageKeySettings = "settings";
 const urlParams = new URLSearchParams(window.location.search);
 const urlGroup = urlParams.get('g');
 
+const defaultSettings = {
+    showHack2g2: true,
+    showCustom: true,
+    menuOpened: false,
+    allWeek: false,
+}
+
 const localGroup = urlGroup || localStorage.getItem(storageKeyGroup) || "";
 const localSettings = (function() {
     const s = localStorage.getItem(storageKeySettings);
     if (s == undefined) {
-        return {
-            showHack2g2: true,
-            showCustom: true,
-            menuOpened: true,
-        }
+        return defaultSettings
     }
     try {
-        return JSON.parse(s)
+        const data = JSON.parse(s)
+        return {...defaultSettings, ...data}
     } catch (error) {
-        return {
-            showHack2g2: true,
-            showCustom: true,
-            menuOpened: true,
-        }
+        return defaultSettings
     }
 })()
 
