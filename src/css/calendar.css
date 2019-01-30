@@ -23,15 +23,13 @@
 }
 
 .calendar--week {
-  /* display: flex;
-  flex-flow: column nowrap; */
   flex: 1;
   overflow-y: auto;
 }
 
 .calendar--week-content {
   display: flex;
-  overflow-x: hidden;
+  overflow: hidden;
   /* flex: 1; */
   min-height: 100%;
 }
