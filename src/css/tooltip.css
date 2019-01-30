@@ -1,12 +1,10 @@
 
 .tooltip--event {
     position: absolute;
-    font-size: 15px;
+    font-size: 0.9rem;
     width: 250px;
-    /* bottom: 0; */
-    border-radius: 5px;
-    color: white;
-    border: 1px solid black;
+    color: var(--text-color);
+    box-shadow: 1px 1px 5px rgba(0,0,0,0.4);
 
     pointer-events: none;
     user-select: none;
@@ -14,8 +12,17 @@
 
 .tooltip--event-title {
     font-size: 1.3em;
-    border-bottom: 1px solid black;
     padding: 5px;
+}
+
+.tooltip--event-badge {
+    font-weight: 500;
+    font-size: 0.7rem;
+    padding: 1px;
+    border-radius: 3px;
+    margin-left: 6px;
+    vertical-align: baseline;
+    background-color: var(--background-color);
 }
 
 .tooltip--event-hours {
@@ -24,11 +31,7 @@
 }
 
 .tooltip--event-sub {
-    background-color: #373c3d;
-    border-top: 1px solid #404547;
-    color: white;
+    background-color: var(--body-color);
+    border-top: 1px solid var(--border-color);
+    color: var(--text-color);
 }
-
-/* .tooltip--event-sub:first-child() {
-    border: 0;
-} */
