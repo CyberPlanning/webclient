@@ -26,7 +26,7 @@ view group timespan { menuOpened, showCustom, showHack2g2 } =
             [ class "sidemenu--footer" ]
             [ div
                 [ class "sidemenu--footer-content" ]
-                [ a [ title "Click me" ] [ i [ class "icon-secure" ] [] ]
+                [ a [] [ i [ class "icon-secure" ] [] ]
                 , span [] [ text "Secured by CP" ]
                 ]
             ]
