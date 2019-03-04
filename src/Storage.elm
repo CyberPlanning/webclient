@@ -1,10 +1,10 @@
-port module Storage exposing (save, Storage)
+port module Storage exposing (Storage, save)
 
 import Model
 
 
 type alias Storage =
-    { group : String
+    { groupId : Int
     , settings : Model.Settings
     }
 

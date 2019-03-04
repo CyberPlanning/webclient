@@ -3,10 +3,11 @@ module Msg exposing (Msg(..))
 import Browser.Dom exposing (Viewport)
 import Calendar.Msg as Calendar
 import Http exposing (Error)
+import Model exposing (CustomEvent)
 import Swipe
 import Time exposing (Posix)
 import Types exposing (Query)
-import Model exposing(CustomEvent)
+
 
 type Msg
     = Noop

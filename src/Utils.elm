@@ -1,16 +1,32 @@
-module Utils exposing (computeStyle, extractTimeIsoString, find, initialModel, toCalEvents, toCalEventsWithSource, toDatetime)
+module Utils exposing (computeStyle, extractTimeIsoString, find, getGroup, groupId, initialModel, toCalEvents, toCalEventsWithSource, toDatetime)
 
 import Calendar.Calendar as Calendar
 import Calendar.Event as CalEvent
 import Calendar.Helpers exposing (colorToHex, computeColor, noBright)
 import Calendar.Msg
-import Config exposing (allGroups)
+import Config exposing (allGroups, firstGroup)
 import Iso8601
-import Model exposing (Model, Settings)
+import Model exposing (Collection(..), Group, Model, Settings)
 import Secret
 import Swipe
 import Time exposing (Posix)
 import Types exposing (Event)
+
+
+groupId : Group -> Int
+groupId group =
+    List.indexedMap Tuple.pair allGroups
+        |> find (\x -> Tuple.second x == group)
+        |> Maybe.withDefault ( 0, firstGroup )
+        |> Tuple.first
+
+
+getGroup : Int -> Group
+getGroup id =
+    List.indexedMap Tuple.pair allGroups
+        |> find (\x -> Tuple.first x == id)
+        |> Maybe.withDefault ( 0, firstGroup )
+        |> Tuple.second
 
 
 toDatetime : Posix -> String
@@ -18,12 +34,11 @@ toDatetime =
     Iso8601.fromTime >> String.dropRight 14
 
 
-initialModel : Settings -> String -> Model
-initialModel settings slug =
+initialModel : Settings -> Int -> Model
+initialModel settings id =
     let
         group =
-            find (\x -> x.slug == slug) allGroups
-                |> Maybe.withDefault { slug = "12", name = "Cyber1 TD2" }
+            getGroup id
     in
     { data = Nothing
     , error = Nothing
