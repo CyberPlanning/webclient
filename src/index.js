@@ -1,23 +1,53 @@
-import '../bower_components/normalize-css/normalize.css'
+import './css/colors.css';
 import './css/main.css';
 import './css/tooltip.css';
 import './css/calendar.css';
+import './css/sidemenu.css';
 import './css/secret.css';
+import './css/cybericons.css';
+import './css/material-checkbox.css';
 import {
     Elm
 } from './Main.elm';
 // import registerServiceWorker from './service/registerServiceWorker';
+const storageKeyGroup = "group";
+const storageKeySettings = "settings";
+
+const urlParams = new URLSearchParams(window.location.search);
+const urlGroup = urlParams.get('g');
+
+const defaultSettings = {
+    showHack2g2: true,
+    showCustom: true,
+    menuOpened: false,
+    allWeek: false,
+}
+
+const localGroup = urlGroup || localStorage.getItem(storageKeyGroup) || "";
+const localSettings = (function() {
+    const s = localStorage.getItem(storageKeySettings);
+    if (s == undefined) {
+        return defaultSettings
+    }
+    try {
+        const data = JSON.parse(s)
+        return {...defaultSettings, ...data}
+    } catch (error) {
+        return defaultSettings
+    }
+})()
 
 const app = Elm.Main.init({
-    node: document.getElementById('root')
+    node: document.getElementById('root'),
+    flags: {
+        group: localGroup,
+        settings: localSettings,
+    }
 });
-const storageKey = "group";
-app.ports.save.subscribe(function (value) {
-    localStorage.setItem(storageKey, value);
-    app.ports.saved.send("ok");
-});
-app.ports.doload.subscribe(function () {
-    app.ports.load.send(localStorage.getItem(storageKey) || "");
+
+app.ports.save.subscribe(function ({group, settings}) {
+    localStorage.setItem(storageKeyGroup, group);
+    localStorage.setItem(storageKeySettings, JSON.stringify(settings));
 });
 
 // registerServiceWorker();

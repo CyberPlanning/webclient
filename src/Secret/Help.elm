@@ -1,10 +1,10 @@
 module Secret.Help exposing (Help, helpEvents, helpMessages)
 
 import Calendar.Event as Cal
-import Calendar.Helpers exposing (computeColor)
 import Time exposing (Posix)
 import Time.Extra as TimeExtra
 import TimeZone exposing (europe__paris)
+import Utils exposing (computeStyle)
 
 
 type alias Help =
@@ -79,10 +79,9 @@ helpToEvent viewing help =
     , title = help.title
     , startTime = start
     , endTime = end
-    , classrooms = [ help.desc ]
-    , teachers = [ help.desc2 ]
-    , groups = []
-    , color = computeColor help.title
+    , description = [ help.desc, help.desc2 ]
+    , style = computeStyle help.title
+    , source = ""
     }
 
 

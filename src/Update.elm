@@ -1,10 +1,10 @@
-module Update exposing (calendarAction, createPlanningRequest, distanceX, find, update)
+module Update exposing (calendarAction, createPlanningRequest, update)
 
 import Browser.Dom
 import Calendar.Calendar as Calendar
 import Calendar.Msg as CalMsg exposing (TimeSpan(..))
 import Config exposing (allGroups)
-import Model exposing (Model, toCalEvents, toDatetime)
+import Model exposing (CustomEvent(..), Model, Settings)
 import Msg exposing (Msg(..))
 import Process
 import Query exposing (sendRequest)
@@ -15,6 +15,7 @@ import Task
 import Time exposing (Posix)
 import Time.Extra as TimeExtra
 import TimeZone exposing (europe__paris)
+import Utils exposing (find, toCalEvents, toCalEventsWithSource, toDatetime)
 
 
 
@@ -34,22 +35,49 @@ update msgSource model =
                         Day
 
                     else
-                        Week
+                        if model.settings.allWeek then AllWeek else Week
+
             in
             ( { model | date = Just date, calendarState = Calendar.init timespan date }
-            , createPlanningRequest date model.selectedGroup.slug
+            , createPlanningRequest date model.selectedGroup.slug model.settings
             )
 
         GraphQlMsg response ->
             case response of
                 Ok query ->
                     let
-                        data =
+                        cyberEvents =
                             query.planning.events
                                 |> toCalEvents
+
+                        hack2g2Events =
+                            case query.hack2g2 of
+                                Nothing ->
+                                    []
+
+                                Just p ->
+                                    p.events
+                                        |> toCalEventsWithSource "Hack2g2" "#00ff1d"
+
+                        customEvents =
+                            case query.custom of
+                                Nothing ->
+                                    []
+
+                                Just p ->
+                                    p.events
+                                        |> toCalEventsWithSource "Custom" "#d82727"
+
+                        allEvents =
+                            cyberEvents
+                                ++ hack2g2Events
+                                ++ customEvents
                                 |> Just
+
+                        cmd =
+                            Task.attempt (always Noop) (Browser.Dom.blur "select-group")
                     in
-                    ( { model | data = data, loading = False, error = Nothing }, Task.attempt (always Noop) (Browser.Dom.blur "groupSelect") )
+                    ( { model | data = allEvents, loading = False, error = Nothing }, cmd )
 
                 Err err ->
                     ( { model | error = Just err, loading = False }, Cmd.none )
@@ -59,8 +87,23 @@ update msgSource model =
                 group =
                     find (\x -> x.slug == slug) allGroups
                         |> Maybe.withDefault { slug = "12", name = "Cyber1 TD2" }
+
+                storage =
+                    { group = slug
+                    , settings = model.settings
+                    }
+
+                ( load, action ) =
+                    if (model.loading == False) && (model.loop == False) then
+                        ( True, queryReload (createPlanningRequest model.calendarState.viewing slug model.settings) )
+
+                    else
+                        ( False, Cmd.none )
             in
-            ( { model | selectedGroup = group }, Storage.save slug )
+            ( { model | selectedGroup = group, loading = True, loop = True }, Cmd.batch [ Storage.save storage, action ] )
+
+        Reload ->
+            ( { model | loading = True, loop = True }, queryReload (createPlanningRequest model.calendarState.viewing model.selectedGroup.slug model.settings) )
 
         SetCalendarState calendarMsg ->
             let
@@ -76,25 +119,23 @@ update msgSource model =
             calendarAction model CalMsg.PageBack
 
         WindowSize view ->
-            ( { model | size = { width = floor view.viewport.width, height = floor view.viewport.height } }, Storage.doload () )
+            ( { model | size = { width = floor view.viewport.width, height = floor view.viewport.height } }, Task.perform SetDate Time.now )
 
         KeyDown code ->
             let
-                cmd =
+                ( calendarModel, cmd ) =
                     case code of
                         39 ->
-                            Task.succeed PageForward
-                                |> Task.perform identity
+                            calendarAction model CalMsg.PageForward
 
                         37 ->
-                            Task.succeed PageBack
-                                |> Task.perform identity
+                            calendarAction model CalMsg.PageBack
 
                         _ ->
-                            Cmd.none
+                            ( model, Cmd.none )
 
                 updatedModel =
-                    { model | secret = Secret.update code model.secret }
+                    { calendarModel | secret = Secret.update code model.secret }
             in
             ( updatedModel, cmd )
 
@@ -104,62 +145,95 @@ update msgSource model =
                     Swipe.update msg model.swipe
 
                 action =
-                    if (updatedSwipe.state == Swipe.SwipeEnd) && (distanceX updatedSwipe.c0 updatedSwipe.c1 > 70.0) then
-                        case updatedSwipe.direction of
-                            Just Swipe.Left ->
-                                Task.succeed PageForward
-                                    |> Task.perform identity
+                    case Swipe.hasSwiped updatedSwipe 70 of
+                        Just Swipe.Left ->
+                            Task.succeed PageForward
+                                |> Task.perform identity
 
-                            Just Swipe.Right ->
-                                Task.succeed PageBack
-                                    |> Task.perform identity
+                        Just Swipe.Right ->
+                            Task.succeed PageBack
+                                |> Task.perform identity
 
-                            _ ->
-                                Cmd.none
-
-                    else
-                        Cmd.none
+                        _ ->
+                            Cmd.none
             in
             ( { model | swipe = updatedSwipe }, action )
 
         ClickToday ->
-            let
-                date =
-                    model.date |> Maybe.withDefault (Time.millisToPosix 0)
-            in
-            calendarAction model (CalMsg.ChangeViewing date)
-
-        LoadGroup slug ->
-            let
-                group =
-                    find (\x -> x.slug == slug) allGroups
-                        |> Maybe.withDefault { slug = "12", name = "Cyber1 TD2" }
-            in
-            ( { model | selectedGroup = group }, Task.perform SetDate Time.now )
-
-        SavedGroup ok ->
-            let
-                state =
-                    if (model.loading == False) && (model.loop == False) then
-                        ( { model | loading = True, loop = True }
-                        , Cmd.batch
-                            [ createPlanningRequest model.calendarState.viewing model.selectedGroup.slug
-                            , Process.sleep (1 * 1000)
-                                |> Task.perform StopReloadIcon
-                            ]
-                        )
-
-                    else
-                        ( model, Cmd.none )
-            in
-            state
+            model.date
+                |> Maybe.withDefault (Time.millisToPosix 0)
+                |> CalMsg.ChangeViewing
+                |> calendarAction model
 
         StopReloadIcon _ ->
             ( { model | loop = False }, Cmd.none )
 
+        ToggleMenu ->
+            let
+                s =
+                    model.settings
 
-createPlanningRequest : Posix -> String -> Cmd Msg
-createPlanningRequest date slug =
+                newSettings =
+                    { s | menuOpened = not s.menuOpened }
+
+                storage =
+                    { group = model.selectedGroup.slug
+                    , settings = newSettings
+                    }
+            in
+            ( { model | settings = newSettings }, Storage.save storage )
+
+        ChangeMode mode ->
+            let
+                ( calendarModel, _ ) =
+                    calendarAction model (CalMsg.ChangeTimeSpan mode)
+
+                allWeek =
+                    if mode == AllWeek then True else False
+            
+                s = model.settings
+
+                updatedSettings =
+                    { s | allWeek = allWeek }
+
+                storage =
+                    { group = calendarModel.selectedGroup.slug
+                    , settings = updatedSettings
+                    }
+
+            in
+                ({ calendarModel | settings = updatedSettings }, Storage.save storage)
+            
+
+        CheckEvents type_ checked ->
+            let
+                s =
+                    model.settings
+
+                updatedSettings =
+                    case type_ of
+                        Hack2g2 ->
+                            { s | showHack2g2 = checked }
+
+                        Custom ->
+                            { s | showCustom = checked }
+
+                storage =
+                    { group = model.selectedGroup.slug
+                    , settings = updatedSettings
+                    }
+
+                cmd =
+                    Cmd.batch
+                        [ createPlanningRequest model.calendarState.viewing model.selectedGroup.slug updatedSettings
+                        , Storage.save storage
+                        ]
+            in
+            ( { model | loading = True, loop = True, settings = updatedSettings }, queryReload cmd )
+
+
+createPlanningRequest : Posix -> String -> Settings -> Cmd Msg
+createPlanningRequest date slug settings =
     let
         dateFrom =
             date
@@ -175,26 +249,7 @@ createPlanningRequest date slug =
                 |> TimeExtra.ceiling TimeExtra.Sunday europe__paris
                 |> toDatetime
     in
-    sendRequest dateFrom dateTo [ slug ]
-
-
-find : (a -> Bool) -> List a -> Maybe a
-find predicate list =
-    case list of
-        [] ->
-            Nothing
-
-        first :: rest ->
-            if predicate first then
-                Just first
-
-            else
-                find predicate rest
-
-
-distanceX : Swipe.Coordinates -> Swipe.Coordinates -> Float
-distanceX c0 c1 =
-    abs (c0.clientX - c1.clientX)
+    sendRequest dateFrom dateTo [ slug ] settings
 
 
 calendarAction : Model -> CalMsg.Msg -> ( Model, Cmd Msg )
@@ -205,7 +260,7 @@ calendarAction model calMsg =
 
         ( cmd, loading ) =
             if Time.toMonth europe__paris updatedCalendar.viewing /= Time.toMonth europe__paris model.calendarState.viewing then
-                ( createPlanningRequest updatedCalendar.viewing model.selectedGroup.slug
+                ( createPlanningRequest updatedCalendar.viewing model.selectedGroup.slug model.settings
                 , True
                 )
 
@@ -220,3 +275,12 @@ calendarAction model calMsg =
                 updatedCalendar
     in
     ( { model | calendarState = updatedCalWithJourFerie, loading = loading }, cmd )
+
+
+queryReload : Cmd.Cmd Msg -> Cmd.Cmd Msg
+queryReload action =
+    Cmd.batch
+        [ action
+        , Process.sleep (1 * 1000)
+            |> Task.perform StopReloadIcon
+        ]

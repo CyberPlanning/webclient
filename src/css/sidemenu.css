@@ -1,0 +1,35 @@
+.sidemenu--container {
+  display: flex;
+  flex-direction: column;
+}
+
+.sidemenu--main {
+    padding: 15px;
+    flex: 1;
+}
+
+.sidemenu--selector select {
+  display: block;
+  border: 0;
+  padding: 2px;
+  background-color: var(--accent-color);
+  font-size: 1rem;
+  cursor: pointer;
+  vertical-align: top;
+}
+
+.sidemenu--footer {
+  padding: 3px 0;
+}
+
+.sidemenu--footer i {
+  padding-right: 5px;
+}
+
+.sidemenu--footer .icon-secure {
+  color: green;
+}
+
+.sidemenu--footer .icon-unsecure {
+  color: rgb(180, 40, 40);
+}

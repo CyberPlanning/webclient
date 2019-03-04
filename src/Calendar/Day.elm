@@ -3,23 +3,25 @@ module Calendar.Day exposing (view, viewAllDayCell, viewDate, viewDayEvent, view
 import Calendar.Event exposing (Event, maybeViewDayEvent, rangeDescription)
 import Calendar.Helpers as Helpers
 import Calendar.JourFerie exposing (jourFerie)
-import Calendar.Msg exposing (Msg(..))
+import Calendar.Msg exposing (InternalState, Msg(..))
 import Dict exposing (Dict)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
 import Time exposing (Posix)
 import Time.Extra as TimeExtra
+import TimeZone exposing (europe__paris)
 
 
-view : List Event -> Maybe String -> Posix -> Dict String Posix -> Html Msg
-view events selectedId day feries =
+view : InternalState -> List Event -> Html Msg
+view { selected, viewing, joursFeries } events =
     div [ class "calendar--day" ]
-        [ viewDayHeader day
-        , div [ class "calendar--day-content" ]
-            [ viewTimeGutter day
+        [ div [ class "calendar--day-content" ]
+            [ viewTimeGutter viewing
             , div [ class "calendar--day" ]
-                [ viewDaySlot events selectedId day feries ]
+                [ viewDayHeader viewing
+                , viewDaySlot events selected viewing joursFeries
+                ]
             ]
         ]
 
@@ -40,27 +42,64 @@ viewDate day =
 viewDayHeader : Posix -> Html Msg
 viewDayHeader day =
     div [ class "calendar--day-header" ]
-        [ viewTimeGutterHeader
-        , viewDate day
+        [ viewDate day
         ]
 
 
 viewTimeGutter : Posix -> Html Msg
-viewTimeGutter _ =
+viewTimeGutter viewing =
     Helpers.hours
-        |> List.map viewTimeSlotGroup
+        |> List.indexedMap (viewTimeSlotGroup viewing)
+        |> (::) (viewTimeGutterHeader viewing)
         |> div [ class "calendar--time-gutter" ]
 
 
-viewTimeGutterHeader : Html Msg
-viewTimeGutterHeader =
-    div [ class "calendar--time-gutter" ] []
+viewTimeGutterHeader : Posix -> Html Msg
+viewTimeGutterHeader viewing =
+    let
+        date =
+            viewing
+                |> TimeExtra.ceiling TimeExtra.Sunday europe__paris
+
+        year =
+            Time.toYear europe__paris date
+
+        weekNum =
+            TimeExtra.diff TimeExtra.Week
+                europe__paris
+                (TimeExtra.partsToPosix europe__paris (TimeExtra.Parts year Time.Jan 1 0 0 0 0))
+                date
+                |> (+) 1
+                |> String.fromInt
+    in
+    div [ class "calendar--date-header", class "calendar--date-header-weeknum" ]
+        [ span [ class "calendar--date" ] [ text weekNum ]
+        ]
+
+viewTimeGutterZone : Posix -> Html Msg
+viewTimeGutterZone viewing =
+    let
+        offset =
+            viewing
+            |> TimeExtra.toOffset europe__paris
+            |> toFloat
+
+        zone = offset / 60
+            |> floor
+            |> String.fromInt
+            |> (++) "GMT+"
+
+    in
+    div [ class "calendar--date-header-zone" ]
+        [ span [ ] [ text zone ]
+        ]
 
 
-viewTimeSlotGroup : String -> Html Msg
-viewTimeSlotGroup date =
+viewTimeSlotGroup : Posix -> Int -> String -> Html Msg
+viewTimeSlotGroup viewing idx date =
     div [ class "calendar--time-slot-group" ]
-        [ viewHourSlot date
+        [ if idx == 0 then viewTimeGutterZone viewing else text ""
+        , viewHourSlot date
         , div [ class "calendar--time-slot" ] []
         ]
 

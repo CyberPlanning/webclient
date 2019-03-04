@@ -1,13 +1,12 @@
-port module Storage exposing (doload, load, save, saved)
+port module Storage exposing (save, Storage)
+
+import Model
 
 
-port save : String -> Cmd msg
+type alias Storage =
+    { group : String
+    , settings : Model.Settings
+    }
 
 
-port saved : (String -> msg) -> Sub msg
-
-
-port doload : () -> Cmd msg
-
-
-port load : (String -> msg) -> Sub msg
+port save : Storage -> Cmd msg

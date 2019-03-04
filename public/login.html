@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Cyberplanning</title>
+    <link rel="stylesheet" href="../src/css/main.css">
+
+    <style>
+
+    @import url('https://fonts.googleapis.com/css?family=Montserrat');
+
+    * {
+        box-sizing: border-box;
+    }
+
+    html,
+    body {
+        padding: 0;
+        margin: 0;
+        height: 100vh;
+        overflow: hidden
+    }
+
+    body {
+        font-family: 'Montserrat', sans-serif;
+        font-size: 20px;
+        margin: 0;
+        text-align: center;
+        background-color: #2d3436;
+        color: #ecf0f1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .title {
+        font-size: 32px;
+    }
+
+    .login {
+        display: flex;
+    }
+
+    .logo {
+        width: 120px;
+    }
+
+    .side {
+        flex: 1;
+    }
+
+    .image {
+        text-align: right;
+    }
+
+    .form {
+        text-align: left;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        letter-spacing: 1px;
+        --main: #ccc;
+        --accent: #1466a0;
+    }
+    
+    .input-effect {
+        position: relative;
+        margin-bottom: 10px;
+    }
+    
+    input[type="text"], input[type="password"] {
+        font: 15px;
+        line-height: 24px;
+        letter-spacing: 1px;
+        color: var(--main);
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .material {
+        border: 0;
+        padding: 4px 0;
+        border-bottom: 1px solid var(--main);
+        background-color: transparent;
+    }
+
+    .material ~ .focus-border{
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background-color: var(--accent);
+        transition: 0.4s;
+    }
+    .material:focus ~ .focus-border,
+    .has-content.material ~ .focus-border{
+        width: 100%;
+    }
+
+    .material ~ label{
+        position: absolute;
+        left: 0;
+        top: 2px;
+        width: 100%;
+        color: var(--main);
+        transition: transform 0.3s;
+        z-index: -1;
+        letter-spacing: 0.5px;
+        transform-origin: left center;
+    }
+    .material:focus ~ label, .has-content.material ~ label{
+        transform: translateY(-20px) scale(0.7);
+        color: var(--accent);
+    }
+
+    :focus{outline: none;}
+
+    .separator {
+        margin: 10px 25px;
+    }
+    .send button {
+        border: 1px solid;
+        border-radius: 0;
+        padding: 5px 20px;
+        width: 100%;
+        box-sizing: border-box;
+        background-color: transparent;
+        color: var(--main);
+        cursor: pointer;
+        transition: 0.3s;
+    }
+    .send button:hover {
+        color: var(--accent);
+    }
+    </style>
+</head>
+<body>
+    <section>
+        <article class="title">
+            <h1>Cyber Planning</h1>
+        </article>
+        <article class="login">
+            <div class="image side">
+                <img class="logo" src="logo.min.gif" alt="logo">
+            </div>
+            <hr class="separator">
+            <form class="form side">
+                <div class="input-effect">
+                    <input class="material" type="password" placeholder="" id="passphrase">
+                    <label>Passphrase</label>
+                    <span class="focus-border"></span>
+                </div>
+                <div class="send">
+                    <button>Login &gt;</button>
+                </div>
+            </form>
+        </article>
+    </section>
+
+    <script>
+    const input = document.querySelector('#passphrase')
+    input.addEventListener('change', e => {
+        if(input.value === "") {
+            input.classList.remove("has-content")
+        } else {
+            input.classList.add("has-content")
+        }
+    })
+    </script>
+</body>
+</html>

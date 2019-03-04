@@ -21,4 +21,4 @@ allGroups =
 
 minWeekWidth : Int
 minWeekWidth =
-    598
+    660

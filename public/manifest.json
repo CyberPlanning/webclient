@@ -1,15 +1,22 @@
 {
   "short_name": "Cyber Planning",
-  "name": "An awesome planning for cyber elite",
+  "name": "Cyber Planning - What I will learn today?",
+  "description": "An awesome planning for cyber elite",
   "icons": [
     {
-      "src": "favicon.ico",
-      "sizes": "192x192",
-      "type": "image/png"
+      "src": "/images/logo-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/images/logo-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
     }
   ],
   "start_url": "./index.html",
+  "scope": "/",
   "display": "standalone",
-  "theme_color": "#ecf0f1",
+  "theme_color": "#124368",
   "background_color": "#2d3436"
 }

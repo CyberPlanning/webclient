@@ -1,22 +1,24 @@
-module View exposing (errorMessage, optionGroup, reloadButton, view, viewMessage, viewPagination, viewSelector, viewTitle, viewToolbar)
+module View exposing (view)
 
 import Browser exposing (Document)
 import Calendar.Calendar as Calendar
 import Calendar.Msg exposing (TimeSpan(..))
-import Config exposing (allGroups)
+import Config
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (on, onClick, targetValue)
 import Http
 import Json.Decode as Json
-import Model exposing (Group, Model, toDatetime)
+import Model exposing (Group, Model)
 import Msg exposing (Msg(..))
 import Secret
 import Secret.Help
+import SideMenu
 import Swipe exposing (onSwipe)
 import Time exposing (Month(..), Posix)
 import TimeZone exposing (europe__paris)
 import Tooltip
+import Utils exposing (toDatetime)
 
 
 
@@ -38,17 +40,25 @@ view model =
                 ++ [ class "main--container" ]
                 ++ Secret.classStyle model.secret
 
+        currentEvent =
+            if model.size.width < Config.minWeekWidth then
+                model.calendarState.selected
+
+            else
+                model.calendarState.hover
+
         funThings =
             Secret.view model.secret
 
         container =
             div attrs
-                [ viewToolbar model.selectedGroup model.calendarState.viewing (model.calendarState.timeSpan == Week) model.loop
+                [ viewToolbar model.selectedGroup model.calendarState.viewing (model.calendarState.timeSpan /= Day) model.loop
                 , div [ class "main--calendar" ]
-                    [ Html.map SetCalendarState (Calendar.view events model.calendarState)
+                    [ SideMenu.view model.selectedGroup model.calendarState.timeSpan model.settings
+                    , Html.map SetCalendarState (Calendar.view events model.calendarState)
                     ]
                 , viewMessage model
-                , Tooltip.viewTooltip model.calendarState.hover events
+                , Tooltip.viewTooltip currentEvent model.calendarState.position events model.size
                 , funThings
                 ]
     in
@@ -62,9 +72,6 @@ viewToolbar selected viewing all loop =
     div [ class "main--toolbar" ]
         [ viewPagination all loop
         , viewTitle viewing
-        , viewSelector selected
-
-        -- , viewTimeSpanSelection timeSpan
         ]
 
 
@@ -72,10 +79,6 @@ viewTitle : Posix -> Html Msg
 viewTitle viewing =
     div [ class "main--month-title" ]
         [ h2 [] [ text <| formatDateTitle viewing ] ]
-
-
-
--- "MMMM yyyy"
 
 
 formatDateTitle : Posix -> String
@@ -132,56 +135,58 @@ formatDateTitle date =
 viewPagination : Bool -> Bool -> Html Msg
 viewPagination all loop =
     let
-        btns =
+        navigations =
             if all then
-                [ button [ class "main--navigatiors-button", onClick PageBack ] [ text "back" ]
-                , button [ class "main--navigatiors-button", onClick PageForward ] [ text "next" ]
+                [ navButton
+                    [ class "main--navigatiors-button", onClick PageBack, attribute "aria-label" "Previous Page" ]
+                    [ i [ class "icon-left" ] []
+                    ]
+                , navButton
+                    [ class "main--navigatiors-button", onClick PageForward, attribute "aria-label" "Next Page" ]
+                    [ i [ class "icon-right" ] []
+                    ]
                 ]
 
             else
                 []
     in
     div [ class "main--paginators" ]
-        (btns
-            ++ [ button [ class "main--navigatiors-button", onClick ClickToday ] [ text "today" ]
+        (viewMenuButton
+            :: navigations
+            ++ [ navButton [ class "main--navigatiors-today", onClick ClickToday, attribute "aria-label" "Today" ] [ text "aujourd'hui" ]
                , reloadButton loop
                ]
         )
 
 
-viewSelector : Group -> Html Msg
-viewSelector selected =
-    div [ class "main--selector" ]
-        [ select
-            [ class "main--selector-select"
-            , id "groupSelect"
-            , on "change" <| Json.map SetGroup targetValue
-            , value selected.slug
-            , multiple False
-            ]
-            (List.map optionGroup allGroups)
-        ]
-
-
-optionGroup : Group -> Html Msg
-optionGroup group =
-    option [ value group.slug ]
-        [ text group.name ]
-
-
 reloadButton : Bool -> Html Msg
 reloadButton loop =
-    button
+    navButton
         [ classList
             [ ( "main--navigatiors-button", True )
             , ( "main--navigatiors-reload", True )
             , ( "loop", loop )
             ]
-        , style "font-size" "1.2em"
-        , onClick (SavedGroup "ok")
+        , onClick Reload
+        , attribute "aria-label" "Reload"
         ]
-        [ span [] [ text "⟳" ]
+        [ i [ class "icon-reload" ] []
         ]
+
+
+viewMenuButton : Html Msg
+viewMenuButton =
+    navButton
+        [ class "main--navigatiors-button", onClick ToggleMenu, attribute "aria-label" "Toggle Menu" ]
+        [ i [ class "icon-menu" ] []
+        ]
+
+
+navButton : List (Attribute msg) -> List (Html msg) -> Html msg
+navButton attr content =
+    div
+        [ class "main--navigatiors-action" ]
+        [ button attr content ]
 
 
 viewMessage : Model -> Html Msg
