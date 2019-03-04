@@ -4,15 +4,15 @@ import Config
 import Http exposing (Body, Error, Header, Request)
 import Json.Decode as Decode
 import Json.Encode as Encode
+import Model exposing (Settings)
 import Msg exposing (Msg(..))
 import Types exposing (Query, decodeQuery)
-import Model exposing (Settings)
 
 
 eventsApiQuery : String
 eventsApiQuery =
-    """query day_planning($grs: [String], $to: DateTime!, $from: DateTime!, $hack2g2: Boolean!, $custom: Boolean!) {
-        planning(collection: CYBER, affiliationGroups: $grs, toDate: $to, fromDate: $from) {
+    """query day_planning($collec: Collection!, $grs: [String], $to: DateTime!, $from: DateTime!, $hack2g2: Boolean!, $custom: Boolean!) {
+        planning(collection: $collec, affiliationGroups: $grs, toDate: $to, fromDate: $from) {
             ...events
         }
         hack2g2: planning(collection: HACK2G2, toDate: $to, fromDate: $from) @include(if: $hack2g2) {
@@ -37,7 +37,8 @@ eventsApiQuery =
 
 
 type alias Params =
-    { from : String
+    { collec : String
+    , from : String
     , to : String
     , grs : List String
     , hack2g2 : Bool
@@ -69,11 +70,12 @@ requestAPI =
 
 
 requestBody : String -> Params -> Body
-requestBody queryString { from, to, grs, hack2g2, custom } =
+requestBody queryString { collec, from, to, grs, hack2g2, custom } =
     let
         var =
             Encode.object
-                [ ( "from", Encode.string from )
+                [ ( "collec", Encode.string collec )
+                , ( "from", Encode.string from )
                 , ( "to", Encode.string to )
                 , ( "grs", Encode.list Encode.string grs )
                 , ( "hack2g2", Encode.bool hack2g2 )
@@ -87,9 +89,10 @@ requestBody queryString { from, to, grs, hack2g2, custom } =
         |> Http.jsonBody
 
 
-sendRequest : String -> String -> List String -> Settings -> Cmd Msg
-sendRequest from to groups { showCustom, showHack2g2 } =
-    { from = from
+sendRequest : String -> String -> List String -> Settings -> String -> Cmd Msg
+sendRequest from to groups { showCustom, showHack2g2 } collection =
+    { collec = collection
+    , from = from
     , to = to
     , grs = groups
     , hack2g2 = showHack2g2
