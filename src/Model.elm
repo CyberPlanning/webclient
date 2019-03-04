@@ -1,4 +1,4 @@
-module Model exposing (CustomEvent(..), Group, Model, PlanningResponse, Settings, WindowSize)
+module Model exposing (CustomEvent(..), Collection(..), Group, Model, PlanningResponse, Settings, WindowSize)
 
 import Calendar.Calendar as Calendar
 import Calendar.Event as CalEvent
@@ -51,7 +51,13 @@ type alias Settings =
 type alias Group =
     { name : String
     , slug : String
+    , collection : Collection
     }
+
+
+type Collection
+    = Cyber
+    | Info
 
 
 type CustomEvent
