@@ -1,4 +1,4 @@
-module Model exposing (CustomEvent(..), Collection(..), Group, Model, PlanningResponse, Settings, WindowSize)
+module Model exposing (Collection(..), CustomEvent(..), Group, Model, PlanningResponse, Settings, WindowSize)
 
 import Calendar.Calendar as Calendar
 import Calendar.Event as CalEvent

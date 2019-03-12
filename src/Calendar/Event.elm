@@ -1,13 +1,14 @@
-module Calendar.Event exposing (Style, Event, EventRange(..), cellWidth, eventSegment, eventStyling, maybeViewDayEvent, offsetLength, offsetPercentage, percentDay, rangeDescription, rowSegment, styleDayEvent, styleRowSegment)
+module Calendar.Event exposing (Event, EventRange(..), Style, cellWidth, eventSegment, eventStyling, maybeViewDayEvent, offsetLength, offsetPercentage, percentDay, rangeDescription, rowSegment, styleDayEvent, styleRowSegment)
+
+-- import String.Extra
 
 import Calendar.Helpers as Helpers
-import Calendar.Msg exposing (Msg(..), TimeSpan(..), onMouseEnter, onClick)
+import Calendar.Msg exposing (Msg(..), TimeSpan(..), onClick, onMouseEnter)
 import Html exposing (..)
 import Html.Attributes exposing (attribute, class, classList, style)
 import Html.Events exposing (onMouseLeave)
 import Iso8601
 import String
--- import String.Extra
 import Time exposing (Posix, Weekday(..))
 import Time.Extra as TimeExtra
 import TimeZone exposing (europe__paris)
@@ -18,6 +19,7 @@ type alias Style =
     , textColor : String
     }
 
+
 type alias Event =
     { toId : String
     , title : String
@@ -27,6 +29,7 @@ type alias Event =
     , source : String
     , style : Style
     }
+
 
 type EventRange
     = StartsAndEnds
@@ -92,13 +95,14 @@ eventStyling event eventRange customClasses =
         extraStyle =
             if String.isEmpty event.source then
                 []
+
             else
                 [ style "border-color" colorFg ]
 
         styles =
             styleDayEvent eventStart eventEnd
-            ++ styleColorDayEvent eventTitle colorFg colorBg
-            ++ extraStyle
+                ++ styleColorDayEvent eventTitle colorFg colorBg
+                ++ extraStyle
     in
     [ classList (( classes, True ) :: customClasses) ] ++ styles
 
@@ -145,6 +149,7 @@ styleDayEvent start end =
     , style "position" "absolute"
     ]
 
+
 styleColorDayEvent : String -> String -> String -> List (Html.Attribute msg)
 styleColorDayEvent title fg bg =
     [ style "background-color" bg
@@ -184,7 +189,6 @@ eventSegment event selectedId eventRange =
 
         childs =
             List.map viewSub event.description
-        
     in
     div
         ([ onMouseEnter <| EventMouseEnter eventId
@@ -193,7 +197,7 @@ eventSegment event selectedId eventRange =
          ]
             ++ eventStyling event eventRange classes
         )
-        (( div [ class "calendar--event-title" ] title ) :: childs)
+        (div [ class "calendar--event-title" ] title :: childs)
 
 
 makeTitle : String -> Html Msg
@@ -258,8 +262,11 @@ isBetween start end current =
 escapeTitle : String -> String
 escapeTitle =
     always ""
-    -- String.Extra.removeAccents
-        -- >> String.Extra.underscored
+
+
+
+-- String.Extra.removeAccents
+-- >> String.Extra.underscored
 
 
 weekdayToNumber : Weekday -> Int
