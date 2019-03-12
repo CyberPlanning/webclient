@@ -105,6 +105,7 @@ computeColor text =
     let
         hex =
             String.dropRight 1 text
+                |> String.toUpper
                 |> MD5.hex
                 |> String.right 6
 
