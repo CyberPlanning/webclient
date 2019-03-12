@@ -111,11 +111,7 @@ update msgSource model =
             ( { model | loading = True, loop = True }, queryReload (createPlanningRequest model.calendarState.viewing model.selectedGroup model.settings) )
 
         SetCalendarState calendarMsg ->
-            let
-                updatedCalendar =
-                    Calendar.update calendarMsg model.calendarState
-            in
-            ( { model | calendarState = updatedCalendar }, Cmd.none )
+            calendarAction model calendarMsg
 
         PageForward ->
             calendarAction model CalMsg.PageForward
