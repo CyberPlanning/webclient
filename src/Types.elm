@@ -15,6 +15,7 @@ type alias Event =
     , classrooms : Maybe (List String)
     , teachers : Maybe (List String)
     , groups : Maybe (List String)
+    , affiliations : Maybe (List String)
     , eventId : String
     }
 
@@ -35,19 +36,20 @@ decodePlanning =
 listnull : Decoder (Maybe (List String))
 listnull =
     Decode.string
-    |> Decode.list
-    |> Decode.nullable
+        |> Decode.list
+        |> Decode.nullable
 
 
 decodeEvent : Decoder Event
 decodeEvent =
-    Decode.map7 Event
+    Decode.map8 Event
         (field "title" string)
         (field "startDate" string)
         (field "endDate" string)
         (field "classrooms" listnull)
         (field "teachers" listnull)
         (field "groups" listnull)
+        (field "affiliations" listnull)
         (field "eventId" string)
 
 

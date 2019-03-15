@@ -41,7 +41,7 @@ update msgSource model =
                         Week
             in
             ( { model | date = Just date, calendarState = Calendar.init timespan date }
-            , createPlanningRequest date model.selectedGroup model.settings
+            , createPlanningRequest date model.selectedGroups model.selectedCollection model.settings
             )
 
         GraphQlMsg response ->
@@ -50,7 +50,7 @@ update msgSource model =
                     let
                         cyberEvents =
                             query.planning.events
-                                |> toCalEvents
+                                |> toCalEvents model.selectedGroups
 
                         hack2g2Events =
                             case query.hack2g2 of
@@ -90,8 +90,9 @@ update msgSource model =
                     String.toInt idString
                         |> Maybe.withDefault 0
 
-                group =
+                groups =
                     getGroup id
+                        |> List.singleton
 
                 storage =
                     { groupId = id
@@ -100,15 +101,34 @@ update msgSource model =
 
                 ( load, action ) =
                     if (model.loading == False) && (model.loop == False) then
-                        ( True, queryReload (createPlanningRequest model.calendarState.viewing group model.settings) )
+                        ( True, queryReload (createPlanningRequest model.calendarState.viewing groups model.selectedCollection model.settings) )
 
                     else
                         ( False, Cmd.none )
             in
-            ( { model | selectedGroup = group, loading = True, loop = True }, Cmd.batch [ Storage.save storage, action ] )
+            ( { model | selectedGroups = groups, loading = True, loop = True }, Cmd.batch [ Storage.save storage, action ] )
+
+        SetGroups idsStrings ->
+            let
+                groups =
+                    List.map (String.toInt >> Maybe.withDefault 0 >> getGroup) idsStrings
+
+                storage =
+                    { groupId = 0
+                    , settings = model.settings
+                    }
+
+                ( load, action ) =
+                    if (model.loading == False) && (model.loop == False) then
+                        ( True, queryReload (createPlanningRequest model.calendarState.viewing groups model.selectedCollection model.settings) )
+
+                    else
+                        ( False, Cmd.none )
+            in
+            ( { model | selectedGroups = groups, loading = True, loop = True }, Cmd.batch [ Storage.save storage, action ] )
 
         Reload ->
-            ( { model | loading = True, loop = True }, queryReload (createPlanningRequest model.calendarState.viewing model.selectedGroup model.settings) )
+            ( { model | loading = True, loop = True }, queryReload (createPlanningRequest model.calendarState.viewing model.selectedGroups model.selectedCollection model.settings) )
 
         SetCalendarState calendarMsg ->
             calendarAction model calendarMsg
@@ -178,7 +198,8 @@ update msgSource model =
                     { s | menuOpened = not s.menuOpened }
 
                 storage =
-                    { groupId = groupId model.selectedGroup
+                    -- { groupId = groupId model.selectedGroups
+                    { groupId = 0
                     , settings = newSettings
                     }
             in
@@ -203,7 +224,8 @@ update msgSource model =
                     { s | allWeek = allWeek }
 
                 storage =
-                    { groupId = groupId calendarModel.selectedGroup
+                    -- { groupId = groupId calendarModel.selectedGroups
+                    { groupId = 0
                     , settings = updatedSettings
                     }
             in
@@ -223,21 +245,22 @@ update msgSource model =
                             { s | showCustom = checked }
 
                 storage =
-                    { groupId = groupId model.selectedGroup
+                    -- { groupId = groupId model.selectedGroups
+                    { groupId = 0
                     , settings = updatedSettings
                     }
 
                 cmd =
                     Cmd.batch
-                        [ createPlanningRequest model.calendarState.viewing model.selectedGroup updatedSettings
+                        [ createPlanningRequest model.calendarState.viewing model.selectedGroups model.selectedCollection updatedSettings
                         , Storage.save storage
                         ]
             in
             ( { model | loading = True, loop = True, settings = updatedSettings }, queryReload cmd )
 
 
-createPlanningRequest : Posix -> Group -> Settings -> Cmd Msg
-createPlanningRequest date { slug, collection } settings =
+createPlanningRequest : Posix -> List Group -> Collection -> Settings -> Cmd Msg
+createPlanningRequest date groups collection settings =
     let
         dateFrom =
             date
@@ -260,8 +283,11 @@ createPlanningRequest date { slug, collection } settings =
 
                 Info ->
                     "INFO"
+
+        groupsSlugs =
+            List.map .slug groups
     in
-    sendRequest dateFrom dateTo [ slug ] settings collectionName
+    sendRequest dateFrom dateTo groupsSlugs settings collectionName
 
 
 calendarAction : Model -> CalMsg.Msg -> ( Model, Cmd Msg )
@@ -272,7 +298,7 @@ calendarAction model calMsg =
 
         ( cmd, loading ) =
             if Time.toMonth europe__paris updatedCalendar.viewing /= Time.toMonth europe__paris model.calendarState.viewing then
-                ( createPlanningRequest updatedCalendar.viewing model.selectedGroup model.settings
+                ( createPlanningRequest updatedCalendar.viewing model.selectedGroups model.selectedCollection model.settings
                 , True
                 )
 

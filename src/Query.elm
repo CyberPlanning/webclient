@@ -31,6 +31,7 @@ eventsApiQuery =
             classrooms
             teachers
             groups
+            affiliations
         }
     }
     """

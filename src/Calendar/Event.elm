@@ -1,4 +1,4 @@
-module Calendar.Event exposing (Event, EventRange(..), Style, cellWidth, eventSegment, eventStyling, maybeViewDayEvent, offsetLength, offsetPercentage, percentDay, rangeDescription, rowSegment, styleDayEvent, styleRowSegment)
+module Calendar.Event exposing (Event, EventRange(..), PositionMode(..), Style, cellWidth, eventSegment, eventStyling, maybeViewDayEvent, offsetLength, offsetPercentage, percentDay, rangeDescription, rowSegment, styleDayEvent, styleRowSegment)
 
 -- import String.Extra
 
@@ -28,7 +28,13 @@ type alias Event =
     , description : List String
     , source : String
     , style : Style
+    , position : PositionMode
     }
+
+
+type PositionMode
+    = All
+    | Column Int Int
 
 
 type EventRange
@@ -100,7 +106,7 @@ eventStyling event eventRange customClasses =
                 [ style "border-color" colorFg ]
 
         styles =
-            styleDayEvent eventStart eventEnd
+            styleDayEvent eventStart eventEnd event.position
                 ++ styleColorDayEvent eventTitle colorFg colorBg
                 ++ extraStyle
     in
@@ -127,9 +133,34 @@ percentDay date min max =
     (fractionalDay date - min) / (max - min)
 
 
-styleDayEvent : Posix -> Posix -> List (Html.Attribute msg)
-styleDayEvent start end =
+styleDayEvent : Posix -> Posix -> PositionMode -> List (Html.Attribute msg)
+styleDayEvent start end position =
     let
+        ( left, width ) =
+            case position of
+                All ->
+                    ( "0", "96%" )
+
+                Column idx count ->
+                    -- TODO dynamic columns number
+                    let
+                        size =
+                            96 / toFloat count
+
+                        l =
+                            idx
+                                |> toFloat
+                                |> (*) size
+                                |> String.fromFloat
+                                |> (\x -> x ++ "%")
+
+                        w =
+                            size
+                                |> String.fromFloat
+                                |> (\x -> x ++ "%")
+                    in
+                    ( l, w )
+
         startPercent =
             100 * percentDay start (7 / 24) (21 / 24)
 
@@ -144,8 +175,9 @@ styleDayEvent start end =
     in
     [ style "top" startPercentage
     , style "height" height
-    , style "left" "2%"
-    , style "width" "96%"
+    , style "left" left
+    , style "margin" "0 6px"
+    , style "width" width
     , style "position" "absolute"
     ]
 
@@ -190,14 +222,16 @@ eventSegment event selectedId eventRange =
         childs =
             List.map viewSub event.description
     in
-    div
-        ([ onMouseEnter <| EventMouseEnter eventId
-         , onMouseLeave <| EventMouseLeave eventId
-         , onClick <| EventClick eventId
-         ]
-            ++ eventStyling event eventRange classes
-        )
-        (div [ class "calendar--event-title" ] title :: childs)
+    div []
+        [ div
+            ([ onMouseEnter <| EventMouseEnter eventId
+             , onMouseLeave <| EventMouseLeave eventId
+             , onClick <| EventClick eventId
+             ]
+                ++ eventStyling event eventRange classes
+            )
+            (div [ class "calendar--event-title" ] title :: childs)
+        ]
 
 
 makeTitle : String -> Html Msg

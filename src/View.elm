@@ -52,23 +52,27 @@ view model =
 
         container =
             div attrs
-                [ viewToolbar model.selectedGroup model.calendarState.viewing (model.calendarState.timeSpan /= Day) model.loop
+                [ viewToolbar model.calendarState.viewing (model.calendarState.timeSpan /= Day) model.loop
                 , div [ class "main--calendar" ]
-                    [ SideMenu.view model.selectedGroup model.calendarState.timeSpan model.settings
+                    [ SideMenu.view model.selectedGroups model.calendarState.timeSpan model.settings
                     , Html.map SetCalendarState (Calendar.view events model.calendarState)
                     ]
                 , viewMessage model
                 , Tooltip.viewTooltip currentEvent model.calendarState.position events model.size
                 , funThings
                 ]
+
+        names =
+            List.map .name model.selectedGroups
+                |> String.join ", "
     in
-    { title = "Planning - " ++ model.selectedGroup.name
+    { title = "Planning - " ++ names
     , body = [ container ]
     }
 
 
-viewToolbar : Group -> Posix -> Bool -> Bool -> Html Msg
-viewToolbar selected viewing all loop =
+viewToolbar : Posix -> Bool -> Bool -> Html Msg
+viewToolbar viewing all loop =
     div [ class "main--toolbar" ]
         [ viewPagination all loop
         , viewTitle viewing

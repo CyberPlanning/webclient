@@ -14,19 +14,14 @@ import Types exposing (Event)
 
 
 groupId : Group -> Int
-groupId group =
-    List.indexedMap Tuple.pair allGroups
-        |> find (\x -> Tuple.second x == group)
-        |> Maybe.withDefault ( 0, firstGroup )
-        |> Tuple.first
+groupId =
+    .id
 
 
 getGroup : Int -> Group
 getGroup id =
-    List.indexedMap Tuple.pair allGroups
-        |> find (\x -> Tuple.first x == id)
-        |> Maybe.withDefault ( 0, firstGroup )
-        |> Tuple.second
+    find (\x -> x.id == id) allGroups
+        |> Maybe.withDefault firstGroup
 
 
 toDatetime : Posix -> String
@@ -44,7 +39,8 @@ initialModel settings id =
     , error = Nothing
     , date = Nothing
     , loading = True
-    , selectedGroup = group
+    , selectedGroups = [ group ]
+    , selectedCollection = Cyber
     , calendarState = Calendar.init Calendar.Msg.Week (Time.millisToPosix 0)
     , size = { width = 1200, height = 800 }
     , swipe = Swipe.init
@@ -55,9 +51,9 @@ initialModel settings id =
     }
 
 
-toCalEvents : List Event -> List CalEvent.Event
-toCalEvents events =
-    List.map toCalEvent events
+toCalEvents : List Group -> List Event -> List CalEvent.Event
+toCalEvents selectedGroups events =
+    List.map (toCalEvent selectedGroups) events
 
 
 toCalEventsWithSource : String -> String -> List Event -> List CalEvent.Event
@@ -65,8 +61,8 @@ toCalEventsWithSource source color events =
     List.map (toCalEventSource source color) events
 
 
-toCalEvent : Event -> CalEvent.Event
-toCalEvent event =
+toCalEvent : List Group -> Event -> CalEvent.Event
+toCalEvent selectedGroups event =
     let
         classes =
             Maybe.withDefault [] event.classrooms
@@ -77,8 +73,41 @@ toCalEvent event =
         groups =
             Maybe.withDefault [] event.groups
 
+        affiliations =
+            Maybe.withDefault [] event.affiliations
+
         description =
             List.map (String.join ", ") [ classes, teachers, groups ]
+
+        search1 =
+            List.foldl (\a b -> b && String.contains "1" a) True affiliations
+
+        search2 =
+            List.foldl (\a b -> b && String.contains "2" a) True affiliations
+
+        selectedLen =
+            List.length selectedGroups
+
+        affiliationLen =
+            List.length affiliations
+
+        firstAff =
+            List.head affiliations
+                |> Maybe.withDefault "11"
+
+        firstAffIndex =
+            List.map .slug selectedGroups
+                |> List.indexedMap Tuple.pair
+                |> find (\x -> Tuple.second x == firstAff)
+                |> Maybe.withDefault ( 0, "" )
+                |> Tuple.first
+
+        position =
+            if affiliationLen == selectedLen || affiliationLen == 0 then
+                CalEvent.All
+
+            else
+                CalEvent.Column firstAffIndex selectedLen
     in
     { toId = event.eventId
     , title = event.title
@@ -87,6 +116,7 @@ toCalEvent event =
     , description = description
     , style = computeStyle event.title
     , source = ""
+    , position = position
     }
 
 
@@ -115,6 +145,7 @@ toCalEventSource source color event =
         { textColor = color
         , eventColor = "black"
         }
+    , position = CalEvent.All
     }
 
 

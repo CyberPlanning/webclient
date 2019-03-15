@@ -8,13 +8,14 @@ import Html.Events exposing (on, onCheck, onClick, targetValue)
 import Json.Decode as Json
 import Model exposing (Group, Settings)
 import Msg exposing (Msg(..))
+import MultiSelect exposing (..)
 import Svg exposing (path, svg)
 import Svg.Attributes exposing (d, fillRule, height, version, viewBox, width)
 import Utils exposing (groupId)
 
 
-view : Group -> TimeSpan -> Settings -> Html Msg
-view group timespan { menuOpened, showCustom, showHack2g2 } =
+view : List Group -> TimeSpan -> Settings -> Html Msg
+view groups timespan { menuOpened, showCustom, showHack2g2 } =
     div
         [ class "sidemenu--container"
         , style "display"
@@ -27,7 +28,7 @@ view group timespan { menuOpened, showCustom, showHack2g2 } =
         ]
         [ div
             [ class "sidemenu--main" ]
-            [ viewSelector group
+            [ viewMultiSelector groups
             , hack2g2Checkbox showHack2g2
             , customCheckbox showCustom
             , modeButton Week "Week"
@@ -63,6 +64,27 @@ viewSelector selected =
             , multiple False
             ]
             (List.map optionGroup allGroups)
+        ]
+
+
+myOption : Options Msg
+myOption =
+    { items = List.map (\x -> { value = String.fromInt x.id, text = x.name, enabled = True }) allGroups
+    , onChange = SetGroups
+    }
+
+
+viewMultiSelector : List Group -> Html Msg
+viewMultiSelector selectedGroups =
+    div [ class "sidemenu--selector" ]
+        [ label [ for "select-group" ] [ text "Groupes" ]
+        , multiSelect
+            myOption
+            [ class "sidemenu--selector"
+            , style "color" "white"
+            , id "select-group"
+            ]
+            (List.map (.id >> String.fromInt) selectedGroups)
         ]
 
 

@@ -28,7 +28,8 @@ type alias Model =
     { data : Maybe (List CalEvent.Event) --Maybe (Result String Query)
     , error : Maybe Error
     , date : Maybe Posix
-    , selectedGroup : Group
+    , selectedGroups : List Group
+    , selectedCollection : Collection
     , loading : Bool
     , size : WindowSize
     , calendarState : Calendar.State
@@ -52,6 +53,7 @@ type alias Group =
     { name : String
     , slug : String
     , collection : Collection
+    , id : Int
     }
 
 

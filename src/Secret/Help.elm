@@ -82,6 +82,7 @@ helpToEvent viewing help =
     , description = [ help.desc, help.desc2 ]
     , style = computeStyle help.title
     , source = ""
+    , position = Cal.All
     }
 
 
