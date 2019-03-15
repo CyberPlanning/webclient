@@ -1,7 +1,10 @@
 # webclient
+
 Web calendar in ELM
 
 ## Query GraphQL
+
+[Cyberplanning API](https://github.com/cyberplanning/apiserver)
 
 ```js
 query day_planning($grs: [String], $to: DateTime!, $from: DateTime!, $hack2g2: Boolean!, $custom: Boolean!) {
@@ -31,6 +34,7 @@ fragment events on Planning {
 ```
 
 Variables
+
 ```
 {
   "from": "2018-11-12T12:00:00.000",
