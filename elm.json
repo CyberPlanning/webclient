@@ -6,6 +6,7 @@
     "elm-version": "0.19.0",
     "dependencies": {
         "direct": {
+            "abadi199/elm-input-extra": "5.2.2",
             "elm/browser": "1.0.0",
             "elm/core": "1.0.0",
             "elm/html": "1.0.0",
@@ -20,8 +21,10 @@
         },
         "indirect": {
             "elm/parser": "1.1.0",
+            "elm/regex": "1.0.0",
             "elm/url": "1.0.0",
             "elm/virtual-dom": "1.0.2",
+            "elm-community/list-extra": "8.1.0",
             "justinmimbs/date": "3.1.1",
             "zwilias/elm-utf-tools": "2.0.1"
         }
