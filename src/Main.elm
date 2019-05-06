@@ -18,8 +18,8 @@ import View exposing (view)
 
 
 init : Storage.Storage -> ( Model, Cmd Msg )
-init { groupId, settings } =
-    ( initialModel settings groupId, Task.perform WindowSize Browser.Dom.getViewport )
+init storage =
+    ( initialModel storage, Task.perform WindowSize Browser.Dom.getViewport )
 
 
 main : Program Storage.Storage Model Msg

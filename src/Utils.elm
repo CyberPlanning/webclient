@@ -29,13 +29,40 @@ toDatetime =
     Iso8601.fromTime >> String.dropRight 14
 
 
-initialModel : Settings -> Int -> Model
-initialModel settings id =
+initialModel : Storage.Storage -> Model
+initialModel { settings, groupId, offlineEvents } =
     let
         group =
-            getGroup id
+            getGroup groupId
+
+        cyberEvents =
+            offlineEvents.planning.events
+                |> toCalEvents [ group ]
+
+        hack2g2Events =
+            case offlineEvents.hack2g2 of
+                Nothing ->
+                    []
+
+                Just p ->
+                    p.events
+                        |> toCalEventsWithSource "Hack2g2" "#00ff1d"
+
+        customEvents =
+            case offlineEvents.custom of
+                Nothing ->
+                    []
+
+                Just p ->
+                    p.events
+                        |> toCalEventsWithSource "Custom" "#d82727"
+
+        allEvents =
+            cyberEvents
+                ++ hack2g2Events
+                ++ customEvents
     in
-    { data = Nothing
+    { data = allEvents
     , error = Nothing
     , date = Nothing
     , loading = True

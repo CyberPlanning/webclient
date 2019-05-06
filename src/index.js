@@ -10,6 +10,7 @@ import { Elm } from './Main.elm'
 import registerServiceWorker from './service/registerServiceWorker'
 const storageKeyGroup = 'groupId'
 const storageKeySettings = 'settings'
+const storageOfflineEvents = 'offlineEvents'
 
 const urlParams = new URLSearchParams(window.location.search)
 const urlGroup = urlParams.get('g')
@@ -19,6 +20,12 @@ const defaultSettings = {
     showCustom: true,
     menuOpened: false,
     allWeek: false,
+}
+
+const defaultEvents = {
+    planning: { events: [] },
+    hack2g2: { events: [] },
+    custom: { events: [] },
 }
 
 const localGroup = (function() {
@@ -42,18 +49,41 @@ const localSettings = (function() {
         return defaultSettings
     }
 })()
+const offlineEvents = (function() {
+    const s = localStorage.getItem(storageOfflineEvents)
+    if (s == undefined) {
+        return defaultEvents
+    }
+    try {
+        return JSON.parse(s)
+    } catch (error) {
+        return defaultEvents
+    }
+})()
+
+if (process.env.NODE_ENV !== 'production') {
+    console.log('Settings', localSettings)
+    console.log('GroupId', localGroup)
+    console.log('OfflineEvents', offlineEvents)
+}
 
 const app = Elm.Main.init({
     node: document.getElementById('root'),
     flags: {
+        offlineEvents,
         groupId: localGroup,
         settings: localSettings,
     },
 })
 
-app.ports.save.subscribe(function({ groupId, settings }) {
-    localStorage.setItem(storageKeyGroup, groupId)
+app.ports.saveSettings.subscribe(function(settings) {
     localStorage.setItem(storageKeySettings, JSON.stringify(settings))
+})
+app.ports.saveGroup.subscribe(function(groupId) {
+    localStorage.setItem(storageKeyGroup, groupId)
+})
+app.ports.saveEvents.subscribe(function(events) {
+    localStorage.setItem(storageOfflineEvents, JSON.stringify(events))
 })
 
 registerServiceWorker()
