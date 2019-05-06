@@ -1,4 +1,4 @@
-module Utils exposing (computeStyle, extractTimeIsoString, find, getGroup, groupId, initialModel, toCalEvents, toCalEventsWithSource, toDatetime)
+module Utils exposing (computeStyle, extractTimeIsoString, find, getGroup, getGroupId, initialModel, toCalEvents, toCalEventsWithSource, toDatetime)
 
 import Calendar.Calendar as Calendar
 import Calendar.Event as CalEvent
@@ -8,13 +8,14 @@ import Config exposing (allGroups, firstGroup)
 import Iso8601
 import Model exposing (Collection(..), Group, Model, Settings)
 import Secret
+import Storage
 import Swipe
 import Time exposing (Posix)
 import Types exposing (Event)
 
 
-groupId : Group -> Int
-groupId =
+getGroupId : Group -> Int
+getGroupId =
     .id
 
 
