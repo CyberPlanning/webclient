@@ -1,7 +1,8 @@
 {
-  "main.css": "/static/css/main.7abca72e.chunk.css",
-  "main.js": "/static/js/main.bb0676dd.chunk.js",
+  "main.css": "/static/css/main.aab84574.chunk.css",
+  "main.js": "/static/js/main.83972c70.chunk.js",
   "runtime~main.js": "/static/js/runtime~main.d53d57e4.js",
   "vendors~main.js": "/static/js/vendors~main.3ca81432.chunk.js",
-  "index.html": "/index.html"
+  "index.html": "/index.html",
+  "static/media/cybericons.css": "/static/media/cybericons.47ef9db5.svg"
 }
