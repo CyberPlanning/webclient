@@ -9,7 +9,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (on, onClick, targetValue)
 import Http
 import Json.Decode as Json
-import Model exposing (Group, Model)
+import Model exposing (FetchStatus(..), Group, Model)
 import Msg exposing (Msg(..))
 import Secret
 import Secret.Help
@@ -33,32 +33,52 @@ view model =
                 Secret.Help.helpEvents model.calendarState.viewing
 
             else
-                model.data |> Maybe.withDefault []
+                model.data
 
         attrs =
             Swipe.onSwipe SwipeEvent
                 ++ [ class "main--container" ]
                 ++ Secret.classStyle model.secret
 
-        currentEvent =
+        currentEventId =
             if model.size.width < Config.minWeekWidth then
                 model.calendarState.selected
 
             else
                 model.calendarState.hover
 
+        currentEvent =
+            case currentEventId of
+                Just id ->
+                    List.filter (\e -> e.toId == id) events
+                        |> List.head
+
+                _ ->
+                    Nothing
+
         funThings =
             Secret.view model.secret
 
+        fetchStatus =
+            if model.loading then
+                Loading
+
+            else
+                case model.error of
+                    Just err ->
+                        Error err
+
+                    Nothing ->
+                        None
+
         container =
             div attrs
-                [ viewToolbar model.calendarState.viewing (model.calendarState.timeSpan /= Day) model.loop
+                [ viewToolbar model.calendarState.viewing (model.calendarState.timeSpan /= Day) model.loop fetchStatus
                 , div [ class "main--calendar" ]
                     [ SideMenu.view model.selectedGroups model.calendarState.timeSpan model.settings
                     , Html.map SetCalendarState (Calendar.view events model.calendarState)
                     ]
-                , viewMessage model
-                , Tooltip.viewTooltip currentEvent model.calendarState.position events model.size
+                , Tooltip.viewTooltip currentEvent model.calendarState.position model.size
                 , funThings
                 ]
 
@@ -71,10 +91,11 @@ view model =
     }
 
 
-viewToolbar : Posix -> Bool -> Bool -> Html Msg
-viewToolbar viewing all loop =
+viewToolbar : Posix -> Bool -> Bool -> FetchStatus -> Html Msg
+viewToolbar viewing displayArrows loop fetchStatus =
     div [ class "main--toolbar" ]
-        [ viewPagination all loop
+        [ viewPagination displayArrows loop
+        , viewMessage fetchStatus
         , viewTitle viewing
         ]
 
@@ -137,10 +158,10 @@ formatDateTitle date =
 
 
 viewPagination : Bool -> Bool -> Html Msg
-viewPagination all loop =
+viewPagination displayArrows loop =
     let
         navigations =
-            if all then
+            if displayArrows then
                 [ navButton
                     [ class "main--navigatiors-button", onClick PageBack, attribute "aria-label" "Previous Page" ]
                     [ i [ class "icon-left" ] []
@@ -193,34 +214,21 @@ navButton attr content =
         [ button attr content ]
 
 
-viewMessage : Model -> Html Msg
-viewMessage model =
+viewMessage : FetchStatus -> Html Msg
+viewMessage fetchStatus =
     let
-        ( message, display ) =
-            case model.error of
-                Just err ->
-                    ( errorMessage err, True )
+        content =
+            case fetchStatus of
+                Loading ->
+                    [ span [] [ text "Loading" ] ]
 
-                _ ->
-                    if model.loading then
-                        ( "Loading...", True )
+                Error err ->
+                    [ i [ class "icon-warn", style "color" "#f9f961" ] [], span [ style "color" "#f9f961" ] [ errorMessage err |> text ] ]
 
-                    else
-                        ( "", False )
+                None ->
+                    [ span [] [ text "" ] ]
     in
-    div
-        [ class
-            ("main--message "
-                ++ (if display then
-                        ""
-
-                    else
-                        "hidden"
-                   )
-            )
-        ]
-        [ text message
-        ]
+    div [ class "main--status" ] content
 
 
 errorMessage : Http.Error -> String

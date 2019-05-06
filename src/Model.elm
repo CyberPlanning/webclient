@@ -1,4 +1,4 @@
-module Model exposing (Collection(..), CustomEvent(..), Group, Model, PlanningResponse, Settings, WindowSize)
+module Model exposing (Collection(..), CustomEvent(..), FetchStatus(..), Group, Model, PlanningResponse, Settings, WindowSize)
 
 import Calendar.Calendar as Calendar
 import Calendar.Event as CalEvent
@@ -25,7 +25,7 @@ type alias WindowSize =
 
 
 type alias Model =
-    { data : Maybe (List CalEvent.Event) --Maybe (Result String Query)
+    { data : List CalEvent.Event --Maybe (Result String Query)
     , error : Maybe Error
     , date : Maybe Posix
     , selectedGroups : List Group
@@ -65,3 +65,9 @@ type Collection
 type CustomEvent
     = Hack2g2
     | Custom
+
+
+type FetchStatus
+    = Loading
+    | Error Error
+    | None

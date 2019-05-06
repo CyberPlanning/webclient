@@ -15,7 +15,7 @@ import Task
 import Time exposing (Posix)
 import Time.Extra as TimeExtra
 import TimeZone exposing (europe__paris)
-import Utils exposing (find, getGroup, groupId, toCalEvents, toCalEventsWithSource, toDatetime)
+import Utils exposing (find, getGroup, toCalEvents, toCalEventsWithSource, toDatetime)
 
 
 
@@ -74,10 +74,12 @@ update msgSource model =
                             cyberEvents
                                 ++ hack2g2Events
                                 ++ customEvents
-                                |> Just
 
                         cmd =
-                            Task.attempt (always Noop) (Browser.Dom.blur "select-group")
+                            Cmd.batch
+                                [ Storage.saveEvents query
+                                , Task.attempt (always Noop) (Browser.Dom.blur "select-group")
+                                ]
                     in
                     ( { model | data = allEvents, loading = False, error = Nothing }, cmd )
 
@@ -94,11 +96,6 @@ update msgSource model =
                     getGroup id
                         |> List.singleton
 
-                storage =
-                    { groupId = id
-                    , settings = model.settings
-                    }
-
                 ( load, action ) =
                     if (model.loading == False) && (model.loop == False) then
                         ( True, queryReload (createPlanningRequest model.calendarState.viewing groups model.selectedCollection model.settings) )
@@ -106,18 +103,13 @@ update msgSource model =
                     else
                         ( False, Cmd.none )
             in
-            ( { model | selectedGroups = groups, loading = True, loop = True }, Cmd.batch [ Storage.save storage, action ] )
+            ( { model | selectedGroups = groups, loading = True, loop = True }, Cmd.batch [ Storage.saveSettings model.settings, Storage.saveGroup id, action ] )
 
         SetGroups idsStrings ->
             let
                 groups =
                     List.map (String.toInt >> Maybe.withDefault 0 >> getGroup) idsStrings
 
-                storage =
-                    { groupId = 0
-                    , settings = model.settings
-                    }
-
                 ( load, action ) =
                     if (model.loading == False) && (model.loop == False) then
                         ( True, queryReload (createPlanningRequest model.calendarState.viewing groups model.selectedCollection model.settings) )
@@ -125,7 +117,7 @@ update msgSource model =
                     else
                         ( False, Cmd.none )
             in
-            ( { model | selectedGroups = groups, loading = True, loop = True }, Cmd.batch [ Storage.save storage, action ] )
+            ( { model | selectedGroups = groups, loading = True, loop = True }, Cmd.batch [ Storage.saveSettings model.settings, action ] )
 
         Reload ->
             ( { model | loading = True, loop = True }, queryReload (createPlanningRequest model.calendarState.viewing model.selectedGroups model.selectedCollection model.settings) )
@@ -196,14 +188,8 @@ update msgSource model =
 
                 newSettings =
                     { s | menuOpened = not s.menuOpened }
-
-                storage =
-                    -- { groupId = groupId model.selectedGroups
-                    { groupId = 0
-                    , settings = newSettings
-                    }
             in
-            ( { model | settings = newSettings }, Storage.save storage )
+            ( { model | settings = newSettings }, Storage.saveSettings newSettings )
 
         ChangeMode mode ->
             let
@@ -222,14 +208,8 @@ update msgSource model =
 
                 updatedSettings =
                     { s | allWeek = allWeek }
-
-                storage =
-                    -- { groupId = groupId calendarModel.selectedGroups
-                    { groupId = 0
-                    , settings = updatedSettings
-                    }
             in
-            ( { calendarModel | settings = updatedSettings }, Storage.save storage )
+            ( { calendarModel | settings = updatedSettings }, Storage.saveSettings updatedSettings )
 
         CheckEvents type_ checked ->
             let
@@ -244,16 +224,10 @@ update msgSource model =
                         Custom ->
                             { s | showCustom = checked }
 
-                storage =
-                    -- { groupId = groupId model.selectedGroups
-                    { groupId = 0
-                    , settings = updatedSettings
-                    }
-
                 cmd =
                     Cmd.batch
                         [ createPlanningRequest model.calendarState.viewing model.selectedGroups model.selectedCollection updatedSettings
-                        , Storage.save storage
+                        , Storage.saveSettings updatedSettings
                         ]
             in
             ( { model | loading = True, loop = True, settings = updatedSettings }, queryReload cmd )

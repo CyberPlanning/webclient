@@ -10,20 +10,10 @@ import Time exposing (Posix)
 import TimeZone exposing (europe__paris)
 
 
-viewTooltip : Maybe String -> Maybe Position -> List CalEvent.Event -> WindowSize -> Html Msg
-viewTooltip selectedId maybePos events screenSize =
-    let
-        content =
-            case selectedId of
-                Just id ->
-                    List.filter (\e -> e.toId == id) events
-                        |> List.head
-                        |> viewTooltipContent maybePos screenSize
-
-                _ ->
-                    []
-    in
-    div [ class "tooltip" ] content
+viewTooltip : Maybe CalEvent.Event -> Maybe Position -> WindowSize -> Html Msg
+viewTooltip maybeEvent maybePos screenSize =
+    viewTooltipContent maybePos screenSize maybeEvent
+        |> div [ class "tooltip" ]
 
 
 viewTooltipContent : Maybe Position -> WindowSize -> Maybe CalEvent.Event -> List (Html Msg)
@@ -34,6 +24,7 @@ viewTooltipContent maybePos screenSize maybeEvent =
                 badge =
                     if String.isEmpty event.source then
                         []
+
                     else
                         [ viewBadge event.source event.style ]
 
