@@ -7,7 +7,7 @@ import './css/secret.css'
 import './css/cybericons.css'
 import './css/material-checkbox.css'
 import { Elm } from './Main.elm'
-// import registerServiceWorker from './service/registerServiceWorker';
+import registerServiceWorker from './service/registerServiceWorker'
 const storageKeyGroup = 'groupId'
 const storageKeySettings = 'settings'
 
@@ -56,7 +56,7 @@ app.ports.save.subscribe(function({ groupId, settings }) {
     localStorage.setItem(storageKeySettings, JSON.stringify(settings))
 })
 
-// registerServiceWorker();
+registerServiceWorker()
 
 var _0x6ba2 = [
     '\x66\x6C\x61\x67',
