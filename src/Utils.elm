@@ -31,14 +31,14 @@ toDatetime =
 
 
 initialModel : Storage.Storage -> Model
-initialModel { settings, groupId, offlineEvents } =
+initialModel { settings, groupIds, offlineEvents } =
     let
-        group =
-            getGroup groupId
+        groups =
+            List.map getGroup groupIds
 
         cyberEvents =
             offlineEvents.planning.events
-                |> toCalEvents [ group ]
+                |> toCalEvents groups
 
         hack2g2Events =
             case offlineEvents.hack2g2 of
@@ -67,7 +67,7 @@ initialModel { settings, groupId, offlineEvents } =
     , error = Nothing
     , date = Nothing
     , loading = True
-    , selectedGroups = [ group ]
+    , selectedGroups = groups
     , selectedCollection = Cyber
     , calendarState = Calendar.init Calendar.Msg.Week (Time.millisToPosix 0)
     , size = { width = 1200, height = 800 }

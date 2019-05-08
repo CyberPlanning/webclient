@@ -1,4 +1,4 @@
-port module Storage exposing (Storage, saveEvents, saveGroup, saveSettings)
+port module Storage exposing (Storage, saveEvents, saveGroups, saveSettings)
 
 import Model
 import Types
@@ -6,7 +6,7 @@ import Types
 
 type alias Storage =
     { settings : Model.Settings
-    , groupId : Int
+    , groupIds : List Int
     , offlineEvents : Types.Query
     }
 
@@ -14,7 +14,7 @@ type alias Storage =
 port saveSettings : Model.Settings -> Cmd msg
 
 
-port saveGroup : Int -> Cmd msg
+port saveGroups : List Int -> Cmd msg
 
 
 port saveEvents : Types.Query -> Cmd msg

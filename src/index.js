@@ -28,13 +28,21 @@ const defaultEvents = {
     custom: { events: [] },
 }
 
-const localGroup = (function() {
-    const val = urlGroup || localStorage.getItem(storageKeyGroup) || 0
-    const ret = parseInt(val)
-    if (isNaN(ret)) {
-        return 0
+const localGroups = (function() {
+    if (urlGroup) {
+        return [urlGroup]
     } else {
-        return ret
+        let s = localStorage.getItem(storageKeyGroup)
+        try {
+            const data = JSON.parse(s)
+            if (data instanceof Array) {
+                return data
+            } else {
+                return [0]
+            }
+        } catch (error) {
+            return [0]
+        }
     }
 })()
 const localSettings = (function() {
@@ -63,7 +71,7 @@ const offlineEvents = (function() {
 
 if (process.env.NODE_ENV !== 'production') {
     console.log('Settings', localSettings)
-    console.log('GroupId', localGroup)
+    console.log('GroupId', localGroups)
     console.log('OfflineEvents', offlineEvents)
 }
 
@@ -71,20 +79,24 @@ const app = Elm.Main.init({
     node: document.getElementById('root'),
     flags: {
         offlineEvents,
-        groupId: localGroup,
+        groupIds: localGroups,
         settings: localSettings,
     },
 })
 
 app.ports.saveSettings.subscribe(function(settings) {
+    // console.log('New Settings', settings)
     localStorage.setItem(storageKeySettings, JSON.stringify(settings))
 })
-app.ports.saveGroup.subscribe(function(groupId) {
-    localStorage.setItem(storageKeyGroup, groupId)
+app.ports.saveGroups.subscribe(function(groupIds) {
+    // console.log('New Groups', groupIds)
+    localStorage.setItem(storageKeyGroup, JSON.stringify(groupIds))
 })
 app.ports.saveEvents.subscribe(function(events) {
+    // console.log('New Events', events)
     localStorage.setItem(storageOfflineEvents, JSON.stringify(events))
 })
+global.app = app
 
 registerServiceWorker()
 

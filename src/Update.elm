@@ -103,12 +103,15 @@ update msgSource model =
                     else
                         ( False, Cmd.none )
             in
-            ( { model | selectedGroups = groups, loading = True, loop = True }, Cmd.batch [ Storage.saveSettings model.settings, Storage.saveGroup id, action ] )
+            ( { model | selectedGroups = groups, loading = True, loop = True }, Cmd.batch [ Storage.saveGroups [ id ], action ] )
 
         SetGroups idsStrings ->
             let
+                groupsIds =
+                    List.map (String.toInt >> Maybe.withDefault 0) idsStrings
+
                 groups =
-                    List.map (String.toInt >> Maybe.withDefault 0 >> getGroup) idsStrings
+                    List.map getGroup groupsIds
 
                 ( load, action ) =
                     if (model.loading == False) && (model.loop == False) then
@@ -117,7 +120,7 @@ update msgSource model =
                     else
                         ( False, Cmd.none )
             in
-            ( { model | selectedGroups = groups, loading = True, loop = True }, Cmd.batch [ Storage.saveSettings model.settings, action ] )
+            ( { model | selectedGroups = groups, loading = True, loop = True }, Cmd.batch [ Storage.saveGroups groupsIds, action ] )
 
         Reload ->
             ( { model | loading = True, loop = True }, queryReload (createPlanningRequest model.calendarState.viewing model.selectedGroups model.selectedCollection model.settings) )
