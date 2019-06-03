@@ -18,7 +18,7 @@ eventsApiQuery =
         hack2g2: planning(collection: HACK2G2, toDate: $to, fromDate: $from) @include(if: $hack2g2) {
             ...events
         }
-        custom: planning(collection: CUSTOM, toDate: $to, fromDate: $from) @include(if: $custom) {
+        custom: planning(collection: CUSTOM, affiliationGroups: $grs, toDate: $to, fromDate: $from) @include(if: $custom) {
             ...events
         }
     }
