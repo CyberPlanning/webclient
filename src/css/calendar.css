@@ -1,151 +1,152 @@
 .calendar--calendar {
-  display: flex;
-  flex: 1;
+    display: flex;
+    flex: 1;
 }
 
 .calendar--time-gutter {
-  display: flex;
-  flex-direction: column;
-  background-color: var(--background-color);
+    display: flex;
+    flex-direction: column;
+    background-color: var(--background-color);
 }
 
 .calendar--time-slot-group {
-  min-height: 30px;
-  display: flex;
-  flex-flow: column nowrap;
-  flex: 1;
-  border-bottom: 1px solid var(--border-color);
-  border-left: 1px solid var(--border-color);
+    min-height: 30px;
+    display: flex;
+    flex-flow: column nowrap;
+    flex: 1;
+    border-bottom: 1px solid var(--border-color);
+    border-left: 1px solid var(--border-color);
 }
 
 .calendar--time-slot-text {
-  font-size: 12px;
+    font-size: 12px;
 }
 
 .calendar--week {
-  flex: 1;
-  overflow-y: auto;
+    flex: 1;
+    overflow-y: auto;
 }
 
 .calendar--week-content {
-  display: flex;
-  overflow: hidden;
-  /* flex: 1; */
-  min-height: 100%;
+    display: flex;
+    overflow: hidden;
+    /* flex: 1; */
+    min-height: 100%;
 }
 
 .calendar--dates {
-  flex-flow: column nowrap;
-  display: flex;
-  align-content: stretch;
-  justify-content: space-around;
-  flex: 1;
-  min-width: 0;
+    flex-flow: column nowrap;
+    display: flex;
+    align-content: stretch;
+    justify-content: space-around;
+    flex: 1;
+    min-width: 0;
 }
 
 .calendar--date-header {
-  justify-content: center;
-  display: flex;
-  align-items: center;
+    justify-content: center;
+    display: flex;
+    align-items: center;
 
-  background-color: var(--accent-color);
-  padding: 2px 0;
-  border-bottom: 2px solid var(--header-border-color);
+    background-color: var(--accent-color);
+    padding: 2px 0;
+    border-bottom: 2px solid var(--header-border-color);
 }
 
 .calendar--date-header-weeknum {
-  background-color: var(--accent-color-dark);
+    background-color: var(--accent-color-dark);
 }
 
 .calendar--date-header-zone {
-  font-size: 9px;
-  padding: 1px 0;
-  border-bottom: 1px solid var(--border-color);
+    font-size: 9px;
+    padding: 1px 0;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .calendar--date-header-content {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .calendar--date {
-  text-decoration: none;
-  font-size: 15px;
-  line-height: 26px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+    text-decoration: none;
+    font-size: 15px;
+    line-height: 26px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .calendar--day {
-  display: flex;
-  flex-flow: column nowrap;
-  flex: 1;
+    display: flex;
+    flex-flow: column nowrap;
+    flex: 1;
 }
 
 .calendar--day-slot {
-  flex: 1;
-  position: relative;
-  display: flex;
-  flex-direction: column;
+    flex: 1;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
 }
 
 .calendar--day-content {
-  display: flex;
-  flex: 1;
-  overflow: auto;
+    display: flex;
+    flex: 1;
+    overflow: auto;
 }
 
 .calendar--hour-slot {
-  padding: 0 10px;
-  flex: 1 0 0;
+    padding: 0 10px;
+    flex: 1 0 0;
 }
 
 .calendar--event {
-  font-size: 0.9rem;
-  padding: 0.2em;
-  background-color: var(--accent-color);
-  color: white;
-  cursor: pointer;
-  overflow: hidden;
-  border-bottom: 1px solid var(--border-color);
-  user-select: none;
+    font-size: 0.9rem;
+    padding: 0.2em;
+    background-color: var(--accent-color);
+    color: white;
+    cursor: pointer;
+    overflow: hidden;
+    border-bottom: 1px solid var(--border-color);
+    user-select: none;
 }
 
 .calendar--event-title {
-  font-weight: 500;
-  font-size: 0.9rem;
-  max-height: 2.4em;
-  overflow: hidden;
+    font-weight: 500;
+    font-size: 0.9rem;
+    max-height: 2.4em;
+    overflow: hidden;
 }
 
 .calendar--event-sub {
-  font-size: 11px;
+    font-size: 11px;
 }
 
 .calendar--navigations-day,
 .calendar--navigations-week {
-  border: 0;
-  padding: 0 15px;
-  background-color: transparent;
-  height: 100%;
-  font-size: 15px;
-  cursor: pointer;
+    border: 0;
+    padding: 0 15px;
+    background-color: transparent;
+    height: 100%;
+    font-size: 15px;
+    cursor: pointer;
 }
 
 .calendar--navigations-day:hover,
 .calendar--navigations-week:hover {
-  font-weight: bold;
+    font-weight: bold;
 }
 
 .calendar--jour-ferie {
-  position: absolute;
-  top: 0;
-  height: 100%;
-  background-color: #262D2F;
-  width: 100%;
-  color: #657277;
-  padding: 100px 0;
+    position: absolute;
+    top: 0;
+    height: 100%;
+    background-color: #262d2f;
+    width: 100%;
+    color: #657277;
+    padding: 100px 0;
 }
