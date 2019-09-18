@@ -35,6 +35,6 @@ Disallow: /admin/
 #  \_______)|___/     (_______/  \_______)|__|  \___)     \_______)    \__|    \__/      
 #                                                                                        
 #                                                                                        
-# 3 flag sont cachÃ©s sur le site
+# 3 flag sont cachés sur le site
 # 
 # Tu peux valider un flag sur /flags/<flag>
