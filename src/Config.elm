@@ -11,22 +11,30 @@ apiUrl =
 
 allGroups : List Group
 allGroups =
-    [ { name = "Cyber1 TD1", slug = "11", collection = Cyber, id = 0 }
-    , { name = "Cyber1 TD2", slug = "12", collection = Cyber, id = 1 }
-    , { name = "Cyber2 TD1", slug = "21", collection = Cyber, id = 2 }
-    , { name = "Cyber2 TD2", slug = "22", collection = Cyber, id = 3 }
-    , { name = "Cyber3 TD1", slug = "31", collection = Cyber, id = 4 }
-    , { name = "Info1 TD1", slug = "11", collection = Info, id = 5 }
-    , { name = "Info1 TD2", slug = "12", collection = Info, id = 6 }
-    , { name = "Info2 TD1", slug = "21", collection = Info, id = 7 }
-    , { name = "Info2 TD2", slug = "22", collection = Info, id = 8 }
-    , { name = "Info3", slug = "31", collection = Info, id = 9 }
+    [ { name = "Cyber1 TD1 TP1", slug = "111", collection = Cyber, id = 0 }
+    , { name = "Cyber1 TD1 TP2", slug = "112", collection = Cyber, id = 1 }
+    , { name = "Cyber1 TD2 TP3", slug = "121", collection = Cyber, id = 2 }
+    , { name = "Cyber1 TD2 TP4", slug = "122", collection = Cyber, id = 3 }
+    , { name = "Cyber2 TD1 TP1", slug = "211", collection = Cyber, id = 4 }
+    , { name = "Cyber2 TD1 TP2", slug = "212", collection = Cyber, id = 5 }
+    , { name = "Cyber2 TD2 TP3", slug = "221", collection = Cyber, id = 6 }
+    , { name = "Cyber2 TD2 TP4", slug = "222", collection = Cyber, id = 7 }
+    , { name = "Cyber3 TD1 TP1", slug = "311", collection = Cyber, id = 8 }
+    , { name = "Cyber3 TD1 TP2", slug = "312", collection = Cyber, id = 9 }
+    , { name = "Cyber3 TD2 TP3", slug = "321", collection = Cyber, id = 10 }
+    , { name = "Cyber3 TD2 TP4", slug = "322", collection = Cyber, id = 11 }
+    , { name = "Info1 TP1", slug = "111", collection = Info, id = 12 }
+    , { name = "Info1 TP2", slug = "121", collection = Info, id = 13 }
+    , { name = "Info2 TP1", slug = "211", collection = Info, id = 14 }
+    , { name = "Info2 TP2", slug = "221", collection = Info, id = 15 }
+    , { name = "Info3 TP1", slug = "311", collection = Info, id = 16 }
+    , { name = "Info3 TP2", slug = "321", collection = Info, id = 17 }
     ]
 
 
 firstGroup : Group
 firstGroup =
-    { name = "Cyber1 TD1", slug = "11", collection = Cyber, id = 0 }
+    { name = "Cyber1 TD1 TP1", slug = "111", collection = Cyber, id = 0 }
 
 
 minWeekWidth : Int
