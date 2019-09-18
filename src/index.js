@@ -85,15 +85,12 @@ const app = Elm.Main.init({
 })
 
 app.ports.saveSettings.subscribe(function(settings) {
-    // console.log('New Settings', settings)
     localStorage.setItem(storageKeySettings, JSON.stringify(settings))
 })
 app.ports.saveGroups.subscribe(function(groupIds) {
-    // console.log('New Groups', groupIds)
     localStorage.setItem(storageKeyGroup, JSON.stringify(groupIds))
 })
 app.ports.saveEvents.subscribe(function(events) {
-    // console.log('New Events', events)
     localStorage.setItem(storageOfflineEvents, JSON.stringify(events))
 })
 global.app = app
