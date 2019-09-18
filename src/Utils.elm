@@ -130,7 +130,7 @@ toCalEvent selectedGroups event =
                 |> Tuple.first
 
         position =
-            if affiliationLen == selectedLen || affiliationLen == 0 then
+            if affiliationLen >= selectedLen || affiliationLen == 0 then
                 CalEvent.All
 
             else
