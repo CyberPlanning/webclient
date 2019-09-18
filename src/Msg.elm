@@ -13,7 +13,6 @@ type Msg
     = Noop
     | GraphQlMsg (Result Error Query)
     | SetDate Posix
-    | SetGroup String
     | SetGroups (List String)
     | WindowSize Viewport
     | PageBack

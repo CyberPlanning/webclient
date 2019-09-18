@@ -68,7 +68,6 @@ initialModel { settings, groupIds, offlineEvents } =
     , date = Nothing
     , loading = True
     , selectedGroups = groups
-    , selectedCollection = Cyber
     , calendarState = Calendar.init Calendar.Msg.Week (Time.millisToPosix 0)
     , size = { width = 1200, height = 800 }
     , swipe = Swipe.init

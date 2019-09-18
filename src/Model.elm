@@ -29,7 +29,6 @@ type alias Model =
     , error : Maybe Error
     , date : Maybe Posix
     , selectedGroups : List Group
-    , selectedCollection : Collection
     , loading : Bool
     , size : WindowSize
     , calendarState : Calendar.State

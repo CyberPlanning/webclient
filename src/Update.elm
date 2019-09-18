@@ -41,7 +41,7 @@ update msgSource model =
                         Week
             in
             ( { model | date = Just date, calendarState = Calendar.init timespan date }
-            , createPlanningRequest date model.selectedGroups model.selectedCollection model.settings
+            , createPlanningRequest date model.selectedGroups model.settings
             )
 
         GraphQlMsg response ->
@@ -86,25 +86,6 @@ update msgSource model =
                 Err err ->
                     ( { model | error = Just err, loading = False }, Cmd.none )
 
-        SetGroup idString ->
-            let
-                id =
-                    String.toInt idString
-                        |> Maybe.withDefault 0
-
-                groups =
-                    getGroup id
-                        |> List.singleton
-
-                ( load, action ) =
-                    if (model.loading == False) && (model.loop == False) then
-                        ( True, queryReload (createPlanningRequest model.calendarState.viewing groups model.selectedCollection model.settings) )
-
-                    else
-                        ( False, Cmd.none )
-            in
-            ( { model | selectedGroups = groups, loading = True, loop = True }, Cmd.batch [ Storage.saveGroups [ id ], action ] )
-
         SetGroups idsStrings ->
             let
                 groupsIds =
@@ -113,17 +94,14 @@ update msgSource model =
                 groups =
                     List.map getGroup groupsIds
 
-                ( load, action ) =
-                    if (model.loading == False) && (model.loop == False) then
-                        ( True, queryReload (createPlanningRequest model.calendarState.viewing groups model.selectedCollection model.settings) )
-
-                    else
-                        ( False, Cmd.none )
+                action =
+                    createPlanningRequest model.calendarState.viewing groups model.settings
+                        |> queryReload
             in
             ( { model | selectedGroups = groups, loading = True, loop = True }, Cmd.batch [ Storage.saveGroups groupsIds, action ] )
 
         Reload ->
-            ( { model | loading = True, loop = True }, queryReload (createPlanningRequest model.calendarState.viewing model.selectedGroups model.selectedCollection model.settings) )
+            ( { model | loading = True, loop = True }, queryReload (createPlanningRequest model.calendarState.viewing model.selectedGroups model.settings) )
 
         SetCalendarState calendarMsg ->
             calendarAction model calendarMsg
@@ -229,15 +207,15 @@ update msgSource model =
 
                 cmd =
                     Cmd.batch
-                        [ createPlanningRequest model.calendarState.viewing model.selectedGroups model.selectedCollection updatedSettings
+                        [ createPlanningRequest model.calendarState.viewing model.selectedGroups updatedSettings
                         , Storage.saveSettings updatedSettings
                         ]
             in
             ( { model | loading = True, loop = True, settings = updatedSettings }, queryReload cmd )
 
 
-createPlanningRequest : Posix -> List Group -> Collection -> Settings -> Cmd Msg
-createPlanningRequest date groups collection settings =
+createPlanningRequest : Posix -> List Group -> Settings -> Cmd Msg
+createPlanningRequest date groups settings =
     let
         dateFrom =
             date
@@ -253,13 +231,21 @@ createPlanningRequest date groups collection settings =
                 |> TimeExtra.ceiling TimeExtra.Sunday europe__paris
                 |> toDatetime
 
-        collectionName =
-            case collection of
-                Cyber ->
-                    "CYBER"
+        maybeFirstGrp =
+            List.head groups
 
-                Info ->
-                    "INFO"
+        collectionName =
+            case maybeFirstGrp of
+                Just collec ->
+                    case collec.collection of
+                        Cyber ->
+                            "CYBER"
+
+                        Info ->
+                            "INFO"
+
+                Nothing ->
+                    "CYBER"
 
         groupsSlugs =
             List.map .slug groups
@@ -275,7 +261,7 @@ calendarAction model calMsg =
 
         ( cmd, loading ) =
             if Time.toMonth europe__paris updatedCalendar.viewing /= Time.toMonth europe__paris model.calendarState.viewing then
-                ( createPlanningRequest updatedCalendar.viewing model.selectedGroups model.selectedCollection model.settings
+                ( createPlanningRequest updatedCalendar.viewing model.selectedGroups model.settings
                 , True
                 )
 

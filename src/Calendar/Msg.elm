@@ -1,10 +1,10 @@
-module Calendar.Msg exposing (InternalState, Msg(..), TimeSpan(..), Position, position, onMouseEnter, onClick)
+module Calendar.Msg exposing (InternalState, Msg(..), Position, TimeSpan(..), onClick, onMouseEnter, position)
 
 import Dict exposing (Dict)
-import Time exposing (Posix)
-import Json.Decode as Json
 import Html exposing (Attribute)
 import Html.Events exposing (on)
+import Json.Decode as Json
+import Time exposing (Posix)
 
 
 type TimeSpan

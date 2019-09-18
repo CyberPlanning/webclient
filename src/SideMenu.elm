@@ -51,22 +51,6 @@ view groups timespan { menuOpened, showCustom, showHack2g2 } =
         ]
 
 
-viewSelector : Group -> Html Msg
-viewSelector selected =
-    div [ class "sidemenu--selector" ]
-        [ label [ for "select-group" ] [ text "Groupes" ]
-        , select
-            [ class "sidemenu--selector"
-            , style "color" "white"
-            , id "select-group"
-            , on "change" <| Json.map SetGroup targetValue
-            , value (String.fromInt (getGroupId selected))
-            , multiple False
-            ]
-            (List.map optionGroup allGroups)
-        ]
-
-
 myOption : Options Msg
 myOption =
     { items = List.map (\x -> { value = String.fromInt x.id, text = x.name, enabled = True }) allGroups
