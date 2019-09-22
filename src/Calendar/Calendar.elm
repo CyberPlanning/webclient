@@ -18,13 +18,14 @@ type alias State =
     InternalState
 
 
-init : TimeSpan -> Posix -> State
-init timeSpan viewing =
+init : TimeSpan -> Posix -> Int -> State
+init timeSpan viewing columns =
     { timeSpan = timeSpan
     , viewing = viewing
     , hover = Nothing
     , position = Nothing
     , selected = Nothing
+    , columns = columns
     , joursFeries = getAllJourFerie (Time.toYear europe__paris viewing)
     }
 
@@ -44,6 +45,9 @@ update msg state =
 
         WeekForward ->
             page 7 state
+
+        SetColumns len ->
+            { state | columns = len }
 
         ChangeTimeSpan timeSpan ->
             { state | timeSpan = timeSpan }
