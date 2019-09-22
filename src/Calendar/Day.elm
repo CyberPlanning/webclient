@@ -1,6 +1,6 @@
 module Calendar.Day exposing (view, viewAllDayCell, viewDate, viewDayEvent, viewDayEvents, viewDayHeader, viewDaySlot, viewDaySlotGroup, viewHourSlot, viewTimeGutter, viewTimeGutterHeader, viewTimeSlot, viewTimeSlotGroup)
 
-import Calendar.Event exposing (Event, maybeViewDayEvent, rangeDescription)
+import Calendar.Event exposing (Event, eventSegment, rangeDescription)
 import Calendar.Helpers as Helpers
 import Calendar.JourFerie exposing (jourFerie)
 import Calendar.Msg exposing (InternalState, Msg(..))
@@ -14,13 +14,13 @@ import TimeZone exposing (europe__paris)
 
 
 view : InternalState -> List Event -> Html Msg
-view { selected, viewing, joursFeries } events =
+view state events =
     div [ class "calendar--day" ]
         [ div [ class "calendar--day-content" ]
-            [ viewTimeGutter viewing
+            [ viewTimeGutter state.viewing
             , div [ class "calendar--day" ]
-                [ viewDayHeader viewing
-                , viewDaySlot events selected viewing joursFeries
+                [ viewDayHeader state.viewing
+                , viewDaySlot state events
                 ]
             ]
         ]
@@ -76,29 +76,35 @@ viewTimeGutterHeader viewing =
         [ span [ class "calendar--date" ] [ text weekNum ]
         ]
 
+
 viewTimeGutterZone : Posix -> Html Msg
 viewTimeGutterZone viewing =
     let
         offset =
             viewing
-            |> TimeExtra.toOffset europe__paris
-            |> toFloat
+                |> TimeExtra.toOffset europe__paris
+                |> toFloat
 
-        zone = offset / 60
-            |> floor
-            |> String.fromInt
-            |> (++) "GMT+"
-
+        zone =
+            offset
+                / 60
+                |> floor
+                |> String.fromInt
+                |> (++) "GMT+"
     in
     div [ class "calendar--date-header-zone" ]
-        [ span [ ] [ text zone ]
+        [ span [] [ text zone ]
         ]
 
 
 viewTimeSlotGroup : Posix -> Int -> String -> Html Msg
 viewTimeSlotGroup viewing idx date =
     div [ class "calendar--time-slot-group" ]
-        [ if idx == 0 then viewTimeGutterZone viewing else text ""
+        [ if idx == 0 then
+            viewTimeGutterZone viewing
+
+          else
+            text ""
         , viewHourSlot date
         , div [ class "calendar--time-slot" ] []
         ]
@@ -110,11 +116,11 @@ viewHourSlot date =
         [ span [ class "calendar--time-slot-text" ] [ text date ] ]
 
 
-viewDaySlot : List Event -> Maybe String -> Posix -> Dict String Posix -> Html Msg
-viewDaySlot events selectedId day feries =
+viewDaySlot : InternalState -> List Event -> Html Msg
+viewDaySlot state events =
     Helpers.hours
         |> List.map viewDaySlotGroup
-        |> (\b a -> (++) a b) (viewDayEvents events selectedId day feries)
+        |> (\b a -> (++) a b) (viewDayEvents state events state.viewing)
         |> div [ class "calendar--day-slot" ]
 
 
@@ -133,11 +139,11 @@ viewTimeSlot date =
         []
 
 
-viewDayEvents : List Event -> Maybe String -> Posix -> Dict String Posix -> List (Html Msg)
-viewDayEvents events selectedId day feries =
+viewDayEvents : InternalState -> List Event -> Posix -> List (Html Msg)
+viewDayEvents state events day =
     let
         extra =
-            case jourFerie feries day of
+            case jourFerie state.joursFeries day of
                 Just name ->
                     text name
                         |> List.singleton
@@ -148,18 +154,17 @@ viewDayEvents events selectedId day feries =
                     []
 
         eventsHtml =
-            List.filterMap (viewDayEvent day selectedId) events
+            List.filterMap (viewDayEvent state day) events
     in
     extra ++ eventsHtml
 
 
-viewDayEvent : Posix -> Maybe String -> Event -> Maybe (Html Msg)
-viewDayEvent day selectedId event =
-    let
-        eventRange =
-            rangeDescription event.startTime event.endTime TimeExtra.Day day
-    in
-    maybeViewDayEvent event selectedId eventRange
+viewDayEvent : InternalState -> Posix -> Event -> Maybe (Html Msg)
+viewDayEvent state day event =
+    if rangeDescription event.startTime event.endTime TimeExtra.Day day then
+        Just <| eventSegment state event
+    else
+        Nothing
 
 
 viewAllDayCell : List Posix -> Html Msg

@@ -1,9 +1,9 @@
-module Calendar.Event exposing (Event, EventRange(..), PositionMode(..), Style, cellWidth, eventSegment, eventStyling, maybeViewDayEvent, offsetLength, offsetPercentage, percentDay, rangeDescription, rowSegment, styleDayEvent, styleRowSegment)
+module Calendar.Event exposing (Event, PositionMode(..), Style, cellWidth, eventSegment, eventStyling, offsetLength, offsetPercentage, percentDay, rangeDescription, rowSegment, styleDayEvent, styleRowSegment)
 
 -- import String.Extra
 
 import Calendar.Helpers as Helpers
-import Calendar.Msg exposing (Msg(..), TimeSpan(..), onClick, onMouseEnter)
+import Calendar.Msg exposing (InternalState, Msg(..), TimeSpan(..), onClick, onMouseEnter)
 import Html exposing (..)
 import Html.Attributes exposing (attribute, class, classList, style)
 import Html.Events exposing (onMouseLeave)
@@ -37,12 +37,7 @@ type PositionMode
     | Column Int Int
 
 
-type EventRange
-    = StartsAndEnds
-    | ExistsOutside
-
-
-rangeDescription : Posix -> Posix -> TimeExtra.Interval -> Posix -> EventRange
+rangeDescription : Posix -> Posix -> TimeExtra.Interval -> Posix -> Bool
 rangeDescription start end interval date =
     let
         -- Fix : floor and ceiling return same Time if it is midnight
@@ -61,19 +56,14 @@ rangeDescription start end interval date =
         endsThisInterval =
             isBetween begInterval endInterval end
     in
-    if startsThisInterval && endsThisInterval then
-        StartsAndEnds
-
-    else
-        ExistsOutside
-
+    startsThisInterval && endsThisInterval
 
 eventStyling :
-    Event
-    -> EventRange
+    InternalState
+    -> Event
     -> List ( String, Bool )
     -> List (Html.Attribute msg)
-eventStyling event eventRange customClasses =
+eventStyling state event customClasses =
     let
         eventStart =
             event.startTime
@@ -91,12 +81,7 @@ eventStyling event eventRange customClasses =
             escapeTitle event.title
 
         classes =
-            case eventRange of
-                StartsAndEnds ->
-                    "calendar--event calendar--event-starts-and-ends"
-
-                ExistsOutside ->
-                    ""
+            "calendar--event calendar--event-starts-and-ends"
 
         extraStyle =
             if String.isEmpty event.source then
@@ -106,7 +91,7 @@ eventStyling event eventRange customClasses =
                 [ style "border-color" colorFg ]
 
         styles =
-            styleDayEvent eventStart eventEnd event.position
+            styleDayEvent state eventStart eventEnd event.position
                 ++ styleColorDayEvent eventTitle colorFg colorBg
                 ++ extraStyle
     in
@@ -133,29 +118,31 @@ percentDay date min max =
     (fractionalDay date - min) / (max - min)
 
 
-styleDayEvent : Posix -> Posix -> PositionMode -> List (Html.Attribute msg)
-styleDayEvent start end position =
+styleDayEvent : InternalState -> Posix -> Posix -> PositionMode -> List (Html.Attribute msg)
+styleDayEvent state start end position =
     let
         ( left, width ) =
             case position of
                 All ->
                     ( "0", "96%" )
 
-                Column idx count ->
-                    -- TODO dynamic columns number
+                Column idx size ->
                     let
-                        size =
-                            96 / toFloat count
+                        fractionUnit =
+                            96 / toFloat state.columns
+
+                        fractionSize =
+                            fractionUnit * toFloat size
 
                         l =
                             idx
                                 |> toFloat
-                                |> (*) size
+                                |> (*) fractionUnit
                                 |> String.fromFloat
                                 |> (\x -> x ++ "%")
 
                         w =
-                            size
+                            fractionSize
                                 |> String.fromFloat
                                 |> (\x -> x ++ "%")
                     in
@@ -190,30 +177,14 @@ styleColorDayEvent title fg bg =
     , attribute "data-color" fg
     ]
 
-
-maybeViewDayEvent : Event -> Maybe String -> EventRange -> Maybe (Html Msg)
-maybeViewDayEvent event selectedId eventRange =
-    case eventRange of
-        ExistsOutside ->
-            Nothing
-
-        _ ->
-            Just <| eventSegment event selectedId eventRange
-
-
-eventSegment : Event -> Maybe String -> EventRange -> Html Msg
-eventSegment event selectedId eventRange =
+eventSegment : InternalState -> Event -> Html Msg
+eventSegment state event =
     let
         eventId =
             event.toId
 
-        isSelected =
-            Maybe.map ((==) eventId) selectedId
-                |> Maybe.withDefault False
-
         classes =
             [ ( "calendar--event-content", True )
-            , ( "calendar--event-content--is-selected", isSelected )
             ]
 
         title =
@@ -228,7 +199,7 @@ eventSegment event selectedId eventRange =
              , onMouseLeave <| EventMouseLeave eventId
              , onClick <| EventClick eventId
              ]
-                ++ eventStyling event eventRange classes
+                ++ eventStyling state event classes
             )
             (div [ class "calendar--event-title" ] title :: childs)
         ]
