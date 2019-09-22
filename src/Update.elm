@@ -40,7 +40,7 @@ update msgSource model =
                     else
                         Week
             in
-            ( { model | date = Just date, calendarState = Calendar.init timespan date }
+            ( { model | date = Just date, calendarState = Calendar.init timespan date (List.length model.selectedGroups) }
             , createPlanningRequest date model.selectedGroups model.settings
             )
 
@@ -75,13 +75,17 @@ update msgSource model =
                                 ++ hack2g2Events
                                 ++ customEvents
 
+                        newCalendarState =
+                            model.calendarState
+                                |> Calendar.update (CalMsg.SetColumns (List.length model.selectedGroups))
+
                         cmd =
                             Cmd.batch
                                 [ Storage.saveEvents query
                                 , Task.attempt (always Noop) (Browser.Dom.blur "select-group")
                                 ]
                     in
-                    ( { model | data = allEvents, loading = False, error = Nothing }, cmd )
+                    ( { model | data = allEvents, loading = False, error = Nothing, calendarState = newCalendarState }, cmd )
 
                 Err err ->
                     ( { model | error = Just err, loading = False }, Cmd.none )
@@ -270,7 +274,7 @@ calendarAction model calMsg =
 
         updatedCalWithJourFerie =
             if Time.toYear europe__paris updatedCalendar.viewing /= Time.toYear europe__paris model.calendarState.viewing then
-                Calendar.init updatedCalendar.timeSpan updatedCalendar.viewing
+                Calendar.init updatedCalendar.timeSpan updatedCalendar.viewing updatedCalendar.columns
 
             else
                 updatedCalendar

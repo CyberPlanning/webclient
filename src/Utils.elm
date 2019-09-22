@@ -8,6 +8,7 @@ import Config exposing (allGroups, firstGroup)
 import Iso8601
 import Model exposing (Collection(..), Group, Model, Settings)
 import Secret
+import Set
 import Storage
 import Swipe
 import Time exposing (Posix)
@@ -68,7 +69,7 @@ initialModel { settings, groupIds, offlineEvents } =
     , date = Nothing
     , loading = True
     , selectedGroups = groups
-    , calendarState = Calendar.init Calendar.Msg.Week (Time.millisToPosix 0)
+    , calendarState = Calendar.init Calendar.Msg.Week (Time.millisToPosix 0) (List.length groups)
     , size = { width = 1200, height = 800 }
     , swipe = Swipe.init
     , loop = False
@@ -100,8 +101,17 @@ toCalEvent selectedGroups event =
         groups =
             Maybe.withDefault [] event.groups
 
+        selectedGroupsSet =
+            selectedGroups
+                |> List.map .slug
+                |> Set.fromList
+
         affiliations =
-            Maybe.withDefault [] event.affiliations
+            event.affiliations
+                |> Maybe.withDefault []
+                |> Set.fromList
+                |> Set.intersect selectedGroupsSet
+                |> Set.toList
 
         description =
             List.map (String.join ", ") [ classes, teachers, groups ]
@@ -134,7 +144,7 @@ toCalEvent selectedGroups event =
                 CalEvent.All
 
             else
-                CalEvent.Column firstAffIndex selectedLen
+                CalEvent.Column firstAffIndex affiliationLen
     in
     { toId = event.eventId
     , title = event.title
