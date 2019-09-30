@@ -1,4 +1,4 @@
-module Update exposing (calendarAction, createPlanningRequest, update)
+module Update exposing (calendarAction, maybeCreatePlanningRequest, update)
 
 import Browser.Dom
 import Calendar.Calendar as Calendar
@@ -41,7 +41,7 @@ update msgSource model =
                         Week
             in
             ( { model | date = Just date, calendarState = Calendar.init timespan date (List.length model.selectedGroups) }
-            , createPlanningRequest date model.selectedGroups model.settings
+            , maybeCreatePlanningRequest date model.selectedGroups model.settings
             )
 
         GraphQlMsg response ->
@@ -99,13 +99,13 @@ update msgSource model =
                     List.map getGroup groupsIds
 
                 action =
-                    createPlanningRequest model.calendarState.viewing groups model.settings
+                    maybeCreatePlanningRequest model.calendarState.viewing groups model.settings
                         |> queryReload
             in
             ( { model | selectedGroups = groups, loading = True, loop = True }, Cmd.batch [ Storage.saveGroups groupsIds, action ] )
 
         Reload ->
-            ( { model | loading = True, loop = True }, queryReload (createPlanningRequest model.calendarState.viewing model.selectedGroups model.settings) )
+            ( { model | loading = True, loop = True }, queryReload (maybeCreatePlanningRequest model.calendarState.viewing model.selectedGroups model.settings) )
 
         SetCalendarState calendarMsg ->
             calendarAction model calendarMsg
@@ -211,15 +211,37 @@ update msgSource model =
 
                 cmd =
                     Cmd.batch
-                        [ createPlanningRequest model.calendarState.viewing model.selectedGroups updatedSettings
+                        [ maybeCreatePlanningRequest model.calendarState.viewing model.selectedGroups updatedSettings
                         , Storage.saveSettings updatedSettings
                         ]
             in
             ( { model | loading = True, loop = True, settings = updatedSettings }, queryReload cmd )
 
 
-createPlanningRequest : Posix -> List Group -> Settings -> Cmd Msg
-createPlanningRequest date groups settings =
+maybeCreatePlanningRequest : Posix -> List Group -> Settings -> Cmd Msg
+maybeCreatePlanningRequest date groups settings =
+    let
+        maybeFirstGrp =
+            List.head groups
+
+        slugs =
+            List.map .slug groups
+    in
+    case maybeFirstGrp of
+        Just firstGroup ->
+            case firstGroup.collection of
+                Cyber ->
+                    createPlanningRequest date "CYBER" slugs settings
+
+                Info ->
+                    createPlanningRequest date "INFO" slugs settings
+
+        Nothing ->
+            Cmd.none
+
+
+createPlanningRequest : Posix -> String -> List String -> Settings -> Cmd Msg
+createPlanningRequest date collectionName slugs settings =
     let
         dateFrom =
             date
@@ -234,27 +256,8 @@ createPlanningRequest date groups settings =
                 |> TimeExtra.ceiling TimeExtra.Month europe__paris
                 |> TimeExtra.ceiling TimeExtra.Sunday europe__paris
                 |> toDatetime
-
-        maybeFirstGrp =
-            List.head groups
-
-        collectionName =
-            case maybeFirstGrp of
-                Just collec ->
-                    case collec.collection of
-                        Cyber ->
-                            "CYBER"
-
-                        Info ->
-                            "INFO"
-
-                Nothing ->
-                    "CYBER"
-
-        groupsSlugs =
-            List.map .slug groups
     in
-    sendRequest dateFrom dateTo groupsSlugs settings collectionName
+    sendRequest dateFrom dateTo slugs settings collectionName
 
 
 calendarAction : Model -> CalMsg.Msg -> ( Model, Cmd Msg )
@@ -265,7 +268,7 @@ calendarAction model calMsg =
 
         ( cmd, loading ) =
             if Time.toMonth europe__paris updatedCalendar.viewing /= Time.toMonth europe__paris model.calendarState.viewing then
-                ( createPlanningRequest updatedCalendar.viewing model.selectedGroups model.settings
+                ( maybeCreatePlanningRequest updatedCalendar.viewing model.selectedGroups model.settings
                 , True
                 )
 
