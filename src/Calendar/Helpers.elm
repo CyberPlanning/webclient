@@ -1,23 +1,18 @@
 module Calendar.Helpers exposing (colorToHex, computeColor, dateString, dayRangeOfAllWeek, dayRangeOfWeek, hours, noBright)
 
-import Color exposing (Color)
 import Hex
 import MD5
+import MyTime
 import Time exposing (Posix, Weekday(..))
-import Time.Extra as TimeExtra exposing (Parts)
-import TimeZone exposing (europe__paris)
-
-
-paris : Time.Zone
-paris =
-    europe__paris
+import Time.Extra as TimeExtra
+import Vendor.Color exposing (Color)
 
 
 dateString : Posix -> String
 dateString date =
     let
         weekday =
-            Time.toWeekday paris date
+            MyTime.toWeekday date
 
         weekname =
             case weekday of
@@ -43,7 +38,7 @@ dateString date =
                     "Dimanche"
 
         day =
-            Time.toDay paris date
+            MyTime.toDay date
                 |> String.fromInt
     in
     weekname ++ " " ++ day
@@ -74,14 +69,13 @@ dayRangeOfWeek date =
         weekDate =
             date
                 -- move to middle week because week-end are not showned
-                |> TimeExtra.add TimeExtra.Day 2 paris
-                |> TimeExtra.floor TimeExtra.Monday paris
+                |> MyTime.add TimeExtra.Day 2
+                |> MyTime.floor TimeExtra.Monday
     in
-    TimeExtra.range TimeExtra.Day
+    MyTime.range TimeExtra.Day
         1
-        paris
         weekDate
-        (TimeExtra.ceiling TimeExtra.Saturday paris weekDate)
+        (MyTime.ceiling TimeExtra.Saturday weekDate)
 
 
 dayRangeOfAllWeek : Posix -> List Posix
@@ -90,14 +84,13 @@ dayRangeOfAllWeek date =
         weekDate =
             date
                 -- Fix : range return no value if it is Monday midnight
-                |> TimeExtra.floor TimeExtra.Day paris
-                |> TimeExtra.add TimeExtra.Millisecond 1 paris
+                |> MyTime.floor TimeExtra.Day
+                |> MyTime.add TimeExtra.Millisecond 1
     in
-    TimeExtra.range TimeExtra.Day
+    MyTime.range TimeExtra.Day
         1
-        paris
-        (TimeExtra.floor TimeExtra.Monday paris weekDate)
-        (TimeExtra.ceiling TimeExtra.Monday paris weekDate)
+        (MyTime.floor TimeExtra.Monday weekDate)
+        (MyTime.ceiling TimeExtra.Monday weekDate)
 
 
 computeColor : String -> String
@@ -124,7 +117,7 @@ computeColor text =
                 |> Hex.fromString
                 |> Result.withDefault 0
     in
-    Color.rgb red green blue
+    Vendor.Color.rgb red green blue
         |> noBright
         |> colorToHex
 
@@ -133,7 +126,7 @@ colorToHex : Color -> String
 colorToHex color =
     let
         rgb =
-            Color.toRgb color
+            Vendor.Color.toRgb color
 
         toHex =
             Hex.toString >> String.padLeft 2 '0'
@@ -145,7 +138,7 @@ noBright : Color -> Color
 noBright color =
     let
         hsl =
-            Color.toHsl color
+            Vendor.Color.toHsl color
 
         -- hsl.lightness * 0.7
         newLightness =
@@ -158,4 +151,4 @@ noBright color =
         newSaturation =
             hsl.saturation * 0.85
     in
-    Color.hsl hsl.hue hsl.saturation newLightness
+    Vendor.Color.hsl hsl.hue hsl.saturation newLightness

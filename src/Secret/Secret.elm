@@ -1,4 +1,4 @@
-module Secret exposing (StateList, classStyle, createStates, isHelpActivated, update, view)
+module Secret.Secret exposing (StateList, classStyle, createStates, isHelpActivated, update, view)
 
 import Array exposing (Array)
 import Calendar.Event as Cal

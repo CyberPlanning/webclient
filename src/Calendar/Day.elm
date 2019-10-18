@@ -8,9 +8,9 @@ import Dict exposing (Dict)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
+import MyTime
 import Time exposing (Posix)
 import Time.Extra as TimeExtra
-import TimeZone exposing (europe__paris)
 
 
 view : InternalState -> List Event -> Html Msg
@@ -59,15 +59,11 @@ viewTimeGutterHeader viewing =
     let
         date =
             viewing
-                |> TimeExtra.ceiling TimeExtra.Sunday europe__paris
-
-        year =
-            Time.toYear europe__paris date
+                |> MyTime.ceiling TimeExtra.Sunday
 
         weekNum =
-            TimeExtra.diff TimeExtra.Week
-                europe__paris
-                (TimeExtra.partsToPosix europe__paris (TimeExtra.Parts year Time.Jan 1 0 0 0 0))
+            MyTime.diff TimeExtra.Week
+                (MyTime.floor TimeExtra.Year date)
                 date
                 |> (+) 1
                 |> String.fromInt
@@ -82,8 +78,7 @@ viewTimeGutterZone viewing =
     let
         offset =
             viewing
-                |> TimeExtra.toOffset europe__paris
-                |> toFloat
+                |> MyTime.toOffset
 
         zone =
             offset
@@ -163,6 +158,7 @@ viewDayEvent : InternalState -> Posix -> Event -> Maybe (Html Msg)
 viewDayEvent state day event =
     if rangeDescription event.startTime event.endTime TimeExtra.Day day then
         Just <| eventSegment state event
+
     else
         Nothing
 

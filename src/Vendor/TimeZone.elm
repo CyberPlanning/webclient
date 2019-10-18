@@ -1,4 +1,4 @@
-module TimeZone exposing (europe__paris)
+module Vendor.TimeZone exposing (europe__paris)
 
 import Time exposing (Zone, customZone)
 

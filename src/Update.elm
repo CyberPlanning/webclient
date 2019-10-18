@@ -6,15 +6,15 @@ import Calendar.Msg as CalMsg exposing (TimeSpan(..))
 import Config exposing (allGroups, firstGroup)
 import Model exposing (Collection(..), CustomEvent(..), Group, Model, Settings)
 import Msg exposing (Msg(..))
+import MyTime
 import Process
-import Query exposing (sendRequest)
-import Secret
+import Query.Query exposing (sendRequest)
+import Secret.Secret as Secret
 import Storage
 import Swipe
 import Task
 import Time exposing (Posix)
 import Time.Extra as TimeExtra
-import TimeZone exposing (europe__paris)
 import Utils exposing (find, getGroup, toCalEvents, toCalEventsWithSource, toDatetime)
 
 
@@ -245,16 +245,16 @@ createPlanningRequest date collectionName slugs settings =
     let
         dateFrom =
             date
-                |> TimeExtra.floor TimeExtra.Month europe__paris
-                |> TimeExtra.floor TimeExtra.Monday europe__paris
+                |> MyTime.floor TimeExtra.Month
+                |> MyTime.floor TimeExtra.Monday
                 |> toDatetime
 
         dateTo =
             date
                 -- Fix issue : Event not loaded in October to November transition
-                |> TimeExtra.add TimeExtra.Day 1 europe__paris
-                |> TimeExtra.ceiling TimeExtra.Month europe__paris
-                |> TimeExtra.ceiling TimeExtra.Sunday europe__paris
+                |> MyTime.add TimeExtra.Day 1
+                |> MyTime.ceiling TimeExtra.Month
+                |> MyTime.ceiling TimeExtra.Sunday
                 |> toDatetime
     in
     sendRequest dateFrom dateTo slugs settings collectionName
@@ -267,7 +267,7 @@ calendarAction model calMsg =
             Calendar.update calMsg model.calendarState
 
         ( cmd, loading ) =
-            if Time.toMonth europe__paris updatedCalendar.viewing /= Time.toMonth europe__paris model.calendarState.viewing then
+            if MyTime.toMonth updatedCalendar.viewing /= MyTime.toMonth model.calendarState.viewing then
                 ( maybeCreatePlanningRequest updatedCalendar.viewing model.selectedGroups model.settings
                 , True
                 )
@@ -276,7 +276,7 @@ calendarAction model calMsg =
                 ( Cmd.none, False )
 
         updatedCalWithJourFerie =
-            if Time.toYear europe__paris updatedCalendar.viewing /= Time.toYear europe__paris model.calendarState.viewing then
+            if MyTime.toYear updatedCalendar.viewing /= MyTime.toYear model.calendarState.viewing then
                 Calendar.init updatedCalendar.timeSpan updatedCalendar.viewing updatedCalendar.columns
 
             else

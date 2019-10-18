@@ -1,4 +1,4 @@
-module Color exposing
+module Vendor.Color exposing
     ( Color
     , rgb, rgba, hsl, hsla, grayscale, greyscale, complement
     , toRgb, toHsl

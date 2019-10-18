@@ -1,4 +1,4 @@
-module SideMenu exposing (view)
+module View.SideMenu exposing (view)
 
 import Calendar.Msg exposing (TimeSpan(..))
 import Config exposing (allGroups)

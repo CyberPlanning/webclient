@@ -1,4 +1,4 @@
-module Types exposing (Event, Planning, Query, decodeEvent, decodePlanning, decodeQuery)
+module Query.Types exposing (Event, Planning, Query, decodeEvent, decodePlanning, decodeQuery)
 
 import Json.Decode as Decode exposing (Decoder, field, int, maybe, string)
 

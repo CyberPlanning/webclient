@@ -7,12 +7,12 @@ import Calendar.Msg
 import Config exposing (allGroups, firstGroup)
 import Iso8601
 import Model exposing (Collection(..), Group, Model, Settings)
-import Secret
+import Query.Types exposing (Event)
+import Secret.Secret as Secret
 import Set
 import Storage
 import Swipe
 import Time exposing (Posix)
-import Types exposing (Event)
 
 
 getGroupId : Group -> Int

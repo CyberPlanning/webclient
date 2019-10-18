@@ -10,7 +10,7 @@ import Storage
 import Task
 import Update exposing (update)
 import Utils exposing (initialModel)
-import View exposing (view)
+import View.View exposing (view)
 
 
 

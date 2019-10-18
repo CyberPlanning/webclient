@@ -1,21 +1,15 @@
-module Model exposing (Collection(..), CustomEvent(..), FetchStatus(..), Group, Model, PlanningResponse, Settings, WindowSize)
+module Model exposing (Collection(..), CustomEvent(..), FetchStatus(..), Group, Model, Settings, WindowSize)
 
 import Calendar.Calendar as Calendar
 import Calendar.Event as CalEvent
-import Color
 import Http exposing (Error)
-import Secret
+import Secret.Secret
 import Swipe
 import Time exposing (Posix)
-import Types exposing (Event, Query)
 
 
 
 ---- MODEL ----
-
-
-type alias PlanningResponse =
-    Result Error Query
 
 
 type alias WindowSize =
@@ -34,7 +28,7 @@ type alias Model =
     , calendarState : Calendar.State
     , swipe : Swipe.State
     , loop : Bool
-    , secret : Secret.StateList
+    , secret : Secret.Secret.StateList
     , settings : Settings
     , tooltipHover : Bool
     }

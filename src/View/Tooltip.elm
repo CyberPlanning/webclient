@@ -1,4 +1,4 @@
-module Tooltip exposing (viewTooltip)
+module View.Tooltip exposing (viewTooltip)
 
 import Calendar.Event as CalEvent
 import Calendar.Msg exposing (Position)
@@ -6,8 +6,8 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Model exposing (WindowSize)
 import Msg exposing (Msg(..))
+import MyTime
 import Time exposing (Posix)
-import TimeZone exposing (europe__paris)
 
 
 viewTooltip : Maybe CalEvent.Event -> Maybe Position -> WindowSize -> Html Msg
@@ -96,12 +96,12 @@ toString : Posix -> String
 toString time =
     let
         minutes =
-            Time.toMinute europe__paris time
+            MyTime.toMinute time
                 |> String.fromInt
                 |> String.padLeft 2 '0'
 
         hours =
-            Time.toHour europe__paris time
+            MyTime.toHour time
                 |> String.fromInt
     in
     hours ++ ":" ++ minutes

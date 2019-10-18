@@ -8,10 +8,10 @@ import Html exposing (..)
 import Html.Attributes exposing (attribute, class, classList, style)
 import Html.Events exposing (onMouseLeave)
 import Iso8601
+import MyTime
 import String
 import Time exposing (Posix, Weekday(..))
 import Time.Extra as TimeExtra
-import TimeZone exposing (europe__paris)
 
 
 type alias Style =
@@ -42,13 +42,13 @@ rangeDescription start end interval date =
     let
         -- Fix : floor and ceiling return same Time if it is midnight
         day =
-            TimeExtra.add TimeExtra.Millisecond 1 europe__paris date
+            MyTime.add TimeExtra.Millisecond 1 date
 
         begInterval =
-            TimeExtra.floor interval europe__paris day
+            MyTime.floor interval day
 
         endInterval =
-            TimeExtra.ceiling interval europe__paris day
+            MyTime.ceiling interval day
 
         startsThisInterval =
             isBetween begInterval endInterval start
@@ -57,6 +57,7 @@ rangeDescription start end interval date =
             isBetween begInterval endInterval end
     in
     startsThisInterval && endsThisInterval
+
 
 eventStyling :
     InternalState
@@ -102,13 +103,13 @@ fractionalDay : Posix -> Float
 fractionalDay time =
     let
         hours =
-            Time.toHour europe__paris time
+            MyTime.toHour time
 
         minutes =
-            Time.toMinute europe__paris time
+            MyTime.toMinute time
 
         seconds =
-            Time.toSecond europe__paris time
+            MyTime.toSecond time
     in
     toFloat ((hours * 3600) + (minutes * 60) + seconds) / (24 * 3600)
 
@@ -177,6 +178,7 @@ styleColorDayEvent title fg bg =
     , attribute "data-color" fg
     ]
 
+
 eventSegment : InternalState -> Event -> Html Msg
 eventSegment state event =
     let
@@ -222,8 +224,8 @@ cellWidth =
 
 offsetLength : Posix -> Float
 offsetLength date =
-    Time.toWeekday europe__paris date
-        |> weekdayToNumber
+    MyTime.toWeekday date
+        |> MyTime.weekdayToNumber
         |> modBy 7
         |> toFloat
         |> (*) cellWidth
@@ -267,33 +269,3 @@ isBetween start end current =
 escapeTitle : String -> String
 escapeTitle =
     always ""
-
-
-
--- String.Extra.removeAccents
--- >> String.Extra.underscored
-
-
-weekdayToNumber : Weekday -> Int
-weekdayToNumber wd =
-    case wd of
-        Mon ->
-            1
-
-        Tue ->
-            2
-
-        Wed ->
-            3
-
-        Thu ->
-            4
-
-        Fri ->
-            5
-
-        Sat ->
-            6
-
-        Sun ->
-            7

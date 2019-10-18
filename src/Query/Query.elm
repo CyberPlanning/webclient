@@ -1,4 +1,4 @@
-module Query exposing (Params, authorizationHeader, eventsApiQuery, post, requestAPI, requestBody, sendRequest)
+module Query.Query exposing (Params, authorizationHeader, eventsApiQuery, post, requestAPI, requestBody, sendRequest)
 
 import Config
 import Http exposing (Body, Error, Header, Request)
@@ -6,7 +6,7 @@ import Json.Decode as Decode
 import Json.Encode as Encode
 import Model exposing (Settings)
 import Msg exposing (Msg(..))
-import Types exposing (Query, decodeQuery)
+import Query.Types exposing (Query, decodeQuery)
 
 
 eventsApiQuery : String

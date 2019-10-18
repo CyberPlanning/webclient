@@ -1,4 +1,4 @@
-module View exposing (view)
+module View.View exposing (view)
 
 import Browser exposing (Document)
 import Calendar.Calendar as Calendar
@@ -11,14 +11,14 @@ import Http
 import Json.Decode as Json
 import Model exposing (FetchStatus(..), Group, Model)
 import Msg exposing (Msg(..))
-import Secret
+import MyTime
 import Secret.Help
-import SideMenu
+import Secret.Secret
 import Swipe exposing (onSwipe)
 import Time exposing (Month(..), Posix)
-import TimeZone exposing (europe__paris)
-import Tooltip
 import Utils exposing (toDatetime)
+import View.SideMenu as SideMenu
+import View.Tooltip as Tooltip
 
 
 
@@ -29,7 +29,7 @@ view : Model -> Document Msg
 view model =
     let
         events =
-            if Secret.isHelpActivated model.secret then
+            if Secret.Secret.isHelpActivated model.secret then
                 Secret.Help.helpEvents model.calendarState.viewing
 
             else
@@ -38,7 +38,7 @@ view model =
         attrs =
             Swipe.onSwipe SwipeEvent
                 ++ [ class "main--container" ]
-                ++ Secret.classStyle model.secret
+                ++ Secret.Secret.classStyle model.secret
 
         currentEventId =
             if model.size.width < Config.minWeekWidth then
@@ -57,7 +57,7 @@ view model =
                     Nothing
 
         funThings =
-            Secret.view model.secret
+            Secret.Secret.view model.secret
 
         fetchStatus =
             if model.loading then
@@ -110,7 +110,7 @@ formatDateTitle : Posix -> String
 formatDateTitle date =
     let
         month =
-            Time.toMonth europe__paris date
+            MyTime.toMonth date
 
         monthName =
             case month of
@@ -151,7 +151,7 @@ formatDateTitle date =
                     "Décembre"
 
         year =
-            Time.toYear europe__paris date
+            MyTime.toYear date
                 |> String.fromInt
     in
     monthName ++ " " ++ year
@@ -223,7 +223,7 @@ viewMessage fetchStatus =
                     [ span [] [ text "Loading" ] ]
 
                 Error err ->
-                    [ i [ class "icon-warn", style "color" "#f9f961" ] [], span [ style "color" "#f9f961" ] [ errorMessage err |> text ] ]
+                    [ i [ class "icon-wifi", style "color" "#f9f961" ] [], span [ style "color" "#f9f961" ] [ errorMessage err |> text ] ]
 
                 None ->
                     [ span [] [ text "" ] ]

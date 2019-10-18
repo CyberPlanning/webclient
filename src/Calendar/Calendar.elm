@@ -9,9 +9,9 @@ import Html exposing (..)
 import Html.Attributes exposing (class)
 import Html.Events exposing (keyCode, on)
 import Json.Decode as Json
+import MyTime
 import Time exposing (Posix)
 import Time.Extra as TimeExtra
-import TimeZone exposing (europe__paris)
 
 
 type alias State =
@@ -26,7 +26,7 @@ init timeSpan viewing columns =
     , position = Nothing
     , selected = Nothing
     , columns = columns
-    , joursFeries = getAllJourFerie (Time.toYear europe__paris viewing)
+    , joursFeries = getAllJourFerie (MyTime.toYear viewing)
     }
 
 
@@ -82,7 +82,7 @@ page step state =
                 Day ->
                     TimeExtra.Day
     in
-    { state | viewing = TimeExtra.add interval step europe__paris viewing, hover = Nothing, selected = Nothing }
+    { state | viewing = MyTime.add interval step viewing, hover = Nothing, selected = Nothing }
 
 
 view : List Event -> State -> Html Msg

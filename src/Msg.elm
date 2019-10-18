@@ -4,9 +4,9 @@ import Browser.Dom exposing (Viewport)
 import Calendar.Msg as Calendar
 import Http exposing (Error)
 import Model exposing (CustomEvent)
+import Query.Types exposing (Query)
 import Swipe
 import Time exposing (Posix)
-import Types exposing (Query)
 
 
 type Msg
