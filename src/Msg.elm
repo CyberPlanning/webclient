@@ -19,7 +19,7 @@ type Msg
     | PageForward
     | KeyDown Int
     | SetCalendarState Calendar.Msg
-    | SwipeEvent Swipe.Msg
+    | SwipeEvent Vendor.Swipe.Msg
     | ClickToday
     | ToggleMenu
     | StopReloadIcon ()

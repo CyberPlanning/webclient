@@ -11,8 +11,8 @@ import Query.Types exposing (Event)
 import Secret.Secret as Secret
 import Set
 import Storage
-import Swipe
 import Time exposing (Posix)
+import Vendor.Swipe
 
 
 getGroupId : Group -> Int
@@ -32,7 +32,7 @@ toDatetime =
 
 
 initialModel : Storage.Storage -> Model
-initialModel { settings, groupIds, offlineEvents } =
+initialModel { graphqlUrl, settings, groupIds, offlineEvents } =
     let
         groups =
             List.map getGroup groupIds
@@ -71,7 +71,7 @@ initialModel { settings, groupIds, offlineEvents } =
     , selectedGroups = groups
     , calendarState = Calendar.init Calendar.Msg.Week (Time.millisToPosix 0) (List.length groups)
     , size = { width = 1200, height = 800 }
-    , swipe = Swipe.init
+    , swipe = Vendor.Swipe.init
     , loop = False
     , secret = Secret.createStates
     , settings = settings

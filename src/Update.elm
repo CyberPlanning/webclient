@@ -1,4 +1,4 @@
-module Update exposing (calendarAction, maybeCreatePlanningRequest, update)
+module Update exposing (update)
 
 import Browser.Dom
 import Calendar.Calendar as Calendar
@@ -8,14 +8,15 @@ import Model exposing (Collection(..), CustomEvent(..), Group, Model, Settings)
 import Msg exposing (Msg(..))
 import MyTime
 import Process
+import Query.PlanningRequest exposing (maybeCreatePlanningRequest)
 import Query.Query exposing (sendRequest)
 import Secret.Secret as Secret
 import Storage
-import Swipe
+import Vendor.Swipe as Swipe
 import Task
 import Time exposing (Posix)
 import Time.Extra as TimeExtra
-import Utils exposing (find, getGroup, toCalEvents, toCalEventsWithSource, toDatetime)
+import Utils exposing (find, getGroup, toCalEvents, toCalEventsWithSource)
 
 
 
@@ -216,48 +217,6 @@ update msgSource model =
                         ]
             in
             ( { model | loading = True, loop = True, settings = updatedSettings }, queryReload cmd )
-
-
-maybeCreatePlanningRequest : Posix -> List Group -> Settings -> Cmd Msg
-maybeCreatePlanningRequest date groups settings =
-    let
-        maybeFirstGrp =
-            List.head groups
-
-        slugs =
-            List.map .slug groups
-    in
-    case maybeFirstGrp of
-        Just firstGroup ->
-            case firstGroup.collection of
-                Cyber ->
-                    createPlanningRequest date "CYBER" slugs settings
-
-                Info ->
-                    createPlanningRequest date "INFO" slugs settings
-
-        Nothing ->
-            Cmd.none
-
-
-createPlanningRequest : Posix -> String -> List String -> Settings -> Cmd Msg
-createPlanningRequest date collectionName slugs settings =
-    let
-        dateFrom =
-            date
-                |> MyTime.floor TimeExtra.Month
-                |> MyTime.floor TimeExtra.Monday
-                |> toDatetime
-
-        dateTo =
-            date
-                -- Fix issue : Event not loaded in October to November transition
-                |> MyTime.add TimeExtra.Day 1
-                |> MyTime.ceiling TimeExtra.Month
-                |> MyTime.ceiling TimeExtra.Sunday
-                |> toDatetime
-    in
-    sendRequest dateFrom dateTo slugs settings collectionName
 
 
 calendarAction : Model -> CalMsg.Msg -> ( Model, Cmd Msg )

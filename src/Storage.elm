@@ -5,7 +5,8 @@ import Query.Types
 
 
 type alias Storage =
-    { settings : Model.Settings
+    { graphqlUrl : String
+    , settings : Model.Settings
     , groupIds : List Int
     , offlineEvents : Query.Types.Query
     }

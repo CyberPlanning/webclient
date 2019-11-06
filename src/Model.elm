@@ -4,8 +4,8 @@ import Calendar.Calendar as Calendar
 import Calendar.Event as CalEvent
 import Http exposing (Error)
 import Secret.Secret
-import Swipe
 import Time exposing (Posix)
+import Vendor.Swipe
 
 
 
@@ -26,7 +26,7 @@ type alias Model =
     , loading : Bool
     , size : WindowSize
     , calendarState : Calendar.State
-    , swipe : Swipe.State
+    , swipe : Vendor.Swipe.State
     , loop : Bool
     , secret : Secret.Secret.StateList
     , settings : Settings

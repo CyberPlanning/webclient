@@ -1,4 +1,4 @@
-module Query.Query exposing (Params, authorizationHeader, eventsApiQuery, post, requestAPI, requestBody, sendRequest)
+module Query.Query exposing (Params, eventsApiQuery, sendRequest)
 
 import Config
 import Http exposing (Body, Error, Header, Request)
@@ -90,15 +90,8 @@ requestBody queryString { collec, from, to, grs, hack2g2, custom } =
         |> Http.jsonBody
 
 
-sendRequest : String -> String -> List String -> Settings -> String -> Cmd Msg
-sendRequest from to groups { showCustom, showHack2g2 } collection =
-    { collec = collection
-    , from = from
-    , to = to
-    , grs = groups
-    , hack2g2 = showHack2g2
-    , custom = showCustom
-    }
-        |> requestBody eventsApiQuery
+sendRequest : Params -> Cmd Msg
+sendRequest params =
+    requestBody eventsApiQuery params
         |> post Config.apiUrl []
         |> requestAPI GraphQlMsg

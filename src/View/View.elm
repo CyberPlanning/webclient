@@ -14,9 +14,9 @@ import Msg exposing (Msg(..))
 import MyTime
 import Secret.Help
 import Secret.Secret
-import Swipe exposing (onSwipe)
 import Time exposing (Month(..), Posix)
 import Utils exposing (toDatetime)
+import Vendor.Swipe exposing (onSwipe)
 import View.SideMenu as SideMenu
 import View.Tooltip as Tooltip
 
@@ -36,7 +36,7 @@ view model =
                 model.data
 
         attrs =
-            Swipe.onSwipe SwipeEvent
+            onSwipe SwipeEvent
                 ++ [ class "main--container" ]
                 ++ Secret.Secret.classStyle model.secret
 
