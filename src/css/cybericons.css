@@ -1,21 +1,21 @@
 @font-face {
     font-family: 'cybericons';
-    src: url('font/cybericons.eot?15013287');
-    src: url('font/cybericons.eot?15013287#iefix') format('embedded-opentype'), url('font/cybericons.woff2?15013287') format('woff2'), url('font/cybericons.woff?15013287') format('woff'),
-        url('font/cybericons.ttf?15013287') format('truetype'), url('font/cybericons.svg?15013287#cybericons') format('svg');
+    src: url('font/cybericons.eot?33213932');
+    src: url('font/cybericons.eot?33213932#iefix') format('embedded-opentype'), url('font/cybericons.woff2?33213932') format('woff2'), url('font/cybericons.woff?33213932') format('woff'),
+        url('font/cybericons.ttf?33213932') format('truetype'), url('font/cybericons.svg?33213932#cybericons') format('svg');
     font-weight: normal;
     font-style: normal;
 }
 /* Chrome hack: SVG is rendered more smooth in Windozze. 100% magic, uncomment if you need it. */
 /* Note, that will break hinting! In other OS-es font will be not as sharp as it could be */
 /*
-@media screen and (-webkit-min-device-pixel-ratio:0) {
-  @font-face {
-    font-family: 'cybericons';
-    src: url('font/cybericons.svg?15013287#cybericons') format('svg');
+  @media screen and (-webkit-min-device-pixel-ratio:0) {
+    @font-face {
+      font-family: 'cybericons';
+      src: url('font/cybericons.svg?33213932#cybericons') format('svg');
+    }
   }
-}
-*/
+  */
 
 [class^='icon-']:before,
 [class*=' icon-']:before {
@@ -78,6 +78,9 @@
 .icon-menu:before {
     content: '\f0c9';
 } /* '' */
+.icon-today:before {
+    content: '\f133';
+} /* '' */
 .icon-wifi:before {
     content: '\f1eb';
 } /* '' */

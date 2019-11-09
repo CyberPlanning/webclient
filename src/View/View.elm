@@ -93,11 +93,26 @@ view model =
 
 viewToolbar : Posix -> Bool -> Bool -> FetchStatus -> Html Msg
 viewToolbar viewing displayArrows loop fetchStatus =
+    let
+        navigations =
+            if displayArrows then
+                [ viewArrowButton "icon-left" "Previous Page"
+                , viewArrowButton "icon-right" "Next Page"
+                ]
+
+            else
+                []
+    in
     div [ class "main--toolbar" ]
-        [ viewPagination displayArrows loop
-        , viewMessage fetchStatus
-        , viewTitle viewing
-        ]
+        (viewMenuButton
+            :: navigations
+            ++ [ viewTodayButton
+               , viewTodayIconButton
+               , viewTitle viewing
+               , viewMessage fetchStatus
+               , viewReloadButton loop
+               ]
+        )
 
 
 viewTitle : Posix -> Html Msg
@@ -157,35 +172,27 @@ formatDateTitle date =
     monthName ++ " " ++ year
 
 
-viewPagination : Bool -> Bool -> Html Msg
-viewPagination displayArrows loop =
-    let
-        navigations =
-            if displayArrows then
-                [ navButton
-                    [ class "main--navigatiors-button", onClick PageBack, attribute "aria-label" "Previous Page" ]
-                    [ i [ class "icon-left" ] []
-                    ]
-                , navButton
-                    [ class "main--navigatiors-button", onClick PageForward, attribute "aria-label" "Next Page" ]
-                    [ i [ class "icon-right" ] []
-                    ]
-                ]
-
-            else
-                []
-    in
-    div [ class "main--paginators" ]
-        (viewMenuButton
-            :: navigations
-            ++ [ navButton [ class "main--navigatiors-today", onClick ClickToday, attribute "aria-label" "Today" ] [ text "aujourd'hui" ]
-               , reloadButton loop
-               ]
-        )
+viewArrowButton : String -> String -> Html Msg
+viewArrowButton classname label =
+    navButton
+        [ class "main--navigatiors-button", onClick PageBack, attribute "aria-label" label ]
+        [ i [ class classname ] [] ]
 
 
-reloadButton : Bool -> Html Msg
-reloadButton loop =
+viewTodayButton : Html Msg
+viewTodayButton =
+    navButton [ class "main--navigatiors-today", onClick ClickToday, attribute "aria-label" "Today" ] [ text "aujourd'hui" ]
+
+
+viewTodayIconButton : Html Msg
+viewTodayIconButton =
+    navButton
+        [ class "main--navigatiors-todayicon", onClick ClickToday, attribute "aria-label" "Today" ]
+        [ i [ class "icon-today" ] [] ]
+
+
+viewReloadButton : Bool -> Html Msg
+viewReloadButton loop =
     navButton
         [ classList
             [ ( "main--navigatiors-button", True )
@@ -209,9 +216,10 @@ viewMenuButton =
 
 navButton : List (Attribute msg) -> List (Html msg) -> Html msg
 navButton attr content =
-    div
-        [ class "main--navigatiors-action" ]
-        [ button attr content ]
+    -- div
+    --     [ class "main--navigatiors-action" ]
+    --     [ button attr content ]
+    button attr content
 
 
 viewMessage : FetchStatus -> Html Msg

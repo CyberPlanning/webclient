@@ -64,16 +64,23 @@ button:hover {
 .main--toolbar {
     display: flex;
     background-color: var(--nav-color);
-    padding: 0;
+    padding: 0 0.5rem;
     justify-content: space-between;
     height: 40px;
     position: relative;
+    overflow: hidden;
+    /* flex-wrap: wrap; */
+}
+
+.main--toolbar > * {
+    margin: 0.3rem 0.1rem;
 }
 
 .main--month-title {
     display: flex;
     flex: 1;
-    justify-content: center;
+    /* justify-content: center; */
+    padding-left: 3px;
     align-items: center;
 }
 
@@ -137,22 +144,23 @@ input:focus {
     vertical-align: top;
 }
 
-.main--navigatiors-today:active {
+.main--navigatiors-today:active,
+.main--navigatiors-todayicon:active {
     background-color: var(--accent-color-dark);
 }
 
-.main--paginators {
-    z-index: 1;
+.main--navigatiors-todayicon {
+    display: none;
+    font-size: 1rem;
+    padding: 0 0.25em;
+    background-color: var(--accent-color);
+    border-radius: 50%;
 }
 
 .main--status {
-    position: absolute;
-    width: 100%;
-    padding: 0 1rem;
-    height: 100%;
     display: flex;
-    justify-content: flex-end;
     align-items: center;
+    padding: 0 0.5rem;
 }
 
 .main--status i {
@@ -175,21 +183,25 @@ input:focus {
     }
 }
 
-@media only screen and (max-width: 550px) {
-    .main--month-title {
-        position: relative;
-    }
-
+@media only screen and (max-width: 500px) {
     .main--month-title h2 {
         font-size: 1rem;
     }
 
     .main--navigatiors-today {
-        font-size: 0.8rem;
+        /* font-size: 0.8rem; */
+        display: none;
+    }
+    .main--navigatiors-todayicon {
+        display: block;
+    }
+
+    .calendar--hour-slot {
+        padding: 0 3px !important;
     }
 }
 
-@media screen and (max-width: 720px) {
+@media screen and (max-width: 600px) {
     .main--status span {
         display: none;
     }
