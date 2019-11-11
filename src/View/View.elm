@@ -4,18 +4,18 @@ import Browser exposing (Document)
 import Calendar.Calendar as Calendar
 import Calendar.Msg exposing (TimeSpan(..))
 import Config
+import Cyberplanning.Types exposing (FetchStatus(..), Group)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (on, onClick, targetValue)
 import Http
-import Json.Decode as Json
-import Model exposing (FetchStatus(..), Group, Model)
+import Model exposing (Model)
 import Msg exposing (Msg(..))
 import MyTime
+import Personnel.Personnel as Personnel
 import Secret.Help
 import Secret.Secret
 import Time exposing (Month(..), Posix)
-import Utils exposing (toDatetime)
 import Vendor.Swipe exposing (onSwipe)
 import View.SideMenu as SideMenu
 import View.Tooltip as Tooltip
@@ -33,7 +33,7 @@ view model =
                 Secret.Help.helpEvents model.calendarState.viewing
 
             else
-                model.data
+                model.planningState.events ++ Personnel.getEvents model.personnelState
 
         attrs =
             onSwipe SwipeEvent
@@ -59,31 +59,19 @@ view model =
         funThings =
             Secret.Secret.view model.secret
 
-        fetchStatus =
-            if model.loading then
-                Loading
-
-            else
-                case model.error of
-                    Just err ->
-                        Error err
-
-                    Nothing ->
-                        None
-
         container =
             div attrs
-                [ viewToolbar model.calendarState.viewing (model.calendarState.timeSpan /= Day) model.loop fetchStatus
+                [ viewToolbar model.calendarState.viewing (model.calendarState.timeSpan /= Day) model.loop model.planningState.status
                 , div [ class "main--calendar" ]
-                    [ SideMenu.view model.selectedGroups model.calendarState.timeSpan model.settings
-                    , Html.map SetCalendarState (Calendar.view events model.calendarState)
+                    [ SideMenu.view model
+                    , Html.map SetCalendarState (Calendar.view events model.planningState.groupsCount model.calendarState)
                     ]
                 , Tooltip.viewTooltip currentEvent model.calendarState.position model.size
                 , funThings
                 ]
 
         names =
-            List.map .name model.selectedGroups
+            List.map .name model.planningState.selectedGroups
                 |> String.join ", "
     in
     { title = "Planning - " ++ names
@@ -96,8 +84,8 @@ viewToolbar viewing displayArrows loop fetchStatus =
     let
         navigations =
             if displayArrows then
-                [ viewArrowButton "icon-left" "Previous Page"
-                , viewArrowButton "icon-right" "Next Page"
+                [ viewArrowButton "icon-left" "Previous Page" (SetCalendarState Calendar.Msg.PageBack)
+                , viewArrowButton "icon-right" "Next Page" (SetCalendarState Calendar.Msg.PageForward)
                 ]
 
             else
@@ -124,46 +112,9 @@ viewTitle viewing =
 formatDateTitle : Posix -> String
 formatDateTitle date =
     let
-        month =
-            MyTime.toMonth date
-
         monthName =
-            case month of
-                Jan ->
-                    "Janvier"
-
-                Feb ->
-                    "Février"
-
-                Mar ->
-                    "Mars"
-
-                Apr ->
-                    "Avril"
-
-                May ->
-                    "Mai"
-
-                Jun ->
-                    "Juin"
-
-                Jul ->
-                    "Juillet"
-
-                Aug ->
-                    "Août"
-
-                Sep ->
-                    "Septembre"
-
-                Oct ->
-                    "Octobre"
-
-                Nov ->
-                    "Novembre"
-
-                Dec ->
-                    "Décembre"
+            MyTime.toMonth date
+                |> MyTime.monthToString
 
         year =
             MyTime.toYear date
@@ -172,10 +123,10 @@ formatDateTitle date =
     monthName ++ " " ++ year
 
 
-viewArrowButton : String -> String -> Html Msg
-viewArrowButton classname label =
+viewArrowButton : String -> String -> Msg -> Html Msg
+viewArrowButton classname label msg =
     navButton
-        [ class "main--navigatiors-button", onClick PageBack, attribute "aria-label" label ]
+        [ class "main--navigatiors-button", onClick msg, attribute "aria-label" label ]
         [ i [ class classname ] [] ]
 
 
@@ -233,7 +184,7 @@ viewMessage fetchStatus =
                 Error err ->
                     [ i [ class "icon-wifi", style "color" "#f9f961" ] [], span [ style "color" "#f9f961" ] [ errorMessage err |> text ] ]
 
-                None ->
+                Normal ->
                     [ span [] [ text "" ] ]
     in
     div [ class "main--status" ] content

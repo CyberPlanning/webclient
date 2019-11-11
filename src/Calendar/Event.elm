@@ -60,11 +60,11 @@ rangeDescription start end interval date =
 
 
 eventStyling :
-    InternalState
+    Int
     -> Event
     -> List ( String, Bool )
     -> List (Html.Attribute msg)
-eventStyling state event customClasses =
+eventStyling columns event customClasses =
     let
         eventStart =
             event.startTime
@@ -92,7 +92,7 @@ eventStyling state event customClasses =
                 [ style "border-color" colorFg ]
 
         styles =
-            styleDayEvent state eventStart eventEnd event.position
+            styleDayEvent columns eventStart eventEnd event.position
                 ++ styleColorDayEvent eventTitle colorFg colorBg
                 ++ extraStyle
     in
@@ -119,8 +119,8 @@ percentDay date min max =
     (fractionalDay date - min) / (max - min)
 
 
-styleDayEvent : InternalState -> Posix -> Posix -> PositionMode -> List (Html.Attribute msg)
-styleDayEvent state start end position =
+styleDayEvent : Int -> Posix -> Posix -> PositionMode -> List (Html.Attribute msg)
+styleDayEvent columns start end position =
     let
         ( left, width ) =
             case position of
@@ -130,7 +130,7 @@ styleDayEvent state start end position =
                 Column idx size ->
                     let
                         fractionUnit =
-                            96 / toFloat state.columns
+                            96 / toFloat columns
 
                         fractionSize =
                             fractionUnit * toFloat size
@@ -179,8 +179,8 @@ styleColorDayEvent title fg bg =
     ]
 
 
-eventSegment : InternalState -> Event -> Html Msg
-eventSegment state event =
+eventSegment : Int -> Event -> Html Msg
+eventSegment columns event =
     let
         eventId =
             event.toId
@@ -201,7 +201,7 @@ eventSegment state event =
              , onMouseLeave <| EventMouseLeave eventId
              , onClick <| EventClick eventId
              ]
-                ++ eventStyling state event classes
+                ++ eventStyling columns event classes
             )
             (div [ class "calendar--event-title" ] title :: childs)
         ]

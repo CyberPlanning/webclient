@@ -1,6 +1,6 @@
-module MyTime exposing (add, ceiling, diff, floor, partsToPosix, range, toDay, toHour, toMinute, toMonth, toOffset, toSecond, toWeekday, toYear, weekdayToNumber)
+module MyTime exposing (add, ceiling, diff, floor, partsToPosix, range, toDay, toHour, toMinute, toMonth, toOffset, toSecond, toWeekday, toYear, weekdayToNumber, monthToString)
 
-import Time exposing (Posix, Weekday(..))
+import Time exposing (Posix, Weekday(..), Month(..))
 import Time.Extra as TimeExtra exposing (Interval)
 import Vendor.TimeZone exposing (europe__paris)
 
@@ -98,3 +98,43 @@ weekdayToNumber wd =
 
         Sun ->
             7
+
+
+monthToString : Time.Month -> String
+monthToString month =
+    case month of
+        Jan ->
+            "Janvier"
+
+        Feb ->
+            "Février"
+
+        Mar ->
+            "Mars"
+
+        Apr ->
+            "Avril"
+
+        May ->
+            "Mai"
+
+        Jun ->
+            "Juin"
+
+        Jul ->
+            "Juillet"
+
+        Aug ->
+            "Août"
+
+        Sep ->
+            "Septembre"
+
+        Oct ->
+            "Octobre"
+
+        Nov ->
+            "Novembre"
+
+        Dec ->
+            "Décembre"

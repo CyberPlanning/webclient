@@ -18,7 +18,6 @@ type Msg
     | PageForward
     | WeekForward
     | WeekBack
-    | SetColumns Int
     | ChangeTimeSpan TimeSpan
     | ChangeViewing Posix
     | EventClick String Position
@@ -32,7 +31,6 @@ type alias InternalState =
     , hover : Maybe String
     , position : Maybe Position
     , selected : Maybe String
-    , columns : Int
     , joursFeries : Dict String Posix
     }
 

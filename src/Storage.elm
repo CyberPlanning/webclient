@@ -1,21 +1,11 @@
-port module Storage exposing (Storage, saveEvents, saveGroups, saveSettings)
-
-import Model
-import Query.Types
+port module Storage exposing (Storage, saveState)
 
 
 type alias Storage =
     { graphqlUrl : String
-    , settings : Model.Settings
-    , groupIds : List Int
-    , offlineEvents : Query.Types.Query
+    , cyberplanning : String
+    , personnel : String
     }
 
 
-port saveSettings : Model.Settings -> Cmd msg
-
-
-port saveGroups : List Int -> Cmd msg
-
-
-port saveEvents : Query.Types.Query -> Cmd msg
+port saveState : ( String, String ) -> Cmd msg

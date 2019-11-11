@@ -13,14 +13,14 @@ import Time exposing (Posix)
 import Time.Extra as TimeExtra
 
 
-view : InternalState -> List Event -> Html Msg
-view state events =
+view : InternalState -> Int -> List Event -> Html Msg
+view state columns events =
     div [ class "calendar--day" ]
         [ div [ class "calendar--day-content" ]
             [ viewTimeGutter state.viewing
             , div [ class "calendar--day" ]
                 [ viewDayHeader state.viewing
-                , viewDaySlot state events
+                , viewDaySlot state columns events
                 ]
             ]
         ]
@@ -111,11 +111,11 @@ viewHourSlot date =
         [ span [ class "calendar--time-slot-text" ] [ text date ] ]
 
 
-viewDaySlot : InternalState -> List Event -> Html Msg
-viewDaySlot state events =
+viewDaySlot : InternalState -> Int -> List Event -> Html Msg
+viewDaySlot state columns events =
     Helpers.hours
         |> List.map viewDaySlotGroup
-        |> (\b a -> (++) a b) (viewDayEvents state events state.viewing)
+        |> (\b a -> (++) a b) (viewDayEvents state columns events state.viewing)
         |> div [ class "calendar--day-slot" ]
 
 
@@ -134,8 +134,8 @@ viewTimeSlot date =
         []
 
 
-viewDayEvents : InternalState -> List Event -> Posix -> List (Html Msg)
-viewDayEvents state events day =
+viewDayEvents : InternalState -> Int -> List Event -> Posix -> List (Html Msg)
+viewDayEvents state columns events day =
     let
         extra =
             case jourFerie state.joursFeries day of
@@ -149,15 +149,15 @@ viewDayEvents state events day =
                     []
 
         eventsHtml =
-            List.filterMap (viewDayEvent state day) events
+            List.filterMap (viewDayEvent columns day) events
     in
     extra ++ eventsHtml
 
 
-viewDayEvent : InternalState -> Posix -> Event -> Maybe (Html Msg)
-viewDayEvent state day event =
+viewDayEvent : Int -> Posix -> Event -> Maybe (Html Msg)
+viewDayEvent columns day event =
     if rangeDescription event.startTime event.endTime TimeExtra.Day day then
-        Just <| eventSegment state event
+        Just <| eventSegment columns event
 
     else
         Nothing

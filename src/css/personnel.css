@@ -1,0 +1,12 @@
+.personnel--fileinfo {
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+    background-color: var(--accent-color);
+}
+
+.personnel--fileinfo-remove {
+    font-size: 0.7em;
+    width: 90%;
+    display: inline-block;
+    background-color: var(--nav-color);
+}

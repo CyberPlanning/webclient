@@ -1,15 +1,15 @@
-module Query.PlanningRequest exposing (createPlanningRequest, maybeCreatePlanningRequest)
+module Cyberplanning.PlanningRequest exposing (createPlanningRequest, maybeCreatePlanningRequest)
 
-import Model exposing (Collection(..), CustomEvent(..), Group, Model, Settings)
-import Msg exposing (Msg)
+import Cyberplanning.Query exposing (Params, sendRequest)
+import Cyberplanning.Types exposing (Collection(..), Group, InternalMsg, Settings)
+import Cyberplanning.Utils exposing (toDatetime)
+import Http exposing (Error)
 import MyTime
-import Query.Query exposing (Params, sendRequest)
 import Time exposing (Posix)
 import Time.Extra as TimeExtra
-import Utils exposing (toDatetime)
 
 
-maybeCreatePlanningRequest : Posix -> List Group -> Settings -> Cmd Msg
+maybeCreatePlanningRequest : Posix -> List Group -> Settings -> Cmd InternalMsg
 maybeCreatePlanningRequest date groups settings =
     let
         maybeFirstGrp =
@@ -23,15 +23,17 @@ maybeCreatePlanningRequest date groups settings =
             case firstGroup.collection of
                 Cyber ->
                     createPlanningRequest date "CYBER" slugs settings
+                        |> sendRequest
 
                 Info ->
                     createPlanningRequest date "INFO" slugs settings
+                        |> sendRequest
 
         Nothing ->
             Cmd.none
 
 
-createPlanningRequest : Posix -> String -> List String -> Settings -> Cmd Msg
+createPlanningRequest : Posix -> String -> List String -> Settings -> Params
 createPlanningRequest date collectionName slugs settings =
     let
         dateFrom =
@@ -55,4 +57,3 @@ createPlanningRequest date collectionName slugs settings =
     , hack2g2 = settings.showHack2g2
     , custom = settings.showCustom
     }
-        |> sendRequest

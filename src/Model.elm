@@ -1,8 +1,9 @@
-module Model exposing (Collection(..), CustomEvent(..), FetchStatus(..), Group, Model, Settings, WindowSize)
+module Model exposing (Model, WindowSize)
 
 import Calendar.Calendar as Calendar
-import Calendar.Event as CalEvent
+import Cyberplanning.Cyberplanning as Cyberplanning
 import Http exposing (Error)
+import Personnel.Personnel as Personnel
 import Secret.Secret
 import Time exposing (Posix)
 import Vendor.Swipe
@@ -19,48 +20,14 @@ type alias WindowSize =
 
 
 type alias Model =
-    { data : List CalEvent.Event --Maybe (Result String Query)
-    , error : Maybe Error
-    , date : Maybe Posix
-    , selectedGroups : List Group
-    , loading : Bool
+    { date : Maybe Posix
     , size : WindowSize
-    , calendarState : Calendar.State
     , swipe : Vendor.Swipe.State
     , loop : Bool
     , secret : Secret.Secret.StateList
-    , settings : Settings
     , tooltipHover : Bool
-    }
-
-
-type alias Settings =
-    { showHack2g2 : Bool
-    , showCustom : Bool
     , menuOpened : Bool
-    , allWeek : Bool
+    , calendarState : Calendar.State
+    , planningState : Cyberplanning.State
+    , personnelState : Personnel.State
     }
-
-
-type alias Group =
-    { name : String
-    , slug : String
-    , collection : Collection
-    , id : Int
-    }
-
-
-type Collection
-    = Cyber
-    | Info
-
-
-type CustomEvent
-    = Hack2g2
-    | Custom
-
-
-type FetchStatus
-    = Loading
-    | Error Error
-    | None

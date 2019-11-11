@@ -10,51 +10,52 @@ import Html.Attributes exposing (..)
 import Time exposing (Posix)
 
 
-view : InternalState -> List Event -> Html Msg
-view state events =
+view : InternalState -> Int -> List Event -> Html Msg
+view state columns events =
     Helpers.dayRangeOfWeek state.viewing
-        |> viewDays state events
+        |> viewDays state columns events
 
 
-viewAll : InternalState -> List Event -> Html Msg
-viewAll state events =
+viewAll : InternalState -> Int -> List Event -> Html Msg
+viewAll state columns events =
     Helpers.dayRangeOfAllWeek state.viewing
-        |> viewDays state events
+        |> viewDays state columns events
 
 
-viewDays : InternalState -> List Event -> List Posix -> Html Msg
-viewDays state events weekRange =
+viewDays : InternalState -> Int -> List Event -> List Posix -> Html Msg
+viewDays state columns events weekRange =
     div [ class "calendar--week" ]
-        [ viewWeekContent state events weekRange
+        [ viewWeekContent state columns events weekRange
         ]
 
 
 viewWeekContent :
     InternalState
+    -> Int
     -> List Event
     -> List Posix
     -> Html Msg
-viewWeekContent state events days =
+viewWeekContent state columns events days =
     let
         timeGutter =
             viewTimeGutter state.viewing
 
         weekDays =
-            List.map (viewWeekDay state events) days
+            List.map (viewWeekDay state columns events) days
     in
     div [ class "calendar--week-content" ]
         (timeGutter :: weekDays)
 
 
-viewWeekDay : InternalState -> List Event -> Posix -> Html Msg
-viewWeekDay state events day =
+viewWeekDay : InternalState -> Int -> List Event -> Posix -> Html Msg
+viewWeekDay state columns events day =
     let
         viewDaySlots =
             Helpers.hours
                 |> List.map viewDaySlotGroup
 
         dayEvents =
-            viewDayEvents state events day
+            viewDayEvents state columns events day
     in
     div [ class "calendar--dates" ]
         [ div [ class "calendar--date-header" ]

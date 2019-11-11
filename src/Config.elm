@@ -1,6 +1,6 @@
 module Config exposing (allGroups, apiUrl, firstGroup, minWeekWidth)
 
-import Model exposing (Collection(..), Group)
+import Cyberplanning.Types exposing (Collection(..), Group)
 
 
 apiUrl : String

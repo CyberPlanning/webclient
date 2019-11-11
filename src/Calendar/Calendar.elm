@@ -18,14 +18,13 @@ type alias State =
     InternalState
 
 
-init : TimeSpan -> Posix -> Int -> State
-init timeSpan viewing columns =
+init : TimeSpan -> Posix -> State
+init timeSpan viewing =
     { timeSpan = timeSpan
     , viewing = viewing
     , hover = Nothing
     , position = Nothing
     , selected = Nothing
-    , columns = columns
     , joursFeries = getAllJourFerie (MyTime.toYear viewing)
     }
 
@@ -45,9 +44,6 @@ update msg state =
 
         WeekForward ->
             page 7 state
-
-        SetColumns len ->
-            { state | columns = len }
 
         ChangeTimeSpan timeSpan ->
             { state | timeSpan = timeSpan }
@@ -85,19 +81,19 @@ page step state =
     { state | viewing = MyTime.add interval step viewing, hover = Nothing, selected = Nothing }
 
 
-view : List Event -> State -> Html Msg
-view events state =
+view : List Event -> Int -> State -> Html Msg
+view events columns state =
     let
         calendarView =
             case state.timeSpan of
                 Week ->
-                    Week.view state events
+                    Week.view state columns events
 
                 AllWeek ->
-                    Week.viewAll state events
+                    Week.viewAll state columns events
 
                 Day ->
-                    Day.view state events
+                    Day.view state columns events
     in
     div
         [ class "calendar--calendar" ]

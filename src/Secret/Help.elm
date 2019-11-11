@@ -1,10 +1,10 @@
 module Secret.Help exposing (Help, helpEvents, helpMessages)
 
 import Calendar.Event as Cal
+import Cyberplanning.Utils exposing (computeStyle)
 import MyTime
 import Time exposing (Posix)
 import Time.Extra as TimeExtra
-import Utils exposing (computeStyle)
 
 
 type alias Help =

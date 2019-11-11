@@ -1,12 +1,10 @@
-module Query.Query exposing (Params, eventsApiQuery, sendRequest)
+module Cyberplanning.Query exposing (Params, eventsApiQuery, sendRequest)
 
 import Config
+import Cyberplanning.Types exposing (Event, InternalMsg(..), Planning, Query, Settings)
 import Http exposing (Body, Error, Header, Request)
-import Json.Decode as Decode
+import Json.Decode as Decode exposing (Decoder, field, int, maybe, string)
 import Json.Encode as Encode
-import Model exposing (Settings)
-import Msg exposing (Msg(..))
-import Query.Types exposing (Query, decodeQuery)
 
 
 eventsApiQuery : String
@@ -65,7 +63,7 @@ authorizationHeader =
     Http.header "Authorization"
 
 
-requestAPI : (Result Error Query -> Msg) -> Request Query -> Cmd Msg
+requestAPI : (Result Error Query -> InternalMsg) -> Request Query -> Cmd InternalMsg
 requestAPI =
     Http.send
 
@@ -90,8 +88,42 @@ requestBody queryString { collec, from, to, grs, hack2g2, custom } =
         |> Http.jsonBody
 
 
-sendRequest : Params -> Cmd Msg
+sendRequest : Params -> Cmd InternalMsg
 sendRequest params =
     requestBody eventsApiQuery params
         |> post Config.apiUrl []
-        |> requestAPI GraphQlMsg
+        |> requestAPI GraphQlResult
+
+
+decodePlanning : Decoder Planning
+decodePlanning =
+    Decode.map Planning
+        (field "events" (Decode.list decodeEvent))
+
+
+listOrNull : Decoder (Maybe (List String))
+listOrNull =
+    Decode.string
+        |> Decode.list
+        |> Decode.nullable
+
+
+decodeEvent : Decoder Event
+decodeEvent =
+    Decode.map8 Event
+        (field "title" string)
+        (field "startDate" string)
+        (field "endDate" string)
+        (field "classrooms" listOrNull)
+        (field "teachers" listOrNull)
+        (field "groups" listOrNull)
+        (field "affiliations" listOrNull)
+        (field "eventId" string)
+
+
+decodeQuery : Decoder Query
+decodeQuery =
+    Decode.map3 Query
+        (field "planning" decodePlanning)
+        (Decode.maybe (field "hack2g2" decodePlanning))
+        (Decode.maybe (field "custom" decodePlanning))

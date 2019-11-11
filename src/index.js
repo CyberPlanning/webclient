@@ -2,97 +2,32 @@ import './css/colors.css'
 import './css/main.css'
 import './css/tooltip.css'
 import './css/calendar.css'
+import './css/personnel.css'
 import './css/sidemenu.css'
 import './css/secret.css'
 import './css/cybericons.css'
 import './css/material-checkbox.css'
 import { Elm } from './Main.elm'
 import registerServiceWorker from './service/registerServiceWorker'
-const storageKeyGroup = 'groupId'
-const storageKeySettings = 'settings'
-const storageOfflineEvents = 'offlineEvents'
 
-const urlParams = new URLSearchParams(window.location.search)
-const urlGroup = urlParams.get('g')
-
-const defaultSettings = {
-    showHack2g2: true,
-    showCustom: true,
-    menuOpened: false,
-    allWeek: false,
-}
-
-const defaultEvents = {
-    planning: { events: [] },
-    hack2g2: { events: [] },
-    custom: { events: [] },
-}
-
-const localGroups = (function() {
-    if (urlGroup) {
-        return [urlGroup]
-    } else {
-        let s = localStorage.getItem(storageKeyGroup)
-        try {
-            const data = JSON.parse(s)
-            if (data instanceof Array) {
-                return data
-            } else {
-                return [0]
-            }
-        } catch (error) {
-            return [0]
-        }
-    }
-})()
-const localSettings = (function() {
-    const s = localStorage.getItem(storageKeySettings)
-    if (s == undefined) {
-        return defaultSettings
-    }
-    try {
-        const data = JSON.parse(s)
-        return { ...defaultSettings, ...data }
-    } catch (error) {
-        return defaultSettings
-    }
-})()
-const offlineEvents = (function() {
-    const s = localStorage.getItem(storageOfflineEvents)
-    if (s == undefined) {
-        return defaultEvents
-    }
-    try {
-        return JSON.parse(s)
-    } catch (error) {
-        return defaultEvents
-    }
-})()
-
-if (process.env.NODE_ENV !== 'production') {
-    console.log('Settings', localSettings)
-    console.log('GroupId', localGroups)
-    console.log('OfflineEvents', offlineEvents)
-}
+const cyberplanning = localStorage.getItem('cyberplanning') || ''
+const personnel = localStorage.getItem('personnel') || ''
 
 const app = Elm.Main.init({
     node: document.getElementById('root'),
     flags: {
-        offlineEvents,
-        groupIds: localGroups,
-        settings: localSettings,
+        graphqlUrl: 'https://cyberplanning.fr/graphql',
+        cyberplanning,
+        personnel,
     },
 })
 
-app.ports.saveSettings.subscribe(function(settings) {
-    localStorage.setItem(storageKeySettings, JSON.stringify(settings))
-})
-app.ports.saveGroups.subscribe(function(groupIds) {
-    localStorage.setItem(storageKeyGroup, JSON.stringify(groupIds))
-})
-app.ports.saveEvents.subscribe(function(events) {
-    localStorage.setItem(storageOfflineEvents, JSON.stringify(events))
-})
+if (app.ports) {
+    app.ports.saveState.subscribe(function(data) {
+        // console.log('Save state', data[0])
+        localStorage.setItem(data[0], data[1])
+    })
+}
 global.app = app
 
 registerServiceWorker()

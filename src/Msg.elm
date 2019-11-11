@@ -2,27 +2,52 @@ module Msg exposing (Msg(..))
 
 import Browser.Dom exposing (Viewport)
 import Calendar.Msg as Calendar
+import Cyberplanning.Cyberplanning as Cyberplanning
 import Http exposing (Error)
-import Model exposing (CustomEvent)
-import Query.Types exposing (Query)
-import Swipe
+import Personnel.Personnel as Personnel
 import Time exposing (Posix)
+import Vendor.Swipe
+
+
+
+{- Events types
+
+   - Init:
+       SetDate
+       WindowSize
+
+   - TopBar:
+       ClickToday
+       Reload
+       ToggleMenu
+
+   - SideMenu:
+       ChangeMode
+
+   - Internal:
+       SetCalendarState
+       SetPersonnelState
+       SetPlanningState
+
+   - Subscription:
+       KeyDown
+       SwipeEvent
+       StopReloadIcon
+
+-}
 
 
 type Msg
     = Noop
-    | GraphQlMsg (Result Error Query)
     | SetDate Posix
-    | SetGroups (List String)
     | WindowSize Viewport
-    | PageBack
-    | PageForward
     | KeyDown Int
     | SetCalendarState Calendar.Msg
+    | SetPersonnelState Personnel.Msg
+    | SetPlanningState Cyberplanning.Msg
     | SwipeEvent Vendor.Swipe.Msg
     | ClickToday
     | ToggleMenu
     | StopReloadIcon ()
     | ChangeMode Calendar.TimeSpan
-    | CheckEvents CustomEvent Bool
     | Reload

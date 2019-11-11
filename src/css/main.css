@@ -79,12 +79,8 @@ button:hover {
 .main--month-title {
     display: flex;
     flex: 1;
-    /* justify-content: center; */
-    padding-left: 3px;
+    padding-left: 0.4em;
     align-items: center;
-}
-
-.main--month-title h2 {
     font-size: 1.3rem;
     margin: 0;
     white-space: nowrap;
