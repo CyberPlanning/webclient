@@ -66,14 +66,14 @@ button:hover {
     background-color: var(--nav-color);
     padding: 0 0.5rem;
     justify-content: space-between;
-    height: 40px;
+    height: 2.5rem;
     position: relative;
     overflow: hidden;
     /* flex-wrap: wrap; */
 }
 
 .main--toolbar > * {
-    margin: 0.3rem 0.1rem;
+    margin: 0.3125rem 0.5rem;
 }
 
 .main--month-title {
@@ -82,7 +82,6 @@ button:hover {
     padding-left: 0.4em;
     align-items: center;
     font-size: 1.3rem;
-    margin: 0;
     white-space: nowrap;
 }
 
@@ -126,7 +125,7 @@ input:focus {
 }
 
 .main--navigatiors-button {
-    padding: 0 0.25rem;
+    padding: 0 0.2375rem;
     border-radius: 50%;
 }
 
@@ -179,13 +178,22 @@ input:focus {
     }
 }
 
+@media screen and (max-width: 600px) {
+    .main--status span {
+        display: none;
+    }
+
+    .main--toolbar > * {
+        margin: 0.3125rem 0.1rem;
+    }
+}
+
 @media only screen and (max-width: 500px) {
-    .main--month-title h2 {
+    .main--month-title {
         font-size: 1rem;
     }
 
     .main--navigatiors-today {
-        /* font-size: 0.8rem; */
         display: none;
     }
     .main--navigatiors-todayicon {
@@ -194,11 +202,5 @@ input:focus {
 
     .calendar--hour-slot {
         padding: 0 3px !important;
-    }
-}
-
-@media screen and (max-width: 600px) {
-    .main--status span {
-        display: none;
     }
 }

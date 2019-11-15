@@ -105,8 +105,8 @@ viewToolbar viewing displayArrows loop fetchStatus =
 
 viewTitle : Posix -> Html Msg
 viewTitle viewing =
-    div [ class "main--month-title" ]
-        [ h2 [] [ text <| formatDateTitle viewing ] ]
+    h2 [ class "main--month-title" ]
+        [ text <| formatDateTitle viewing ]
 
 
 formatDateTitle : Posix -> String
