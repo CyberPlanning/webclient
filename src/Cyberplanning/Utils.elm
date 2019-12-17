@@ -45,12 +45,6 @@ toCalEvent selectedGroups event =
         description =
             List.map (String.join ", ") [ classes, teachers, groups ]
 
-        search1 =
-            List.foldl (\a b -> b && String.contains "1" a) True affiliations
-
-        search2 =
-            List.foldl (\a b -> b && String.contains "2" a) True affiliations
-
         selectedLen =
             List.length selectedGroups
 

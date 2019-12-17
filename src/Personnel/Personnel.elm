@@ -3,7 +3,7 @@ module Personnel.Personnel exposing (Msg, State, getEvents, initState, restoreSt
 import Calendar.Event as CalEvent
 import File exposing (File)
 import File.Select as Select
-import Html exposing (Html, button, div, input, label, span, text)
+import Html exposing (Html, button, div, input, label, text)
 import Html.Attributes exposing (checked, class, for, id, title, type_)
 import Html.Events exposing (onCheck, onClick)
 import MyTime
@@ -31,8 +31,7 @@ initState =
 
 
 type Msg
-    = FileRequested
-    | FileSelected File
+    = FileSelected File
     | FileLoaded String
     | CheckActive Bool
     | RemoveFile
@@ -41,11 +40,6 @@ type Msg
 update : Msg -> State -> ( State, Cmd Msg )
 update msg state =
     case msg of
-        FileRequested ->
-            ( state
-            , Select.file [ "text/calendar" ] FileSelected
-            )
-
         FileSelected file ->
             ( { state | file = Just (extractFileInfos file) }
             , Task.perform FileLoaded (File.toString file)

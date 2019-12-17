@@ -3,7 +3,6 @@ module Cyberplanning.PlanningRequest exposing (createPlanningRequest, maybeCreat
 import Cyberplanning.Query exposing (Params, sendRequest)
 import Cyberplanning.Types exposing (Collection(..), Group, InternalMsg, Settings)
 import Cyberplanning.Utils exposing (toDatetime)
-import Http exposing (Error)
 import MyTime
 import Time exposing (Posix)
 import Time.Extra as TimeExtra

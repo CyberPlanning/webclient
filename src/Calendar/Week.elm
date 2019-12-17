@@ -1,12 +1,11 @@
 module Calendar.Week exposing (view, viewAll, viewWeekContent, viewWeekDay)
 
-import Calendar.Day exposing (viewAllDayCell, viewDayEvents, viewDaySlotGroup, viewTimeGutter, viewTimeGutterHeader)
+import Calendar.Day exposing (viewDayEvents, viewDaySlotGroup, viewTimeGutter)
 import Calendar.Event exposing (Event)
 import Calendar.Helpers as Helpers
 import Calendar.Msg exposing (InternalState, Msg(..))
-import Dict exposing (Dict)
-import Html exposing (..)
-import Html.Attributes exposing (..)
+import Html exposing (Html, div, span, text)
+import Html.Attributes exposing (class)
 import Time exposing (Posix)
 
 

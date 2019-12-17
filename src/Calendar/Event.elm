@@ -2,12 +2,10 @@ module Calendar.Event exposing (Event, PositionMode(..), Style, cellWidth, event
 
 -- import String.Extra
 
-import Calendar.Helpers as Helpers
-import Calendar.Msg exposing (InternalState, Msg(..), TimeSpan(..), onClick, onMouseEnter)
-import Html exposing (..)
+import Calendar.Msg exposing (Msg(..), TimeSpan(..), onClick, onMouseEnter)
+import Html exposing (Html, div, text)
 import Html.Attributes exposing (attribute, class, classList, style)
 import Html.Events exposing (onMouseLeave)
-import Iso8601
 import MyTime
 import String
 import Time exposing (Posix, Weekday(..))
@@ -96,7 +94,7 @@ eventStyling columns event customClasses =
                 ++ styleColorDayEvent eventTitle colorFg colorBg
                 ++ extraStyle
     in
-    [ classList (( classes, True ) :: customClasses) ] ++ styles
+    classList (( classes, True ) :: customClasses) :: styles
 
 
 fractionalDay : Posix -> Float
@@ -205,11 +203,6 @@ eventSegment columns event =
             )
             (div [ class "calendar--event-title" ] title :: childs)
         ]
-
-
-makeTitle : String -> Html Msg
-makeTitle title =
-    text title
 
 
 viewSub : String -> Html Msg

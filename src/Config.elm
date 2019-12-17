@@ -1,6 +1,16 @@
-module Config exposing (allGroups, apiUrl, firstGroup, minWeekWidth)
+module Config exposing (allGroups, apiUrl, firstGroup, minWeekWidth, enableEasterEgg, enablePersonnelCal)
 
 import Cyberplanning.Types exposing (Collection(..), Group)
+
+
+enableEasterEgg : Bool
+enableEasterEgg =
+    False
+
+
+enablePersonnelCal : Bool
+enablePersonnelCal =
+    False
 
 
 apiUrl : String

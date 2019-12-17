@@ -1,9 +1,9 @@
 module Cyberplanning.Query exposing (Params, eventsApiQuery, sendRequest)
 
 import Config
-import Cyberplanning.Types exposing (Event, InternalMsg(..), Planning, Query, Settings)
+import Cyberplanning.Types exposing (Event, InternalMsg(..), Planning, Query)
 import Http exposing (Body, Error, Header, Request)
-import Json.Decode as Decode exposing (Decoder, field, int, maybe, string)
+import Json.Decode as Decode exposing (Decoder, field, maybe, string)
 import Json.Encode as Encode
 
 
@@ -58,9 +58,9 @@ post url headers body =
         }
 
 
-authorizationHeader : String -> Header
-authorizationHeader =
-    Http.header "Authorization"
+-- authorizationHeader : String -> Header
+-- authorizationHeader =
+--     Http.header "Authorization"
 
 
 requestAPI : (Result Error Query -> InternalMsg) -> Request Query -> Cmd InternalMsg

@@ -3,7 +3,6 @@ module Msg exposing (Msg(..))
 import Browser.Dom exposing (Viewport)
 import Calendar.Msg as Calendar
 import Cyberplanning.Cyberplanning as Cyberplanning
-import Http exposing (Error)
 import Personnel.Personnel as Personnel
 import Time exposing (Posix)
 import Vendor.Swipe

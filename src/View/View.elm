@@ -4,10 +4,10 @@ import Browser exposing (Document)
 import Calendar.Calendar as Calendar
 import Calendar.Msg exposing (TimeSpan(..))
 import Config
-import Cyberplanning.Types exposing (FetchStatus(..), Group)
-import Html exposing (..)
-import Html.Attributes exposing (..)
-import Html.Events exposing (on, onClick, targetValue)
+import Cyberplanning.Types exposing (FetchStatus(..))
+import Html exposing (Html, Attribute, div, h2, text, i, button, span)
+import Html.Attributes exposing (class, attribute, classList, style)
+import Html.Events exposing (onClick)
 import Http
 import Model exposing (Model)
 import Msg exposing (Msg(..))
@@ -36,8 +36,8 @@ view model =
                 model.planningState.events ++ Personnel.getEvents model.personnelState
 
         attrs =
-            onSwipe SwipeEvent
-                ++ [ class "main--container" ]
+            class "main--container"
+                :: onSwipe SwipeEvent
                 ++ Secret.Secret.classStyle model.secret
 
         currentEventId =
@@ -57,7 +57,10 @@ view model =
                     Nothing
 
         funThings =
-            Secret.Secret.view model.secret
+            if Config.enableEasterEgg then
+                Secret.Secret.view model.secret
+            else
+                Html.text ""
 
         container =
             div attrs

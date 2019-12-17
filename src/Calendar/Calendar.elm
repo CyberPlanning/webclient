@@ -5,10 +5,8 @@ import Calendar.Event exposing (Event)
 import Calendar.JourFerie exposing (getAllJourFerie)
 import Calendar.Msg exposing (InternalState, Msg(..), TimeSpan(..))
 import Calendar.Week as Week
-import Html exposing (..)
+import Html exposing (Html, div)
 import Html.Attributes exposing (class)
-import Html.Events exposing (keyCode, on)
-import Json.Decode as Json
 import MyTime
 import Time exposing (Posix)
 import Time.Extra as TimeExtra
@@ -57,7 +55,7 @@ update msg state =
         EventMouseEnter eventId pos ->
             { state | hover = Just eventId, position = Just pos }
 
-        EventMouseLeave eventId ->
+        EventMouseLeave _ ->
             { state | hover = Nothing, selected = Nothing }
 
 

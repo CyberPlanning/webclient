@@ -1,9 +1,8 @@
 module Update exposing (update)
 
-import Browser.Dom
 import Calendar.Calendar as Calendar
 import Calendar.Msg as CalMsg exposing (TimeSpan(..))
-import Config exposing (allGroups, firstGroup)
+import Config
 import Cyberplanning.Cyberplanning as Cyberplanning
 import Cyberplanning.Types exposing (RequestAction(..))
 import Model exposing (Model)
@@ -14,8 +13,7 @@ import Process
 import Secret.Secret as Secret
 import Storage
 import Task
-import Time exposing (Posix)
-import Time.Extra as TimeExtra
+import Time
 import Vendor.Swipe as Swipe
 
 
@@ -60,17 +58,10 @@ update msgSource model =
             calendarAction model calendarMsg
 
         SetPersonnelState personnelMsg ->
-            let
-                ( personnel, action ) =
-                    Personnel.update personnelMsg model.personnelState
-
-                cmd =
-                    Cmd.batch
-                        [ Cmd.map SetPersonnelState action
-                        , Storage.saveState ( "personnel", Personnel.storeState personnel )
-                        ]
-            in
-            ( { model | personnelState = personnel }, cmd )
+            if Config.enablePersonnelCal then
+                personnelAction model personnelMsg
+            else
+                ( model , Cmd.none )
 
         SetPlanningState personnelMsg ->
             let
@@ -107,8 +98,14 @@ update msgSource model =
                         _ ->
                             ( model, Cmd.none )
 
+                secret =
+                    if Config.enableEasterEgg then
+                        Secret.update code model.secret
+                    else
+                        model.secret
+
                 updatedModel =
-                    { calendarModel | secret = Secret.update code model.secret }
+                    { calendarModel | secret = secret }
             in
             ( updatedModel, cmd )
 
@@ -172,6 +169,22 @@ calendarAction model calMsg =
                 updatedCalendar
     in
     ( { model | calendarState = updatedCalWithJourFerie, planningState = planning }, cmd )
+
+
+personnelAction : Model -> Personnel.Msg -> ( Model, Cmd Msg )
+personnelAction model personnelMsg =
+    let
+        ( personnel, action ) =
+            Personnel.update personnelMsg model.personnelState
+
+        cmd =
+            Cmd.batch
+                [ Cmd.map SetPersonnelState action
+                , Storage.saveState ( "personnel", Personnel.storeState personnel )
+                ]
+    in
+    ( { model | personnelState = personnel }, cmd )
+
 
 
 updateWith : (subMsg -> Msg) -> ( subModel, Cmd subMsg ) -> ( subModel, Cmd Msg )

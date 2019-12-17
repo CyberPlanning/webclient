@@ -1,10 +1,9 @@
 module Cyberplanning.Cyberplanning exposing (Msg, State, initState, request, restoreState, storeState, update, view)
 
-import Calendar.Event as CalEvent
-import Config exposing (allGroups, firstGroup)
+import Config exposing (allGroups)
 import Cyberplanning.PlanningRequest exposing (maybeCreatePlanningRequest)
 import Cyberplanning.Storage exposing (decodeState, encodeState)
-import Cyberplanning.Types exposing (CustomEvent(..), Event, FetchStatus(..), Group, InternalMsg(..), InternalState, Query, RequestAction(..), Settings, defaultState)
+import Cyberplanning.Types exposing (CustomEvent(..), FetchStatus(..), InternalMsg(..), InternalState, RequestAction(..), defaultState)
 import Cyberplanning.Utils exposing (toCalEvents, toCalEventsWithSource)
 import Html exposing (Html, text)
 import Http exposing (Error)
@@ -113,7 +112,7 @@ update msg state =
 
 
 view : State -> Html Msg
-view state =
+view _ =
     text ""
 
 

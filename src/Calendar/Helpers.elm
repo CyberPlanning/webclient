@@ -148,7 +148,5 @@ noBright color =
             else
                 hsl.lightness
 
-        newSaturation =
-            hsl.saturation * 0.85
     in
     Vendor.Color.hsl hsl.hue hsl.saturation newLightness

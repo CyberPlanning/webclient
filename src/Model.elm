@@ -2,7 +2,6 @@ module Model exposing (Model, WindowSize)
 
 import Calendar.Calendar as Calendar
 import Cyberplanning.Cyberplanning as Cyberplanning
-import Http exposing (Error)
 import Personnel.Personnel as Personnel
 import Secret.Secret
 import Time exposing (Posix)

@@ -3,7 +3,6 @@ module Personnel.Ical exposing (VCalendar, VEvent, processIcal, emptyVCalendar, 
 import Array
 import Time exposing (Posix)
 import Personnel.Timeparser exposing (toTime)
-import Http
 
 
 type alias VCalendar =
@@ -33,6 +32,7 @@ processIcal data =
         |> .events
 
 
+emptyVCalendar : VCalendar
 emptyVCalendar =
     { events = []
     , working = False
@@ -40,6 +40,7 @@ emptyVCalendar =
     }
 
 
+emptyVEvent : VEvent
 emptyVEvent =
     { summary = ""
     , dtstart = epoch
@@ -107,7 +108,7 @@ parseCalDatetime value =
         Ok time ->
             time
 
-        Err errors ->
+        Err _ ->
             -- let
             --     a =
             --         Debug.log "Parsing errors" errors

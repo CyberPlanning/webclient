@@ -4,9 +4,8 @@ import Calendar.Event exposing (Event, eventSegment, rangeDescription)
 import Calendar.Helpers as Helpers
 import Calendar.JourFerie exposing (jourFerie)
 import Calendar.Msg exposing (InternalState, Msg(..))
-import Dict exposing (Dict)
-import Html exposing (..)
-import Html.Attributes exposing (..)
+import Html exposing (Html, div, button, text, span)
+import Html.Attributes exposing (class)
 import Html.Events exposing (onClick)
 import MyTime
 import Time exposing (Posix)
@@ -115,7 +114,7 @@ viewDaySlot : InternalState -> Int -> List Event -> Html Msg
 viewDaySlot state columns events =
     Helpers.hours
         |> List.map viewDaySlotGroup
-        |> (\b a -> (++) a b) (viewDayEvents state columns events state.viewing)
+        |> (\b a -> a ++ b) (viewDayEvents state columns events state.viewing)
         |> div [ class "calendar--day-slot" ]
 
 
@@ -128,7 +127,7 @@ viewDaySlotGroup date =
 
 
 viewTimeSlot : String -> Html Msg
-viewTimeSlot date =
+viewTimeSlot _ =
     div
         [ class "calendar--time-slot" ]
         []
@@ -169,7 +168,7 @@ viewAllDayCell days =
         viewAllDayText =
             div [ class "calendar--all-day-text" ] [ text "All day" ]
 
-        viewAllDay day =
+        viewAllDay _ =
             div [ class "calendar--all-day" ]
                 []
     in

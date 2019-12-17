@@ -48,7 +48,11 @@ The intention here is to provide a minimal and convenient representation of colo
 {-| A description of a color as computers see them.
 -}
 type alias Color =
-    { red : Int, green : Int, blue : Int, alpha : Float }
+    { red : Int
+    , green : Int
+    , blue : Int
+    , alpha : Float
+    }
 
 
 {-| Builds an RGBA color from all of its components.

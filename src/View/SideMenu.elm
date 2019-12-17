@@ -2,13 +2,13 @@ module View.SideMenu exposing (view)
 
 import Calendar.Msg exposing (TimeSpan(..))
 import Config exposing (allGroups)
-import Cyberplanning.Types as PlanningTypes exposing (Group, Settings)
-import Html exposing (Html, a, button, div, i, input, label, option, select, span, text)
-import Html.Attributes exposing (attribute, checked, class, for, href, id, multiple, style, target, title, type_, value)
-import Html.Events exposing (on, onCheck, onClick, targetValue)
+import Cyberplanning.Types as PlanningTypes exposing (Group)
+import Html exposing (Html, a, button, div, i, input, label, span, text)
+import Html.Attributes exposing (attribute, checked, class, for, href, id, style, target, title, type_)
+import Html.Events exposing (onCheck, onClick)
 import Model exposing (Model)
 import Msg exposing (Msg(..))
-import MultiSelect exposing (..)
+import MultiSelect exposing ( Options, multiSelect)
 import Personnel.Personnel as Personnel
 
 
@@ -26,14 +26,17 @@ view model =
         ]
         [ div
             [ class "sidemenu--main" ]
-            [ viewMultiSelector model.planningState.selectedGroups
+            ([ viewMultiSelector model.planningState.selectedGroups
             , hack2g2Checkbox model.planningState.settings.showHack2g2
             , customCheckbox model.planningState.settings.showCustom
             , modeButton Week "Week"
             , modeButton AllWeek "All Week"
             , modeButton Day "Day"
-            , Html.map SetPersonnelState (Personnel.view model.personnelState)
-            ]
+            ] ++
+            if Config.enablePersonnelCal then
+                [ Html.map SetPersonnelState (Personnel.view model.personnelState) ]
+            else
+                [])
         , div
             [ class "sidemenu--footer" ]
             [ div
@@ -70,12 +73,6 @@ viewMultiSelector selectedGroups =
             (List.map (.id >> String.fromInt) selectedGroups)
         ]
         |> Html.map SetPlanningState
-
-
-optionGroup : Group -> Html Msg
-optionGroup group =
-    option [ value (String.fromInt group.id) ]
-        [ text group.name ]
 
 
 hack2g2Checkbox : Bool -> Html Msg

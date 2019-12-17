@@ -2,8 +2,8 @@ module View.Tooltip exposing (viewTooltip)
 
 import Calendar.Event as CalEvent
 import Calendar.Msg exposing (Position)
-import Html exposing (..)
-import Html.Attributes exposing (..)
+import Html exposing (Html, div, text, span)
+import Html.Attributes exposing (class, style)
 import Model exposing (WindowSize)
 import Msg exposing (Msg(..))
 import MyTime
@@ -29,9 +29,9 @@ viewTooltipContent maybePos screenSize maybeEvent =
                         [ viewBadge event.source event.style ]
 
                 title =
-                    [ text event.title ] ++ badge
+                    text event.title :: badge
             in
-            [ div ([ class "tooltip--event" ] ++ tooltipStylePos event.style maybePos screenSize)
+            [ div (class "tooltip--event" :: tooltipStylePos event.style maybePos screenSize)
                 ([ div [ class "tooltip--event-title" ] title
                  , div [ class "tooltip--event-sub", class "tooltip--event-hours" ] [ viewHour event ]
                  ]
