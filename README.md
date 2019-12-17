@@ -1,8 +1,62 @@
-# webclient
+# Cyberplanning webclient
 
-Web calendar in ELM
+Web calendar in [ELM lang](https://elm-lang.org/)
 
-## Query GraphQL
+## Configure
+
+Configuration file is in `src/Config.elm`
+
+## Compile
+
+### Via Docker
+
+Create the image
+
+```
+docker build . --tag elm-compiler:latest
+```
+
+To build the application with the docker image:
+
+```
+docker run --rm -v $PWD:/app elm-compiler
+```
+
+This must be executed in the application folder
+
+To start in development mode with server and hot reload:
+
+```
+docker run --rm -it -p 3000:3000 -v $PWD:/app elm-compiler start
+```
+
+### Via cli
+
+Install `nodejs` using your package manager or [nvm](https://github.com/nvm-sh/nvm)
+
+Install `elm` and `create-elm-app` using `npm`
+
+```
+npm install -g elm
+npm install -g create-elm-app
+```
+
+Compile using [create-elm-app](https://github.com/halfzebra/create-elm-app)
+
+```
+elm-app build
+```
+
+To start in development mode with server and hot reload:
+
+```
+elm-app start
+```
+
+
+## Documentation
+
+### Query GraphQL
 
 [Cyberplanning API](https://github.com/cyberplanning/apiserver)
 
