@@ -12,7 +12,7 @@ jourFerie joursFeries day =
         dd =
             MyTime.floor TimeExtra.Day day
     in
-    Dict.filter (\k v -> v == dd) joursFeries
+    Dict.filter (\_ v -> v == dd) joursFeries
         |> Dict.keys
         |> List.head
 
