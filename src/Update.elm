@@ -1,5 +1,6 @@
 module Update exposing (update)
 
+import Browser.Navigation as Nav
 import Calendar.Calendar as Calendar
 import Calendar.Msg as CalMsg exposing (TimeSpan(..))
 import Config
@@ -15,6 +16,8 @@ import Storage
 import Task
 import Time
 import Vendor.Swipe as Swipe
+import Url
+import Utils
 
 
 
@@ -75,7 +78,14 @@ update msgSource model =
                                 |> updateWith SetPlanningState
 
                         SaveState ->
-                            ( planning, Storage.saveState ( "cyberplanning", Cyberplanning.storeState planning ) )
+                            let
+                                url = model.url
+                                newUrl =
+                                    { url | fragment = Just (Utils.generateFragment planning.selectedGroups ) }
+                                    |> Url.toString
+                                    |> Nav.replaceUrl model.navKey 
+                            in
+                            ( planning, Cmd.batch [ Storage.saveState ( "cyberplanning", Cyberplanning.storeState planning) , newUrl ] )
 
                         NoAction ->
                             ( planning, Cmd.none )
@@ -143,6 +153,9 @@ update msgSource model =
 
         ChangeMode mode ->
             calendarAction model (CalMsg.ChangeTimeSpan mode)
+
+        UrlChanged url ->
+            ( { model | url = url }, Cmd.none )
     )
         |> queryReload model
 

@@ -1,12 +1,13 @@
 module Model exposing (Model, WindowSize)
 
+import Browser.Navigation as Nav
 import Calendar.Calendar as Calendar
 import Cyberplanning.Cyberplanning as Cyberplanning
 import Personnel.Personnel as Personnel
 import Secret.Secret
 import Time exposing (Posix)
 import Vendor.Swipe
-
+import Url
 
 
 ---- MODEL ----
@@ -19,7 +20,9 @@ type alias WindowSize =
 
 
 type alias Model =
-    { date : Maybe Posix
+    { navKey : Nav.Key
+    , url : Url.Url
+    , date : Maybe Posix
     , size : WindowSize
     , swipe : Vendor.Swipe.State
     , loop : Bool

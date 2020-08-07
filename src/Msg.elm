@@ -6,7 +6,7 @@ import Cyberplanning.Cyberplanning as Cyberplanning
 import Personnel.Personnel as Personnel
 import Time exposing (Posix)
 import Vendor.Swipe
-
+import Url
 
 
 {- Events types
@@ -50,3 +50,4 @@ type Msg
     | StopReloadIcon ()
     | ChangeMode Calendar.TimeSpan
     | Reload
+    | UrlChanged Url.Url
