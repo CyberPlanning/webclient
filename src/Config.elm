@@ -25,6 +25,8 @@ allGroups =
     , { name = "Cyber1 TD1 TP2", slug = "112", collection = Cyber, id = 1 }
     , { name = "Cyber1 TD2 TP3", slug = "121", collection = Cyber, id = 2 }
     , { name = "Cyber1 TD2 TP4", slug = "122", collection = Cyber, id = 3 }
+    , { name = "Cyber1 TD3 TP5", slug = "131", collection = Cyber, id = 18 }
+    , { name = "Cyber1 TD3 TP6", slug = "132", collection = Cyber, id = 19 }
     , { name = "Cyber2 TD1 TP1", slug = "211", collection = Cyber, id = 4 }
     , { name = "Cyber2 TD1 TP2", slug = "212", collection = Cyber, id = 5 }
     , { name = "Cyber2 TD2 TP3", slug = "221", collection = Cyber, id = 6 }
