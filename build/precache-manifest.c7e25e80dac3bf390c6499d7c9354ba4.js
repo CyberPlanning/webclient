@@ -20,7 +20,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/images/logo-512.png"
   },
   {
-    "revision": "1b0c84dec33f5e854b0f82948151e0c5",
+    "revision": "a3e8ed0d7b53a7565999b380f00929b4",
     "url": "/index.html"
   },
   {
@@ -64,12 +64,12 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/robots.txt"
   },
   {
-    "revision": "ebcc668f494e7c07e9bb",
+    "revision": "66bf26de69d352cf1d35",
     "url": "/static/css/main.3953ab90.chunk.css"
   },
   {
-    "revision": "ebcc668f494e7c07e9bb",
-    "url": "/static/js/main.ebcc668f.chunk.js"
+    "revision": "66bf26de69d352cf1d35",
+    "url": "/static/js/main.66bf26de.chunk.js"
   },
   {
     "revision": "1b922744246c39b6bc43",
