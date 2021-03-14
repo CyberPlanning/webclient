@@ -1,29 +1,19 @@
-module Tooltip exposing (viewTooltip)
+module View.Tooltip exposing (viewTooltip)
 
 import Calendar.Event as CalEvent
 import Calendar.Msg exposing (Position)
-import Html exposing (..)
-import Html.Attributes exposing (..)
+import Html exposing (Html, div, text, span)
+import Html.Attributes exposing (class, style)
 import Model exposing (WindowSize)
 import Msg exposing (Msg(..))
+import MyTime
 import Time exposing (Posix)
-import TimeZone exposing (europe__paris)
 
 
-viewTooltip : Maybe String -> Maybe Position -> List CalEvent.Event -> WindowSize -> Html Msg
-viewTooltip selectedId maybePos events screenSize =
-    let
-        content =
-            case selectedId of
-                Just id ->
-                    List.filter (\e -> e.toId == id) events
-                        |> List.head
-                        |> viewTooltipContent maybePos screenSize
-
-                _ ->
-                    []
-    in
-    div [ class "tooltip" ] content
+viewTooltip : Maybe CalEvent.Event -> Maybe Position -> WindowSize -> Html Msg
+viewTooltip maybeEvent maybePos screenSize =
+    viewTooltipContent maybePos screenSize maybeEvent
+        |> div [ class "tooltip" ]
 
 
 viewTooltipContent : Maybe Position -> WindowSize -> Maybe CalEvent.Event -> List (Html Msg)
@@ -34,13 +24,14 @@ viewTooltipContent maybePos screenSize maybeEvent =
                 badge =
                     if String.isEmpty event.source then
                         []
+
                     else
                         [ viewBadge event.source event.style ]
 
                 title =
-                    [ text event.title ] ++ badge
+                    text event.title :: badge
             in
-            [ div ([ class "tooltip--event" ] ++ tooltipStylePos event.style maybePos screenSize)
+            [ div (class "tooltip--event" :: tooltipStylePos event.style maybePos screenSize)
                 ([ div [ class "tooltip--event-title" ] title
                  , div [ class "tooltip--event-sub", class "tooltip--event-hours" ] [ viewHour event ]
                  ]
@@ -105,12 +96,12 @@ toString : Posix -> String
 toString time =
     let
         minutes =
-            Time.toMinute europe__paris time
+            MyTime.toMinute time
                 |> String.fromInt
                 |> String.padLeft 2 '0'
 
         hours =
-            Time.toHour europe__paris time
+            MyTime.toHour time
                 |> String.fromInt
     in
     hours ++ ":" ++ minutes

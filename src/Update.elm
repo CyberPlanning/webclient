@@ -1,21 +1,20 @@
-module Update exposing (calendarAction, createPlanningRequest, update)
+module Update exposing (update)
 
-import Browser.Dom
 import Calendar.Calendar as Calendar
 import Calendar.Msg as CalMsg exposing (TimeSpan(..))
-import Config exposing (allGroups)
-import Model exposing (CustomEvent(..), Model, Settings)
+import Config
+import Cyberplanning.Cyberplanning as Cyberplanning
+import Cyberplanning.Types exposing (RequestAction(..))
+import Model exposing (Model)
 import Msg exposing (Msg(..))
+import MyTime
+import Personnel.Personnel as Personnel
 import Process
-import Query exposing (sendRequest)
-import Secret
+import Secret.Secret as Secret
 import Storage
-import Swipe
 import Task
-import Time exposing (Posix)
-import Time.Extra as TimeExtra
-import TimeZone exposing (europe__paris)
-import Utils exposing (find, toCalEvents, toCalEventsWithSource, toDatetime)
+import Time
+import Vendor.Swipe as Swipe
 
 
 
@@ -24,7 +23,7 @@ import Utils exposing (find, toCalEvents, toCalEventsWithSource, toDatetime)
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msgSource model =
-    case msgSource of
+    (case msgSource of
         Noop ->
             ( model, Cmd.none )
 
@@ -35,88 +34,53 @@ update msgSource model =
                         Day
 
                     else
-                        if model.settings.allWeek then AllWeek else Week
+                        Week
 
+                calendar =
+                    Calendar.init timespan date
+
+                ( planning, cmd ) =
+                    Cyberplanning.request model.planningState calendar.viewing
+                        |> updateWith SetPlanningState
             in
-            ( { model | date = Just date, calendarState = Calendar.init timespan date }
-            , createPlanningRequest date model.selectedGroup.slug model.settings
+            ( { model | date = Just date, calendarState = calendar, planningState = planning }
+            , cmd
             )
 
-        GraphQlMsg response ->
-            case response of
-                Ok query ->
-                    let
-                        cyberEvents =
-                            query.planning.events
-                                |> toCalEvents
-
-                        hack2g2Events =
-                            case query.hack2g2 of
-                                Nothing ->
-                                    []
-
-                                Just p ->
-                                    p.events
-                                        |> toCalEventsWithSource "Hack2g2" "#00ff1d"
-
-                        customEvents =
-                            case query.custom of
-                                Nothing ->
-                                    []
-
-                                Just p ->
-                                    p.events
-                                        |> toCalEventsWithSource "Custom" "#d82727"
-
-                        allEvents =
-                            cyberEvents
-                                ++ hack2g2Events
-                                ++ customEvents
-                                |> Just
-
-                        cmd =
-                            Task.attempt (always Noop) (Browser.Dom.blur "select-group")
-                    in
-                    ( { model | data = allEvents, loading = False, error = Nothing }, cmd )
-
-                Err err ->
-                    ( { model | error = Just err, loading = False }, Cmd.none )
-
-        SetGroup slug ->
-            let
-                group =
-                    find (\x -> x.slug == slug) allGroups
-                        |> Maybe.withDefault { slug = "12", name = "Cyber1 TD2" }
-
-                storage =
-                    { group = slug
-                    , settings = model.settings
-                    }
-
-                ( load, action ) =
-                    if (model.loading == False) && (model.loop == False) then
-                        ( True, queryReload (createPlanningRequest model.calendarState.viewing slug model.settings) )
-
-                    else
-                        ( False, Cmd.none )
-            in
-            ( { model | selectedGroup = group, loading = True, loop = True }, Cmd.batch [ Storage.save storage, action ] )
-
         Reload ->
-            ( { model | loading = True, loop = True }, queryReload (createPlanningRequest model.calendarState.viewing model.selectedGroup.slug model.settings) )
+            let
+                ( planning, action ) =
+                    Cyberplanning.request model.planningState model.calendarState.viewing
+            in
+            ( { model | planningState = planning }, Cmd.map SetPlanningState action )
 
         SetCalendarState calendarMsg ->
+            calendarAction model calendarMsg
+
+        SetPersonnelState personnelMsg ->
+            if Config.enablePersonnelCal then
+                personnelAction model personnelMsg
+            else
+                ( model , Cmd.none )
+
+        SetPlanningState personnelMsg ->
             let
-                updatedCalendar =
-                    Calendar.update calendarMsg model.calendarState
+                ( planning, action ) =
+                    Cyberplanning.update personnelMsg model.planningState
+
+                ( planning2, cmd ) =
+                    case action of
+                        RequestApi ->
+                            Cyberplanning.request planning model.calendarState.viewing
+                                |> updateWith SetPlanningState
+
+                        SaveState ->
+                            ( planning, Storage.saveState ( "cyberplanning", Cyberplanning.storeState planning ) )
+
+                        NoAction ->
+                            ( planning, Cmd.none )
             in
-            ( { model | calendarState = updatedCalendar }, Cmd.none )
-
-        PageForward ->
-            calendarAction model CalMsg.PageForward
-
-        PageBack ->
-            calendarAction model CalMsg.PageBack
+            ( { model | planningState = planning2 }, cmd )
 
         WindowSize view ->
             ( { model | size = { width = floor view.viewport.width, height = floor view.viewport.height } }, Task.perform SetDate Time.now )
@@ -134,8 +98,14 @@ update msgSource model =
                         _ ->
                             ( model, Cmd.none )
 
+                secret =
+                    if Config.enableEasterEgg then
+                        Secret.update code model.secret
+                    else
+                        model.secret
+
                 updatedModel =
-                    { calendarModel | secret = Secret.update code model.secret }
+                    { calendarModel | secret = secret }
             in
             ( updatedModel, cmd )
 
@@ -147,11 +117,11 @@ update msgSource model =
                 action =
                     case Swipe.hasSwiped updatedSwipe 70 of
                         Just Swipe.Left ->
-                            Task.succeed PageForward
+                            Task.succeed (SetCalendarState CalMsg.PageForward)
                                 |> Task.perform identity
 
                         Just Swipe.Right ->
-                            Task.succeed PageBack
+                            Task.succeed (SetCalendarState CalMsg.PageBack)
                                 |> Task.perform identity
 
                         _ ->
@@ -169,87 +139,12 @@ update msgSource model =
             ( { model | loop = False }, Cmd.none )
 
         ToggleMenu ->
-            let
-                s =
-                    model.settings
-
-                newSettings =
-                    { s | menuOpened = not s.menuOpened }
-
-                storage =
-                    { group = model.selectedGroup.slug
-                    , settings = newSettings
-                    }
-            in
-            ( { model | settings = newSettings }, Storage.save storage )
+            ( { model | menuOpened = not model.menuOpened }, Cmd.none )
 
         ChangeMode mode ->
-            let
-                ( calendarModel, _ ) =
-                    calendarAction model (CalMsg.ChangeTimeSpan mode)
-
-                allWeek =
-                    if mode == AllWeek then True else False
-            
-                s = model.settings
-
-                updatedSettings =
-                    { s | allWeek = allWeek }
-
-                storage =
-                    { group = calendarModel.selectedGroup.slug
-                    , settings = updatedSettings
-                    }
-
-            in
-                ({ calendarModel | settings = updatedSettings }, Storage.save storage)
-            
-
-        CheckEvents type_ checked ->
-            let
-                s =
-                    model.settings
-
-                updatedSettings =
-                    case type_ of
-                        Hack2g2 ->
-                            { s | showHack2g2 = checked }
-
-                        Custom ->
-                            { s | showCustom = checked }
-
-                storage =
-                    { group = model.selectedGroup.slug
-                    , settings = updatedSettings
-                    }
-
-                cmd =
-                    Cmd.batch
-                        [ createPlanningRequest model.calendarState.viewing model.selectedGroup.slug updatedSettings
-                        , Storage.save storage
-                        ]
-            in
-            ( { model | loading = True, loop = True, settings = updatedSettings }, queryReload cmd )
-
-
-createPlanningRequest : Posix -> String -> Settings -> Cmd Msg
-createPlanningRequest date slug settings =
-    let
-        dateFrom =
-            date
-                |> TimeExtra.floor TimeExtra.Month europe__paris
-                |> TimeExtra.floor TimeExtra.Monday europe__paris
-                |> toDatetime
-
-        dateTo =
-            date
-                -- Fix issue : Event not loaded in October to November transition
-                |> TimeExtra.add TimeExtra.Day 1 europe__paris
-                |> TimeExtra.ceiling TimeExtra.Month europe__paris
-                |> TimeExtra.ceiling TimeExtra.Sunday europe__paris
-                |> toDatetime
-    in
-    sendRequest dateFrom dateTo [ slug ] settings
+            calendarAction model (CalMsg.ChangeTimeSpan mode)
+    )
+        |> queryReload model
 
 
 calendarAction : Model -> CalMsg.Msg -> ( Model, Cmd Msg )
@@ -258,29 +153,57 @@ calendarAction model calMsg =
         updatedCalendar =
             Calendar.update calMsg model.calendarState
 
-        ( cmd, loading ) =
-            if Time.toMonth europe__paris updatedCalendar.viewing /= Time.toMonth europe__paris model.calendarState.viewing then
-                ( createPlanningRequest updatedCalendar.viewing model.selectedGroup.slug model.settings
-                , True
-                )
+        ( planning, cmd ) =
+            if MyTime.toMonth updatedCalendar.viewing /= MyTime.toMonth model.calendarState.viewing then
+                Cyberplanning.request model.planningState updatedCalendar.viewing
+                    |> updateWith SetPlanningState
 
             else
-                ( Cmd.none, False )
+                ( model.planningState, Cmd.none )
 
         updatedCalWithJourFerie =
-            if Time.toYear europe__paris updatedCalendar.viewing /= Time.toYear europe__paris model.calendarState.viewing then
+            if MyTime.toYear updatedCalendar.viewing /= MyTime.toYear model.calendarState.viewing then
                 Calendar.init updatedCalendar.timeSpan updatedCalendar.viewing
 
             else
                 updatedCalendar
     in
-    ( { model | calendarState = updatedCalWithJourFerie, loading = loading }, cmd )
+    ( { model | calendarState = updatedCalWithJourFerie, planningState = planning }, cmd )
 
 
-queryReload : Cmd.Cmd Msg -> Cmd.Cmd Msg
-queryReload action =
-    Cmd.batch
-        [ action
-        , Process.sleep (1 * 1000)
-            |> Task.perform StopReloadIcon
-        ]
+personnelAction : Model -> Personnel.Msg -> ( Model, Cmd Msg )
+personnelAction model personnelMsg =
+    let
+        ( personnel, action ) =
+            Personnel.update personnelMsg model.personnelState
+
+        cmd =
+            Cmd.batch
+                [ Cmd.map SetPersonnelState action
+                , Storage.saveState ( "personnel", Personnel.storeState personnel )
+                ]
+    in
+    ( { model | personnelState = personnel }, cmd )
+
+
+
+updateWith : (subMsg -> Msg) -> ( subModel, Cmd subMsg ) -> ( subModel, Cmd Msg )
+updateWith toMsg ( subModel, subCmd ) =
+    ( subModel
+    , Cmd.map toMsg subCmd
+    )
+
+
+queryReload : Model -> ( Model, Cmd.Cmd Msg ) -> ( Model, Cmd.Cmd Msg )
+queryReload previousModel ( model, action ) =
+    if model.planningState.status == Cyberplanning.Types.Loading && previousModel.planningState.status /= Cyberplanning.Types.Loading then
+        ( { model | loop = True }
+        , Cmd.batch
+            [ action
+            , Process.sleep (1 * 1000)
+                |> Task.perform StopReloadIcon
+            ]
+        )
+
+    else
+        ( model, action )

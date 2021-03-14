@@ -5,13 +5,11 @@ import Calendar.Event exposing (Event)
 import Calendar.JourFerie exposing (getAllJourFerie)
 import Calendar.Msg exposing (InternalState, Msg(..), TimeSpan(..))
 import Calendar.Week as Week
-import Html exposing (..)
+import Html exposing (Html, div)
 import Html.Attributes exposing (class)
-import Html.Events exposing (keyCode, on)
-import Json.Decode as Json
+import MyTime
 import Time exposing (Posix)
 import Time.Extra as TimeExtra
-import TimeZone exposing (europe__paris)
 
 
 type alias State =
@@ -25,7 +23,7 @@ init timeSpan viewing =
     , hover = Nothing
     , position = Nothing
     , selected = Nothing
-    , joursFeries = getAllJourFerie (Time.toYear europe__paris viewing)
+    , joursFeries = getAllJourFerie (MyTime.toYear viewing)
     }
 
 
@@ -57,7 +55,7 @@ update msg state =
         EventMouseEnter eventId pos ->
             { state | hover = Just eventId, position = Just pos }
 
-        EventMouseLeave eventId ->
+        EventMouseLeave _ ->
             { state | hover = Nothing, selected = Nothing }
 
 
@@ -78,22 +76,22 @@ page step state =
                 Day ->
                     TimeExtra.Day
     in
-    { state | viewing = TimeExtra.add interval step europe__paris viewing, hover = Nothing, selected = Nothing }
+    { state | viewing = MyTime.add interval step viewing, hover = Nothing, selected = Nothing }
 
 
-view : List Event -> State -> Html Msg
-view events state =
+view : List Event -> Int -> State -> Html Msg
+view events columns state =
     let
         calendarView =
             case state.timeSpan of
                 Week ->
-                    Week.view state events
+                    Week.view state columns events
 
                 AllWeek ->
-                    Week.viewAll state events
+                    Week.viewAll state columns events
 
                 Day ->
-                    Day.view state events
+                    Day.view state columns events
     in
     div
         [ class "calendar--calendar" ]

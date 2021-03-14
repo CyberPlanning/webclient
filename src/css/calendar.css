@@ -136,10 +136,10 @@
     cursor: pointer;
 }
 
-.calendar--navigations-day:hover,
+/* .calendar--navigations-day:hover,
 .calendar--navigations-week:hover {
     font-weight: bold;
-}
+} */
 
 .calendar--jour-ferie {
     position: absolute;
@@ -149,4 +149,5 @@
     width: 100%;
     color: #657277;
     padding: 100px 0;
+    border-left: 1px solid var(--border-color);
 }

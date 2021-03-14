@@ -1,22 +1,22 @@
-module Calendar.Event exposing (Style, Event, EventRange(..), cellWidth, eventSegment, eventStyling, maybeViewDayEvent, offsetLength, offsetPercentage, percentDay, rangeDescription, rowSegment, styleDayEvent, styleRowSegment)
+module Calendar.Event exposing (Event, PositionMode(..), Style, cellWidth, eventSegment, eventStyling, offsetLength, offsetPercentage, percentDay, rangeDescription, rowSegment, styleDayEvent, styleRowSegment)
 
-import Calendar.Helpers as Helpers
-import Calendar.Msg exposing (Msg(..), TimeSpan(..), onMouseEnter, onClick)
-import Html exposing (..)
+-- import String.Extra
+
+import Calendar.Msg exposing (Msg(..), TimeSpan(..), onClick, onMouseEnter)
+import Html exposing (Html, div, text)
 import Html.Attributes exposing (attribute, class, classList, style)
 import Html.Events exposing (onMouseLeave)
-import Iso8601
+import MyTime
 import String
--- import String.Extra
 import Time exposing (Posix, Weekday(..))
 import Time.Extra as TimeExtra
-import TimeZone exposing (europe__paris)
 
 
 type alias Style =
     { eventColor : String
     , textColor : String
     }
+
 
 type alias Event =
     { toId : String
@@ -26,25 +26,27 @@ type alias Event =
     , description : List String
     , source : String
     , style : Style
+    , position : PositionMode
     }
 
-type EventRange
-    = StartsAndEnds
-    | ExistsOutside
+
+type PositionMode
+    = All
+    | Column Int Int
 
 
-rangeDescription : Posix -> Posix -> TimeExtra.Interval -> Posix -> EventRange
+rangeDescription : Posix -> Posix -> TimeExtra.Interval -> Posix -> Bool
 rangeDescription start end interval date =
     let
         -- Fix : floor and ceiling return same Time if it is midnight
         day =
-            TimeExtra.add TimeExtra.Millisecond 1 europe__paris date
+            MyTime.add TimeExtra.Millisecond 1 date
 
         begInterval =
-            TimeExtra.floor interval europe__paris day
+            MyTime.floor interval day
 
         endInterval =
-            TimeExtra.ceiling interval europe__paris day
+            MyTime.ceiling interval day
 
         startsThisInterval =
             isBetween begInterval endInterval start
@@ -52,19 +54,15 @@ rangeDescription start end interval date =
         endsThisInterval =
             isBetween begInterval endInterval end
     in
-    if startsThisInterval && endsThisInterval then
-        StartsAndEnds
-
-    else
-        ExistsOutside
+    startsThisInterval && endsThisInterval
 
 
 eventStyling :
-    Event
-    -> EventRange
+    Int
+    -> Event
     -> List ( String, Bool )
     -> List (Html.Attribute msg)
-eventStyling event eventRange customClasses =
+eventStyling columns event customClasses =
     let
         eventStart =
             event.startTime
@@ -82,38 +80,34 @@ eventStyling event eventRange customClasses =
             escapeTitle event.title
 
         classes =
-            case eventRange of
-                StartsAndEnds ->
-                    "calendar--event calendar--event-starts-and-ends"
-
-                ExistsOutside ->
-                    ""
+            "calendar--event calendar--event-starts-and-ends"
 
         extraStyle =
             if String.isEmpty event.source then
                 []
+
             else
                 [ style "border-color" colorFg ]
 
         styles =
-            styleDayEvent eventStart eventEnd
-            ++ styleColorDayEvent eventTitle colorFg colorBg
-            ++ extraStyle
+            styleDayEvent columns eventStart eventEnd event.position
+                ++ styleColorDayEvent eventTitle colorFg colorBg
+                ++ extraStyle
     in
-    [ classList (( classes, True ) :: customClasses) ] ++ styles
+    classList (( classes, True ) :: customClasses) :: styles
 
 
 fractionalDay : Posix -> Float
 fractionalDay time =
     let
         hours =
-            Time.toHour europe__paris time
+            MyTime.toHour time
 
         minutes =
-            Time.toMinute europe__paris time
+            MyTime.toMinute time
 
         seconds =
-            Time.toSecond europe__paris time
+            MyTime.toSecond time
     in
     toFloat ((hours * 3600) + (minutes * 60) + seconds) / (24 * 3600)
 
@@ -123,9 +117,36 @@ percentDay date min max =
     (fractionalDay date - min) / (max - min)
 
 
-styleDayEvent : Posix -> Posix -> List (Html.Attribute msg)
-styleDayEvent start end =
+styleDayEvent : Int -> Posix -> Posix -> PositionMode -> List (Html.Attribute msg)
+styleDayEvent columns start end position =
     let
+        ( left, width ) =
+            case position of
+                All ->
+                    ( "0", "96%" )
+
+                Column idx size ->
+                    let
+                        fractionUnit =
+                            96 / toFloat columns
+
+                        fractionSize =
+                            fractionUnit * toFloat size
+
+                        l =
+                            idx
+                                |> toFloat
+                                |> (*) fractionUnit
+                                |> String.fromFloat
+                                |> (\x -> x ++ "%")
+
+                        w =
+                            fractionSize
+                                |> String.fromFloat
+                                |> (\x -> x ++ "%")
+                    in
+                    ( l, w )
+
         startPercent =
             100 * percentDay start (7 / 24) (21 / 24)
 
@@ -140,10 +161,12 @@ styleDayEvent start end =
     in
     [ style "top" startPercentage
     , style "height" height
-    , style "left" "2%"
-    , style "width" "96%"
+    , style "left" left
+    , style "margin" "0 6px"
+    , style "width" width
     , style "position" "absolute"
     ]
+
 
 styleColorDayEvent : String -> String -> String -> List (Html.Attribute msg)
 styleColorDayEvent title fg bg =
@@ -154,29 +177,14 @@ styleColorDayEvent title fg bg =
     ]
 
 
-maybeViewDayEvent : Event -> Maybe String -> EventRange -> Maybe (Html Msg)
-maybeViewDayEvent event selectedId eventRange =
-    case eventRange of
-        ExistsOutside ->
-            Nothing
-
-        _ ->
-            Just <| eventSegment event selectedId eventRange
-
-
-eventSegment : Event -> Maybe String -> EventRange -> Html Msg
-eventSegment event selectedId eventRange =
+eventSegment : Int -> Event -> Html Msg
+eventSegment columns event =
     let
         eventId =
             event.toId
 
-        isSelected =
-            Maybe.map ((==) eventId) selectedId
-                |> Maybe.withDefault False
-
         classes =
             [ ( "calendar--event-content", True )
-            , ( "calendar--event-content--is-selected", isSelected )
             ]
 
         title =
@@ -184,21 +192,17 @@ eventSegment event selectedId eventRange =
 
         childs =
             List.map viewSub event.description
-        
     in
-    div
-        ([ onMouseEnter <| EventMouseEnter eventId
-         , onMouseLeave <| EventMouseLeave eventId
-         , onClick <| EventClick eventId
-         ]
-            ++ eventStyling event eventRange classes
-        )
-        (( div [ class "calendar--event-title" ] title ) :: childs)
-
-
-makeTitle : String -> Html Msg
-makeTitle title =
-    text title
+    div []
+        [ div
+            ([ onMouseEnter <| EventMouseEnter eventId
+             , onMouseLeave <| EventMouseLeave eventId
+             , onClick <| EventClick eventId
+             ]
+                ++ eventStyling columns event classes
+            )
+            (div [ class "calendar--event-title" ] title :: childs)
+        ]
 
 
 viewSub : String -> Html Msg
@@ -213,8 +217,8 @@ cellWidth =
 
 offsetLength : Posix -> Float
 offsetLength date =
-    Time.toWeekday europe__paris date
-        |> weekdayToNumber
+    MyTime.toWeekday date
+        |> MyTime.weekdayToNumber
         |> modBy 7
         |> toFloat
         |> (*) cellWidth
@@ -258,30 +262,3 @@ isBetween start end current =
 escapeTitle : String -> String
 escapeTitle =
     always ""
-    -- String.Extra.removeAccents
-        -- >> String.Extra.underscored
-
-
-weekdayToNumber : Weekday -> Int
-weekdayToNumber wd =
-    case wd of
-        Mon ->
-            1
-
-        Tue ->
-            2
-
-        Wed ->
-            3
-
-        Thu ->
-            4
-
-        Fri ->
-            5
-
-        Sat ->
-            6
-
-        Sun ->
-            7

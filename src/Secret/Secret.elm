@@ -1,7 +1,6 @@
-module Secret exposing (StateList, classStyle, createStates, isHelpActivated, update, view)
+module Secret.Secret exposing (StateList, classStyle, createStates, isHelpActivated, update, view)
 
 import Array exposing (Array)
-import Calendar.Event as Cal
 import Dict exposing (Dict)
 import Html exposing (Html, iframe)
 import Html.Attributes exposing (attribute, class, height, src, style, width)
@@ -42,7 +41,7 @@ createStates =
           }
         , { code = Array.fromList [ 65, 66, 39, 37, 39, 37, 40, 40, 38, 38 ]
           , index = 0
-          , yt = "vN-ARytZKgQ"
+          , yt = "Rm6q_3WGy9M"
           , opts = Dict.empty
           , class = "fun2"
           }
@@ -153,13 +152,6 @@ viewState state =
 activated : YTState -> Bool
 activated state =
     Array.length state.code == state.index
-
-
-toState : YTState -> State
-toState state =
-    { code = state.code
-    , index = state.index
-    }
 
 
 isHelpActivated : StateList -> Bool

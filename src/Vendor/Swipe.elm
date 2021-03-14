@@ -1,13 +1,13 @@
-module Swipe exposing
+module Vendor.Swipe exposing
     ( Coordinates
     , Direction(..)
     , Msg
     , State
     , SwipeState(..)
+    , hasSwiped
     , init
     , onSwipe
     , update
-    , hasSwiped
     )
 
 import Html
@@ -102,6 +102,7 @@ hasSwiped : State -> Float -> Maybe Direction
 hasSwiped state distance =
     if (state.state == SwipeEnd) && (distanceX state.c0 state.c1 > distance) then
         state.direction
+
     else
         Nothing
 

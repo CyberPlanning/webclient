@@ -1,10 +1,10 @@
 module Secret.Help exposing (Help, helpEvents, helpMessages)
 
 import Calendar.Event as Cal
+import Cyberplanning.Utils exposing (computeStyle)
+import MyTime
 import Time exposing (Posix)
 import Time.Extra as TimeExtra
-import TimeZone exposing (europe__paris)
-import Utils exposing (computeStyle)
 
 
 type alias Help =
@@ -64,16 +64,16 @@ helpToEvent : Posix -> Help -> Cal.Event
 helpToEvent viewing help =
     let
         eventDay =
-            TimeExtra.floor TimeExtra.Monday europe__paris viewing
-                |> TimeExtra.ceiling help.weekday europe__paris
+            MyTime.floor TimeExtra.Monday viewing
+                |> MyTime.ceiling help.weekday
 
         start =
-            TimeExtra.add TimeExtra.Hour help.startHour europe__paris eventDay
-                |> TimeExtra.add TimeExtra.Minute help.startMinute europe__paris
+            MyTime.add TimeExtra.Hour help.startHour eventDay
+                |> MyTime.add TimeExtra.Minute help.startMinute
 
         end =
-            TimeExtra.add TimeExtra.Hour help.endHour europe__paris eventDay
-                |> TimeExtra.add TimeExtra.Minute help.endMinute europe__paris
+            MyTime.add TimeExtra.Hour help.endHour eventDay
+                |> MyTime.add TimeExtra.Minute help.endMinute
     in
     { toId = help.title
     , title = help.title
@@ -82,6 +82,7 @@ helpToEvent viewing help =
     , description = [ help.desc, help.desc2 ]
     , style = computeStyle help.title
     , source = ""
+    , position = Cal.All
     }
 
 

@@ -1,85 +1,80 @@
 module Calendar.Week exposing (view, viewAll, viewWeekContent, viewWeekDay)
 
-import Calendar.Day exposing (viewAllDayCell, viewDayEvents, viewDaySlotGroup, viewTimeGutter, viewTimeGutterHeader)
+import Calendar.Day exposing (viewDayEvents, viewDaySlotGroup, viewTimeGutter)
 import Calendar.Event exposing (Event)
 import Calendar.Helpers as Helpers
 import Calendar.Msg exposing (InternalState, Msg(..))
-import Dict exposing (Dict)
-import Html exposing (..)
-import Html.Attributes exposing (..)
+import Html exposing (Html, div, span, text)
+import Html.Attributes exposing (class)
 import Time exposing (Posix)
 
 
-view : InternalState -> List Event -> Html Msg
-view state events =
+view : InternalState -> Int -> List Event -> Html Msg
+view state columns events =
     Helpers.dayRangeOfWeek state.viewing
-        |> viewDays state events
+        |> viewDays state columns events
 
 
-viewAll : InternalState -> List Event -> Html Msg
-viewAll state events =
+viewAll : InternalState -> Int -> List Event -> Html Msg
+viewAll state columns events =
     Helpers.dayRangeOfAllWeek state.viewing
-        |> viewDays state events
+        |> viewDays state columns events
 
 
-viewDays : InternalState -> List Event -> List Posix -> Html Msg
-viewDays { selected, viewing, joursFeries } events weekRange =
+viewDays : InternalState -> Int -> List Event -> List Posix -> Html Msg
+viewDays state columns events weekRange =
     div [ class "calendar--week" ]
-        [ viewWeekContent events selected viewing weekRange joursFeries
+        [ viewWeekContent state columns events weekRange
         ]
 
 
 viewWeekContent :
-    List Event
-    -> Maybe String
-    -> Posix
+    InternalState
+    -> Int
+    -> List Event
     -> List Posix
-    -> Dict String Posix
     -> Html Msg
-viewWeekContent events selectedId viewing days feries =
+viewWeekContent state columns events days =
     let
         timeGutter =
-            viewTimeGutter viewing
+            viewTimeGutter state.viewing
 
         weekDays =
-            List.map (viewWeekDay events selectedId feries) days
+            List.map (viewWeekDay state columns events) days
     in
     div [ class "calendar--week-content" ]
         (timeGutter :: weekDays)
 
 
-viewWeekDay : List Event -> Maybe String -> Dict String Posix -> Posix -> Html Msg
-viewWeekDay events selectedId feries day =
+viewWeekDay : InternalState -> Int -> List Event -> Posix -> Html Msg
+viewWeekDay state columns events day =
     let
         viewDaySlots =
             Helpers.hours
                 |> List.map viewDaySlotGroup
 
         dayEvents =
-            viewDayEvents events selectedId day feries
+            viewDayEvents state columns events day
     in
-    div [ class "calendar--dates"]
-    [ div [ class "calendar--date-header" ]
-        [ span [ class "calendar--date" ] [ text <| Helpers.dateString day ] ]
-    , div [ class "calendar--day-slot" ]
-        (viewDaySlots ++ dayEvents)
-    ]
+    div [ class "calendar--dates" ]
+        [ div [ class "calendar--date-header" ]
+            [ span [ class "calendar--date" ] [ text <| Helpers.dateString day ] ]
+        , div [ class "calendar--day-slot" ]
+            (viewDaySlots ++ dayEvents)
+        ]
+
 
 
 -- viewWeekHeader : List Posix -> Html Msg
 -- viewWeekHeader days =
 --     div [ class "calendar--week-header" ]
 --         [ viewDates days ]
-
-
 -- viewDates : List Posix -> Html Msg
 -- viewDates days =
 --     div [ class "calendar--dates-header" ]
 --         [ viewTimeGutterHeader
 --         , div [ class "calendar--dates" ] <| List.map viewDate days
 --         ]
-
-
 -- viewDate : Posix -> Html Msg
 -- viewDate day =
 --     div [ class "calendar--date-header" ]

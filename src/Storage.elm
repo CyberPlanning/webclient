@@ -1,12 +1,11 @@
-port module Storage exposing (save, Storage)
-
-import Model
+port module Storage exposing (Storage, saveState)
 
 
 type alias Storage =
-    { group : String
-    , settings : Model.Settings
+    { graphqlUrl : String
+    , cyberplanning : String
+    , personnel : String
     }
 
 
-port save : Storage -> Cmd msg
+port saveState : ( String, String ) -> Cmd msg

@@ -1,175 +1,206 @@
 @import url('https://fonts.googleapis.com/css?family=Roboto:400,500');
 
 * {
-  box-sizing: border-box;
+    box-sizing: border-box;
 }
 
 :root {
-  font-size: 16px;
+    font-size: 16px;
 }
 
 html,
 body {
-  padding: 0;
-  margin: 0;
-  height: 100vh;
-  overflow: hidden
+    padding: 0;
+    margin: 0;
+    height: 100vh;
+    overflow: hidden;
 }
 
 body {
-  margin: 0;
-  text-align: center;
-  background-color: var(--body-color);
+    margin: 0;
+    text-align: center;
+    background-color: var(--body-color);
 }
 
-body, button, a, input, select {
-  font-family: 'Roboto', Helvetica, Arial, sans-serif;
-  color: var(--text-color);
+body,
+button,
+a,
+input,
+select {
+    font-family: 'Roboto', Helvetica, Arial, sans-serif;
+    color: var(--text-color);
 }
 
 button {
-  border: 0;
-  border-radius: 0;
-  background-color: transparent;
-  cursor: pointer;
-  padding: 5px 15px;
+    border: 0;
+    border-radius: 0;
+    background-color: transparent;
+    cursor: pointer;
+    padding: 5px 15px;
 }
 
 button:hover {
-  background-color: var(--accent-color);
+    background-color: var(--accent-color);
 }
 
 .hidden {
-  display: none !important;
+    display: none !important;
 }
 
 .main--container {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  flex: 1;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
 }
 
 .main--calendar {
-  overflow: hidden;
-  display: flex;
-  flex: 1;
-  position: relative;
+    overflow: hidden;
+    display: flex;
+    flex: 1;
+    position: relative;
 }
 
 .main--toolbar {
-  display: flex;
-  background-color: var(--nav-color);
-  padding: 0;
-  justify-content: space-between;
-  height: 40px;
-  position: relative;
+    display: flex;
+    background-color: var(--nav-color);
+    padding: 0 0.5rem;
+    justify-content: space-between;
+    height: 2.5rem;
+    position: relative;
+    overflow: hidden;
+    /* flex-wrap: wrap; */
+}
+
+.main--toolbar > * {
+    margin: 0.3125rem 0.5rem;
 }
 
 .main--month-title {
-  display: flex;
-  flex: 1;
-  justify-content: center;
-  align-items: center;
-}
-
-.main--month-title h2 {
-  font-size: 1.3rem;
-  margin: 0;
-  white-space: nowrap;
+    display: flex;
+    flex: 1;
+    padding-left: 0.4em;
+    align-items: center;
+    font-size: 1.3rem;
+    white-space: nowrap;
 }
 
 .main--navigatiors-button {
-  border: 0;
-  background-color: transparent;
-  font-size: 1rem;
-  cursor: pointer;
-  vertical-align: top;
+    border: 0;
+    background-color: transparent;
+    font-size: 1rem;
+    cursor: pointer;
+    vertical-align: top;
 }
 
 .main--navigatiors-button:hover {
-  background-color: var(--accent-color);
+    background-color: var(--accent-color);
 }
 
 button:focus,
 select:focus,
 option:focus,
 input:focus {
-  outline-color: var(--accent-color);
+    outline-color: var(--accent-color);
 }
 
 .main--navigatiors-reload i {
-  display: block;
-  transform-origin: center center;
-  animation-name: none;
-  animation-duration: 1000ms;
-  animation-timing-function: ease-in-out;
-  animation-iteration-count: 1;
+    display: block;
+    transform-origin: center center;
+    animation-name: none;
+    animation-duration: 1000ms;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: 1;
 }
 
 .main--navigatiors-reload.loop i {
-  animation-name: loop;
+    animation-name: loop;
 }
 
 .main--navigatiors-action {
-  display: inline-flex;
-  vertical-align: top;
-  padding: 5px 0 5px 5px;
-  height: 100%;
+    display: inline-flex;
+    vertical-align: top;
+    padding: 5px 0 5px 5px;
+    height: 100%;
 }
 
 .main--navigatiors-button {
-  padding: 0 0.25rem;
-  border-radius: 50%;
+    padding: 0 0.2375rem;
+    border-radius: 50%;
 }
 
 .main--navigatiors-today {
-  padding: 0 8px;
-  text-transform: uppercase;
-  font-weight: 500;
-  font-size: 0.9rem;
-  background-color: var(--accent-color);
-  border-radius: 5px;
-  vertical-align: top;
+    padding: 0 8px;
+    text-transform: uppercase;
+    font-weight: 500;
+    font-size: 0.9rem;
+    background-color: var(--accent-color);
+    border-radius: 5px;
+    vertical-align: top;
 }
 
-.main--navigatiors-today:active {
-  background-color: var(--accent-color-dark);
+.main--navigatiors-today:active,
+.main--navigatiors-todayicon:active {
+    background-color: var(--accent-color-dark);
 }
 
-.main--paginators {
-  z-index: 1;
+.main--navigatiors-todayicon {
+    display: none;
+    font-size: 1rem;
+    padding: 0 0.25em;
+    background-color: var(--accent-color);
+    border-radius: 50%;
 }
 
-.main--message {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+.main--status {
+    display: flex;
+    align-items: center;
+    padding: 0 0.5rem;
+}
+
+.main--status i {
+    animation: blur 0.75s ease-out infinite;
+}
+
+@keyframes blur {
+    from {
+        text-shadow: 0 0 0.1em, 0 0 0.25em, 0 0 0.5em, 0 0 1.5em, 0 0.1em 1em, 0 -0.1em 1em;
+    }
 }
 
 @keyframes loop {
-  from {
-    transform: rotate(0);
-  }
+    from {
+        transform: rotate(0);
+    }
 
-  to {
-    transform: rotate(360deg);
-  }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
-@media only screen and (max-width: 550px) {
-  .main--month-title {
-      position: relative;
-  }
+@media screen and (max-width: 600px) {
+    .main--status span {
+        display: none;
+    }
 
-  .main--month-title h2 {
-      font-size: 1rem;
-  }
-  
-  .main--navigatiors-today {
-      font-size: 0.8rem;
-  }
+    .main--toolbar > * {
+        margin: 0.3125rem 0.1rem;
+    }
+}
+
+@media only screen and (max-width: 500px) {
+    .main--month-title {
+        font-size: 1rem;
+    }
+
+    .main--navigatiors-today {
+        display: none;
+    }
+    .main--navigatiors-todayicon {
+        display: block;
+    }
+
+    .calendar--hour-slot {
+        padding: 0 3px !important;
+    }
 }

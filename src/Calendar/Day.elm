@@ -1,26 +1,25 @@
 module Calendar.Day exposing (view, viewAllDayCell, viewDate, viewDayEvent, viewDayEvents, viewDayHeader, viewDaySlot, viewDaySlotGroup, viewHourSlot, viewTimeGutter, viewTimeGutterHeader, viewTimeSlot, viewTimeSlotGroup)
 
-import Calendar.Event exposing (Event, maybeViewDayEvent, rangeDescription)
+import Calendar.Event exposing (Event, eventSegment, rangeDescription)
 import Calendar.Helpers as Helpers
 import Calendar.JourFerie exposing (jourFerie)
 import Calendar.Msg exposing (InternalState, Msg(..))
-import Dict exposing (Dict)
-import Html exposing (..)
-import Html.Attributes exposing (..)
+import Html exposing (Html, div, button, text, span)
+import Html.Attributes exposing (class)
 import Html.Events exposing (onClick)
+import MyTime
 import Time exposing (Posix)
 import Time.Extra as TimeExtra
-import TimeZone exposing (europe__paris)
 
 
-view : InternalState -> List Event -> Html Msg
-view { selected, viewing, joursFeries } events =
+view : InternalState -> Int -> List Event -> Html Msg
+view state columns events =
     div [ class "calendar--day" ]
         [ div [ class "calendar--day-content" ]
-            [ viewTimeGutter viewing
+            [ viewTimeGutter state.viewing
             , div [ class "calendar--day" ]
-                [ viewDayHeader viewing
-                , viewDaySlot events selected viewing joursFeries
+                [ viewDayHeader state.viewing
+                , viewDaySlot state columns events
                 ]
             ]
         ]
@@ -59,15 +58,11 @@ viewTimeGutterHeader viewing =
     let
         date =
             viewing
-                |> TimeExtra.ceiling TimeExtra.Sunday europe__paris
-
-        year =
-            Time.toYear europe__paris date
+                |> MyTime.ceiling TimeExtra.Sunday
 
         weekNum =
-            TimeExtra.diff TimeExtra.Week
-                europe__paris
-                (TimeExtra.partsToPosix europe__paris (TimeExtra.Parts year Time.Jan 1 0 0 0 0))
+            MyTime.diff TimeExtra.Week
+                (MyTime.floor TimeExtra.Year date)
                 date
                 |> (+) 1
                 |> String.fromInt
@@ -76,29 +71,34 @@ viewTimeGutterHeader viewing =
         [ span [ class "calendar--date" ] [ text weekNum ]
         ]
 
+
 viewTimeGutterZone : Posix -> Html Msg
 viewTimeGutterZone viewing =
     let
         offset =
             viewing
-            |> TimeExtra.toOffset europe__paris
-            |> toFloat
+                |> MyTime.toOffset
 
-        zone = offset / 60
-            |> floor
-            |> String.fromInt
-            |> (++) "GMT+"
-
+        zone =
+            offset
+                / 60
+                |> floor
+                |> String.fromInt
+                |> (++) "GMT+"
     in
     div [ class "calendar--date-header-zone" ]
-        [ span [ ] [ text zone ]
+        [ span [] [ text zone ]
         ]
 
 
 viewTimeSlotGroup : Posix -> Int -> String -> Html Msg
 viewTimeSlotGroup viewing idx date =
     div [ class "calendar--time-slot-group" ]
-        [ if idx == 0 then viewTimeGutterZone viewing else text ""
+        [ if idx == 0 then
+            viewTimeGutterZone viewing
+
+          else
+            text ""
         , viewHourSlot date
         , div [ class "calendar--time-slot" ] []
         ]
@@ -110,11 +110,11 @@ viewHourSlot date =
         [ span [ class "calendar--time-slot-text" ] [ text date ] ]
 
 
-viewDaySlot : List Event -> Maybe String -> Posix -> Dict String Posix -> Html Msg
-viewDaySlot events selectedId day feries =
+viewDaySlot : InternalState -> Int -> List Event -> Html Msg
+viewDaySlot state columns events =
     Helpers.hours
         |> List.map viewDaySlotGroup
-        |> (\b a -> (++) a b) (viewDayEvents events selectedId day feries)
+        |> (\b a -> a ++ b) (viewDayEvents state columns events state.viewing)
         |> div [ class "calendar--day-slot" ]
 
 
@@ -127,17 +127,17 @@ viewDaySlotGroup date =
 
 
 viewTimeSlot : String -> Html Msg
-viewTimeSlot date =
+viewTimeSlot _ =
     div
         [ class "calendar--time-slot" ]
         []
 
 
-viewDayEvents : List Event -> Maybe String -> Posix -> Dict String Posix -> List (Html Msg)
-viewDayEvents events selectedId day feries =
+viewDayEvents : InternalState -> Int -> List Event -> Posix -> List (Html Msg)
+viewDayEvents state columns events day =
     let
         extra =
-            case jourFerie feries day of
+            case jourFerie state.joursFeries day of
                 Just name ->
                     text name
                         |> List.singleton
@@ -148,18 +148,18 @@ viewDayEvents events selectedId day feries =
                     []
 
         eventsHtml =
-            List.filterMap (viewDayEvent day selectedId) events
+            List.filterMap (viewDayEvent columns day) events
     in
     extra ++ eventsHtml
 
 
-viewDayEvent : Posix -> Maybe String -> Event -> Maybe (Html Msg)
-viewDayEvent day selectedId event =
-    let
-        eventRange =
-            rangeDescription event.startTime event.endTime TimeExtra.Day day
-    in
-    maybeViewDayEvent event selectedId eventRange
+viewDayEvent : Int -> Posix -> Event -> Maybe (Html Msg)
+viewDayEvent columns day event =
+    if rangeDescription event.startTime event.endTime TimeExtra.Day day then
+        Just <| eventSegment columns event
+
+    else
+        Nothing
 
 
 viewAllDayCell : List Posix -> Html Msg
@@ -168,7 +168,7 @@ viewAllDayCell days =
         viewAllDayText =
             div [ class "calendar--all-day-text" ] [ text "All day" ]
 
-        viewAllDay day =
+        viewAllDay _ =
             div [ class "calendar--all-day" ]
                 []
     in
