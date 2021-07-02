@@ -1,12 +1,15 @@
-FROM node:13-alpine
+FROM node:13-alpine AS builder
 
 WORKDIR /app
 
 RUN npm install -g --unsafe-perm create-elm-app
 
-EXPOSE 3000
+COPY . .
 
-ENTRYPOINT [ "/usr/local/bin/elm-app" ]
+RUN /usr/local/bin/elm-app build
 
-# to compile docker run --rm -v $PWD:/app elm-compiler
-CMD [ "build" ]
+FROM nginx
+
+COPY --from=builder /app/build /usr/share/nginx/html/
+
+EXPOSE 80
